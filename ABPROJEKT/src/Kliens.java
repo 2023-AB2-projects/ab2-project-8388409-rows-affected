@@ -276,7 +276,7 @@ public class Kliens extends JFrame implements Runnable {
 //                System.out.println("Server: " + serverResponse);
 //            }
 
-            System.out.println("most kuldok");
+//            System.out.println("most kuldok");
             System.out.println(connected);
             while (connected) {
 
@@ -289,7 +289,7 @@ public class Kliens extends JFrame implements Runnable {
                 }
 
                 userInput = textArea.getText();
-                System.out.println("userInput: " + userInput);
+//                System.out.println("userInput: " + userInput);
                 out.println(userInput);
                 System.out.println("Client: " + userInput);
                 send = false;
