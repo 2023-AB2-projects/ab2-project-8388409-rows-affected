@@ -15,6 +15,7 @@ public class Host {
                 Socket clientSocket = serverSocket.accept();
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
+
         ) {
             System.out.println("Client connected: " + clientSocket.getInetAddress().getHostAddress());
 
@@ -23,7 +24,8 @@ public class Host {
 
             String inputLine;
             while (true){
-                if ((inputLine = in.readLine()) != null) {
+//                System.out.println("waiting.");
+                if ((inputLine = in.readLine()) != null && inputLine.length() > 0) {
 
                     System.out.println("Received from client: " + inputLine);
 //                    out.println("You said: " + inputLine);
@@ -31,6 +33,7 @@ public class Host {
                         break;
                     }
                 }
+
             }
 
 

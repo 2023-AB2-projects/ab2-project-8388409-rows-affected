@@ -10,14 +10,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import static java.lang.System.exit;
 
-public class Kliens extends JFrame {
+
+public class Kliens extends JFrame implements Runnable {
 
     private JTextArea textArea;
     private JTextField outText;
 
     private boolean connected = false;
     private boolean send = false;
+
 
     public Kliens() {
 
@@ -60,24 +63,27 @@ public class Kliens extends JFrame {
             System.out.println("Connect");
             if (connectionButton.getText().equals("Connect")) {
                 connectionButton.setText("Disconnect");
-                connectToServer();
+                new Thread(this).start();
                 connected = true;
             } else {
                 connectionButton.setText("Connect");
                 textArea.setText("EXIT");
                 send = true;
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
-                connected = false;
+
             }
         });
 
         exit.addActionListener(e -> {
             System.out.println("Exit");
-            System.exit(0);
+            textArea.setText("EXIT");
+            send = true;
+            try{
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            exit(0);
+
         });
 
         textArea.addKeyListener(new KeyAdapter() {
@@ -269,7 +275,9 @@ public class Kliens extends JFrame {
 //                serverResponse = in.readLine();
 //                System.out.println("Server: " + serverResponse);
 //            }
-            out.write("na szia te ize");
+
+            System.out.println("most kuldok");
+            System.out.println(connected);
             while (connected) {
 
                 while (!send){
@@ -281,9 +289,13 @@ public class Kliens extends JFrame {
                 }
 
                 userInput = textArea.getText();
-                out.write(userInput);
+                System.out.println("userInput: " + userInput);
+                out.println(userInput);
                 System.out.println("Client: " + userInput);
                 send = false;
+                if(userInput.equals("EXIT")){
+                    connected = false;
+                }
             }
         } catch (IOException e) {
             System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
@@ -296,4 +308,8 @@ public class Kliens extends JFrame {
 
     }
 
+    @Override
+    public void run() {
+        connectToServer();
+    }
 }
