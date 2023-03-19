@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -13,6 +14,7 @@ import java.net.Socket;
 public class Kliens extends JFrame {
 
     private JTextArea textArea;
+    private JTextField outText;
 
     public Kliens() {
 
@@ -23,6 +25,9 @@ public class Kliens extends JFrame {
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 20));
+
+        outText = new JTextField();
+        outText.setText("welcome friend!");
 
         setLayout(new BorderLayout());
 
@@ -122,7 +127,7 @@ public class Kliens extends JFrame {
         panel.add(gombPanel, BorderLayout.NORTH);
 
         panel.add(textArea, BorderLayout.CENTER);
-
+        panel.add(outText, BorderLayout.SOUTH);
         add(panel, BorderLayout.CENTER);
 
         setVisible(true);
