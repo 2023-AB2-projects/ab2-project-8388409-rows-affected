@@ -16,6 +16,9 @@ public class Kliens extends JFrame {
     private JTextArea textArea;
     private JTextField outText;
 
+    private boolean connected = false;
+    private boolean send = false;
+
     public Kliens() {
 
         setTitle("Kliens");
@@ -45,7 +48,7 @@ public class Kliens extends JFrame {
 
         execButton.addActionListener(e -> {
             System.out.println("Execute");
-
+            send = true;
         });
 
         clear.addActionListener(e -> {
@@ -57,8 +60,18 @@ public class Kliens extends JFrame {
             System.out.println("Connect");
             if (connectionButton.getText().equals("Connect")) {
                 connectionButton.setText("Disconnect");
+                connectToServer();
+                connected = true;
             } else {
                 connectionButton.setText("Connect");
+                textArea.setText("EXIT");
+                send = true;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
+                connected = false;
             }
         });
 
@@ -191,7 +204,7 @@ public class Kliens extends JFrame {
         SimpleAttributeSet attrs = new SimpleAttributeSet();
         StyleConstants.setForeground(attrs, Color.blue);
 
-        String newTextArea = "";
+        StringBuilder newTextArea = new StringBuilder();
 
 
         for (String line : textArea.getText().split("\n")) {
@@ -201,20 +214,20 @@ public class Kliens extends JFrame {
                 if (isSyntax(word)) {
 
 //                    set word color to blue
-                    newTextArea += word.toUpperCase() + " ";
+                    newTextArea.append(word.toUpperCase()).append(" ");
 
                 } else {
-                    newTextArea += word + " ";
+                    newTextArea.append(word).append(" ");
                 }
             }
-            newTextArea += "\n";
+            newTextArea.append("\n");
 
         }
 
-        textArea.setText(newTextArea);
+        textArea.setText(newTextArea.toString());
 
         JTextArea cTextArea = new JTextArea();
-        cTextArea.setText(newTextArea);
+        cTextArea.setText(newTextArea.toString());
         cTextArea.setForeground(Color.blue);
 
         try {
@@ -243,7 +256,6 @@ public class Kliens extends JFrame {
                 Socket clientSocket = new Socket(hostName, portNumber);
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in))
         ) {
             String userInput;
 
@@ -252,10 +264,26 @@ public class Kliens extends JFrame {
             System.out.println("Server: " + serverResponse);
 
             // Read user input from console and send to server
-            while ((userInput = stdIn.readLine()) != null) {
-                out.println(userInput);
-                serverResponse = in.readLine();
-                System.out.println("Server: " + serverResponse);
+//            while ((userInput = stdIn.readLine()) != null) {
+//                out.println(userInput);
+//                serverResponse = in.readLine();
+//                System.out.println("Server: " + serverResponse);
+//            }
+            out.write("na szia te ize");
+            while (connected) {
+
+                while (!send){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                userInput = textArea.getText();
+                out.write(userInput);
+                System.out.println("Client: " + userInput);
+                send = false;
             }
         } catch (IOException e) {
             System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
