@@ -3,6 +3,11 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 
 public class Kliens extends JFrame {
@@ -223,7 +228,30 @@ public class Kliens extends JFrame {
     }
 
     private void connectToServer() {
+        String hostName = "localhost"; // replace with your host name or IP address
+        int portNumber = 1234; // replace with your port number
 
+        try (
+                Socket clientSocket = new Socket(hostName, portNumber);
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in))
+        ) {
+            String userInput;
+
+            // Read server response and print to console
+            String serverResponse = in.readLine();
+            System.out.println("Server: " + serverResponse);
+
+            // Read user input from console and send to server
+            while ((userInput = stdIn.readLine()) != null) {
+                out.println(userInput);
+                serverResponse = in.readLine();
+                System.out.println("Server: " + serverResponse);
+            }
+        } catch (IOException e) {
+            System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
+        }
     }
 
     public static void main(String[] args) {
