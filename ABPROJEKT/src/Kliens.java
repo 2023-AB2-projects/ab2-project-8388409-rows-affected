@@ -28,7 +28,7 @@ public class Kliens extends JFrame {
 
         outText = new JTextField();
         outText.setText("welcome friend!");
-
+        outText.setBackground(new Color(154, 154, 154));
         setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
@@ -128,6 +128,7 @@ public class Kliens extends JFrame {
 
         panel.add(textArea, BorderLayout.CENTER);
         panel.add(outText, BorderLayout.SOUTH);
+
         add(panel, BorderLayout.CENTER);
 
         setVisible(true);
