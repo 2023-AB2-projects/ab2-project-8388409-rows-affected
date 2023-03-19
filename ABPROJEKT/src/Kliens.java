@@ -28,7 +28,9 @@ public class Kliens extends JFrame {
 
         outText = new JTextField();
         outText.setText("welcome friend!");
-        outText.setBackground(new Color(154, 154, 154));
+//        set border to the outText
+        outText.setBorder(BorderFactory.createLineBorder(Color.black));
+
         setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
