@@ -127,48 +127,48 @@ public class Kliens extends JFrame {
     private Boolean isSyntax(String word) {
         String w = word.toUpperCase();
         if (w.equals("SELECT"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("WHERE"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("INSERT"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("UPDATE"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("DELETE"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("CREATE"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("DROP"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("ALTER"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("TABLE"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("DATABASE"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("ON"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("FROM"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("AND"))
-            return Boolean.TRUE;
+            return true;
 
         if (w.equals("OR"))
-            return Boolean.TRUE;
+            return true;
 
-        return Boolean.FALSE;
+        return false;
 
     }
 
