@@ -19,6 +19,8 @@ public class Kliens extends JFrame implements Runnable {
     private JTextArea textArea;
     private JTextArea outText;
 
+    private JTable table;
+
     private boolean connected = false;
     private boolean send = false;
 
@@ -33,7 +35,7 @@ public class Kliens extends JFrame implements Runnable {
         setLocationRelativeTo(null);
 
         textArea = new JTextArea();
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 20));
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 15));
         textArea.setBorder(BorderFactory.createLineBorder(Color.black));
 
         JScrollPane scrollText = new JScrollPane(textArea);
@@ -44,6 +46,10 @@ public class Kliens extends JFrame implements Runnable {
         outText.setBorder(BorderFactory.createLineBorder(Color.black));
 
         JScrollPane scrollTextResp = new JScrollPane(outText);
+
+        table = new JTable();
+        JScrollPane srollTable = new JScrollPane(table);
+//        table.setBounds(0,getWidth()*(1/4),getWidth(),getWidth()*(1/4));
 
         setLayout(new BorderLayout());
 
@@ -162,6 +168,7 @@ public class Kliens extends JFrame implements Runnable {
         panel.add(gombPanel, BorderLayout.NORTH);
         panel.add(scrollText, BorderLayout.CENTER);
         panel.add(scrollTextResp, BorderLayout.SOUTH);
+        add(srollTable, BorderLayout.WEST);
         add(panel, BorderLayout.CENTER);
 
         setVisible(true);
