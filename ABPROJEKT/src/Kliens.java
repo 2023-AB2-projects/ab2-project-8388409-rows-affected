@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -16,10 +17,12 @@ import static java.lang.System.exit;
 public class Kliens extends JFrame implements Runnable {
 
     private JTextArea textArea;
-    private JTextField outText;
+    private JTextArea outText;
 
     private boolean connected = false;
     private boolean send = false;
+
+    private JButton connectionButton;
 
 
     public Kliens() {
@@ -31,10 +34,13 @@ public class Kliens extends JFrame implements Runnable {
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 20));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setBorder(BorderFactory.createLineBorder(Color.black));
 
-        outText = new JTextField();
+        outText = new JTextArea();
+        outText.setEditable(false);
         outText.setText("welcome friend!");
-//        set border to the outText
         outText.setBorder(BorderFactory.createLineBorder(Color.black));
 
         setLayout(new BorderLayout());
@@ -42,20 +48,27 @@ public class Kliens extends JFrame implements Runnable {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        connectionButton = new JButton("Connect");
         JPanel gombPanel = new JPanel();
-
         JButton execButton = new JButton("Execute");
-        JButton connectionButton = new JButton("Connect");
         JButton clear = new JButton("Clear");
         JButton exit = new JButton("Exit");
 
+        ComboBoxEditor editor = new BasicComboBoxEditor();
+        JComboBox<String> comboBox = new JComboBox<>();
+        comboBox.setEditable(true);
+        comboBox.addItem("localhost");
+
+        gombPanel.add(comboBox);
+        gombPanel.add(connectionButton);
+
         execButton.addActionListener(e -> {
-            System.out.println("Execute");
+            print("Execute");
             send = true;
         });
 
         clear.addActionListener(e -> {
-            System.out.println("Clear");
+            print("Clear");
             textArea.setText("");
         });
 
@@ -63,8 +76,8 @@ public class Kliens extends JFrame implements Runnable {
             System.out.println("Connect");
             if (connectionButton.getText().equals("Connect")) {
                 connectionButton.setText("Disconnect");
-                new Thread(this).start();
                 connected = true;
+                new Thread(this).start();
             } else {
                 connectionButton.setText("Connect");
                 textArea.setText("EXIT");
@@ -93,7 +106,6 @@ public class Kliens extends JFrame implements Runnable {
                                         super.keyReleased(e);
 
                                         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                                            textArea.append("\n ");
                                             return;
                                         }
                                         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
@@ -249,15 +261,15 @@ public class Kliens extends JFrame implements Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            print(e.getMessage());
         }
 
         textArea.setCaretPosition(textArea.getText().length() - 1);
     }
 
-    private void connectToServer() {
-        String hostName = "localhost"; // replace with your host name or IP address
-        int portNumber = 1234; // replace with your port number
-
+    private int connectToServer() {
+        String hostName = "localhost";
+        int portNumber = 1234;
         try (
                 Socket clientSocket = new Socket(hostName, portNumber);
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -267,7 +279,7 @@ public class Kliens extends JFrame implements Runnable {
 
             // Read server response and print to console
             String serverResponse = in.readLine();
-            System.out.println("Server: " + serverResponse);
+            print("Server: " + serverResponse);
 
             // Read user input from console and send to server
 //            while ((userInput = stdIn.readLine()) != null) {
@@ -277,7 +289,6 @@ public class Kliens extends JFrame implements Runnable {
 //            }
 
 //            System.out.println("most kuldok");
-            System.out.println(connected);
             while (connected) {
 
                 while (!send){
@@ -285,21 +296,32 @@ public class Kliens extends JFrame implements Runnable {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                        print(e.getMessage());
                     }
                 }
 
                 userInput = textArea.getText();
 //                System.out.println("userInput: " + userInput);
                 out.println(userInput);
-                System.out.println("Client: " + userInput);
+                print("Client: " + userInput);
                 send = false;
                 if(userInput.equals("EXIT")){
                     connected = false;
+                    return 0;
                 }
             }
         } catch (IOException e) {
             System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
+            print(e.getMessage());
         }
+        return -1;
+
+    }
+
+    private void print(String s){
+        outText.setText(outText.getText() + "\n" + s);
+        System.out.println(s);
+
     }
 
     public static void main(String[] args) {
@@ -310,6 +332,8 @@ public class Kliens extends JFrame implements Runnable {
 
     @Override
     public void run() {
-        connectToServer();
+        if (connectToServer() != 0) {
+            connectionButton.setText("Connect");
+        }
     }
 }
