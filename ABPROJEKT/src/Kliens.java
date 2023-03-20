@@ -34,14 +34,16 @@ public class Kliens extends JFrame implements Runnable {
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 20));
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
         textArea.setBorder(BorderFactory.createLineBorder(Color.black));
+
+        JScrollPane scrollText = new JScrollPane(textArea);
 
         outText = new JTextArea();
         outText.setEditable(false);
         outText.setText("welcome friend!");
         outText.setBorder(BorderFactory.createLineBorder(Color.black));
+
+        JScrollPane scrollTextResp = new JScrollPane(outText);
 
         setLayout(new BorderLayout());
 
@@ -54,13 +56,13 @@ public class Kliens extends JFrame implements Runnable {
         JButton clear = new JButton("Clear");
         JButton exit = new JButton("Exit");
 
-        ComboBoxEditor editor = new BasicComboBoxEditor();
         JComboBox<String> comboBox = new JComboBox<>();
         comboBox.setEditable(true);
         comboBox.addItem("localhost");
 
         gombPanel.add(comboBox);
         gombPanel.add(connectionButton);
+        gombPanel.setBounds(0,0,getWidth(),10);
 
         execButton.addActionListener(e -> {
             print("Execute");
@@ -158,10 +160,8 @@ public class Kliens extends JFrame implements Runnable {
 
 
         panel.add(gombPanel, BorderLayout.NORTH);
-
-        panel.add(textArea, BorderLayout.CENTER);
-        panel.add(outText, BorderLayout.SOUTH);
-
+        panel.add(scrollText, BorderLayout.CENTER);
+        panel.add(scrollTextResp, BorderLayout.SOUTH);
         add(panel, BorderLayout.CENTER);
 
         setVisible(true);
