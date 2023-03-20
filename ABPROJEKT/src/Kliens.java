@@ -294,6 +294,13 @@ public class Kliens extends JFrame implements Runnable {
                 while (!send){
                     try {
                         Thread.sleep(100);
+                        if (in.ready()){
+                            serverResponse = in.readLine();
+                            print("server: " + serverResponse);
+                        }
+//                        if ((serverResponse = in.readLine())!= null){
+//                            print(serverResponse);
+//                        }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         print(e.getMessage());
