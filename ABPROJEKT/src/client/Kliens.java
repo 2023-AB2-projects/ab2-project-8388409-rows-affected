@@ -1,6 +1,6 @@
+package client;
+
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -27,7 +27,7 @@ public class Kliens extends JFrame implements Runnable {
 
     public Kliens() {
 
-        setTitle("Kliens");
+        setTitle("client.Kliens");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 500);
         setLocationRelativeTo(null);
@@ -157,7 +157,6 @@ public class Kliens extends JFrame implements Runnable {
         gombPanel.add(clear, BorderLayout.EAST);
         gombPanel.add(connectionButton, BorderLayout.WEST);
         gombPanel.add(exit, BorderLayout.EAST);
-
 
         panel.add(gombPanel, BorderLayout.NORTH);
         panel.add(scrollText, BorderLayout.CENTER);

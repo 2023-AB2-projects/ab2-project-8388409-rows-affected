@@ -1,12 +1,17 @@
+package server;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import server.parser.Parser;
 
 public class Host {
     JSONObject catalog = new JSONObject();
+
     public void Create() {
         System.out.println("Starting server...");
 
@@ -110,10 +115,13 @@ public class Host {
                     if (inputLine.equals("EXIT")) {
                         break;
                     }
+
+                    // parse the input
+                    Parser parser = new Parser(inputLine);
+
                 }
 
             }
-
 
             System.out.println("Client disconnected.");
         } catch (IOException e) {
