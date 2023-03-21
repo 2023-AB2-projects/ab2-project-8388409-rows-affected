@@ -1,18 +1,23 @@
 package server;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-
-import org.json.simple.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import server.parser.Parser;
 
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 public class Host {
     JSONObject catalog = new JSONObject();
 
-    public void Create() {
+    public Host() {
+        Create_load_catalog();
+        Create_socket_communication();
+    }
+    private void Create_load_catalog(){
         System.out.println("Starting server...");
 
         JSONObject databases = new JSONObject();
@@ -42,6 +47,8 @@ public class Host {
             throw new RuntimeException(e);
         }
 
+    }
+    private void Create_socket_communication(){
         int portNumber = 1234; // replace with your port number
 
         try (
@@ -80,8 +87,8 @@ public class Host {
         }
     }
 
+
     public static void main(String[] args) {
         Host host = new Host();
-        host.Create();
     }
 }

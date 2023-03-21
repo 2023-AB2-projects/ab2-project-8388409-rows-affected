@@ -5,11 +5,11 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.System.exit;
 
@@ -26,6 +26,7 @@ public class Kliens extends JFrame implements Runnable {
 
     private JButton connectionButton;
 
+    private List<String> syntax;
 
     public Kliens() {
 
@@ -33,6 +34,9 @@ public class Kliens extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 500);
         setLocationRelativeTo(null);
+
+        syntax = new ArrayList<>();
+        readSyntaxFile();
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 15));
@@ -174,50 +178,26 @@ public class Kliens extends JFrame implements Runnable {
 
     }
 
+    private void readSyntaxFile(){
+
+        try(
+                BufferedReader fr = new BufferedReader(new FileReader("syntax.txt"));
+        ){
+            String line;
+            while((line = fr.readLine()) != null){
+                syntax.addAll(Arrays.asList(line.split(" ")));
+            }
+        } catch (IOException e) {
+            print("Error while reading syntax file");
+        }
+    }
     private Boolean isSyntax(String word) {
         String w = word.toUpperCase();
-        if (w.equals("SELECT"))
-            return true;
 
-        if (w.equals("WHERE"))
-            return true;
-
-        if (w.equals("INSERT"))
-            return true;
-
-        if (w.equals("UPDATE"))
-            return true;
-
-        if (w.equals("DELETE"))
-            return true;
-
-        if (w.equals("CREATE"))
-            return true;
-
-        if (w.equals("DROP"))
-            return true;
-
-        if (w.equals("ALTER"))
-            return true;
-
-        if (w.equals("TABLE"))
-            return true;
-
-        if (w.equals("DATABASE"))
-            return true;
-
-        if (w.equals("ON"))
-            return true;
-
-        if (w.equals("FROM"))
-            return true;
-
-        if (w.equals("AND"))
-            return true;
-
-        if (w.equals("OR"))
-            return true;
-
+        for (String s : syntax) {
+            if (w.equals(s))
+                return true;
+        }
         return false;
 
     }
