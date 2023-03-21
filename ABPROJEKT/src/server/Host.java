@@ -87,6 +87,9 @@ public class Host {
         }
     }
 
+    private void CREATE_DATABASE(){
+
+    }
 
     public static void main(String[] args) {
         Host host = new Host();
