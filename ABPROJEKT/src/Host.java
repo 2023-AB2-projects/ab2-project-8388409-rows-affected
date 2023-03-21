@@ -25,7 +25,6 @@ public class Host {
 //        // Creating the innermost JSONObject
 //        JSONObject uniqueAttr = new JSONObject();
 //        uniqueAttr.put("UniqueAttribute", "SpecName");
-//
 //        // Creating the innermost JSONArray
 //        JSONArray tableArray = new JSONArray();
 //        JSONObject table1 = new JSONObject();
@@ -60,6 +59,7 @@ public class Host {
 //        database.put("Tables", tables);
 
         // Creating the outermost JSONObject
+//
         JSONArray databasesArray = new JSONArray();
         databases.put("Databases", databasesArray);
 
