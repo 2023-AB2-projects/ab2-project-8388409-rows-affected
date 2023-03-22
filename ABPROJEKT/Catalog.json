@@ -1,3 +1,10 @@
 {
-  "Databases": []
+  "Databases": [
+    {
+      "Database": {
+        "Tables": [],
+        "_dataBaseName": "adatbazis"
+      }
+    }
+  ]
 }

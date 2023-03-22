@@ -17,11 +17,16 @@ public class CreateDatabase {
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
+        JSONArray databases = (JSONArray) catalog.get("Databases");
+
         JSONObject database = new JSONObject();
         JSONArray tables = new JSONArray();
-        database.put("_dataBaseName", databaseName);
-        database.put("Tables", tables);
-        JSONArray databases = (JSONArray) catalog.get("Databases");
+        JSONObject databasecontents = new JSONObject();
+        database.put("Database", databasecontents);
+        databasecontents.put("Tables", tables);
+        databasecontents.put("_dataBaseName", databaseName);
+
+
         databases.add(database);
         catalog.put("Databases", databases);
         try {
