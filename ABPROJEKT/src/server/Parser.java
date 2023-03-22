@@ -1,7 +1,5 @@
 package server;
 
-import client.Kliens;
-
 public class Parser {
     private Host host;
 
@@ -19,6 +17,7 @@ public class Parser {
                 host.setCurrentDatabase(databaseName);
                 System.out.println("databaseName: " + databaseName);
             } else {
+                host.setError("Database does not exist");
             }
         }
         if (input.contains("CREATE DATABASE")) {
