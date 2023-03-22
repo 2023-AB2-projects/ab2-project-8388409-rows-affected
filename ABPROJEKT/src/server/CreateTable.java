@@ -12,6 +12,7 @@ import java.io.Reader;
 
 public class CreateTable {
     public CreateTable(String tableName, String databaseName, String contents, Parser parser) {
+        // TODO
         JSONObject catalog;
         try {
             Reader reader = new FileReader("Catalog.json");
@@ -49,6 +50,39 @@ public class CreateTable {
             String tableNameInCatalog = (String) tableContents.get("_tableName");
             if (tableNameInCatalog.equals(tableName)) {
                 parser.setOtherError("Table already exists");
+                return;
+            }
+        }
+
+        if (contents.charAt(0) != '(' || contents.charAt(contents.length() - 1) != ')') {
+            parser.setOtherError("Invalid syntax");
+            return;
+        }
+
+        contents = contents.replace("\n", "");
+        contents = contents.substring(1, contents.length() - 1);
+        String[] attr = contents.split(",");
+
+        String[] acceptedTypes = {"int", "float", "bit", "date", "datetime", "varchar"};
+
+
+        for (int i = 0; i < attr.length; i++) {
+            attr[i] = attr[i].trim();
+            String[] splattr = attr[i].split(" ");
+            String name = splattr[0];
+            String type = splattr[1];
+
+            boolean typeOK = false;
+
+            for (String acceptedType : acceptedTypes) {
+                if (type.equals(acceptedType)) {
+                    typeOK = true;
+                    break;
+                }
+            }
+
+            if (!typeOK) {
+                parser.setOtherError("Invalid type");
                 return;
             }
         }
