@@ -1,5 +1,6 @@
 package server;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -20,7 +21,18 @@ public class DropDatabase {
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
-        catalog.remove(databaseName);
+
+        JSONArray databases = (JSONArray) catalog.get("Databases");
+        for (int i = 0; i < databases.size(); i++) {
+            JSONObject database = (JSONObject) databases.get(i);
+            JSONObject databaseContents = (JSONObject) database.get("Database");
+            String databaseNameInCatalog = (String) databaseContents.get("_dataBaseName");
+            if (databaseNameInCatalog.equals(databaseName)) {
+                databases.remove(i);
+                break;
+            }
+        }
+
         try {
             FileWriter fileWriter = new FileWriter("Catalog.json");
             fileWriter.write(catalog.toJSONString());
