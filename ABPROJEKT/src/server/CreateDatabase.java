@@ -9,14 +9,16 @@ import java.io.*;
 
 public class CreateDatabase {
     public CreateDatabase(String databaseName, String contents) {
-        JSONObject catalog = new JSONObject();
+        JSONObject catalog;
         try {
             Reader reader = new FileReader("Catalog.json");
-            catalog = (JSONObject) new JSONParser().parse(reader);
+            JSONParser jsonParser = new JSONParser();
+            catalog = (JSONObject) jsonParser.parse(reader);
             reader.close();
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
+
         JSONArray databases = (JSONArray) catalog.get("Databases");
 
         JSONObject database = new JSONObject();
