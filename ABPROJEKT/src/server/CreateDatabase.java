@@ -8,7 +8,7 @@ import org.json.simple.parser.ParseException;
 import java.io.*;
 
 public class CreateDatabase {
-    public CreateDatabase(String databaseName, String contents) {
+    public CreateDatabase(String databaseName) {
         JSONObject catalog;
         try {
             Reader reader = new FileReader("Catalog.json");

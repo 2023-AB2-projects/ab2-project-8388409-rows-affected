@@ -8,8 +8,7 @@ public class Parser {
             System.out.println("CREATE DATABASE");
             String[] split = input.split(" ");
             String databaseName = split[2];
-            String contents = split[3];
-            new CreateDatabase(databaseName, contents);
+            new CreateDatabase(databaseName);
         }
     }
 }
