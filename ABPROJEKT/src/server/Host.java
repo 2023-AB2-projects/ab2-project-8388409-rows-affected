@@ -99,7 +99,6 @@ public class Host {
                         out.println("ok");
                     }
                 }
-
             }
 
             System.out.println("Client disconnected.");

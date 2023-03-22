@@ -1,1 +1,24 @@
-{"Databases":[]}
+{
+  "Databases": [
+    {
+      "Database": {
+        "Tables": [
+          {
+            "Table": {
+              "IndexFiles": {},
+              "_rowLength": "0",
+              "PrimaryKey": {},
+              "Structure": {
+                "Attributes": []
+              },
+              "ForeignKeys": {},
+              "_fileName": "tabla.bin",
+              "_tableName": "tabla"
+            }
+          }
+        ],
+        "_dataBaseName": "ab"
+      }
+    }
+  ]
+}

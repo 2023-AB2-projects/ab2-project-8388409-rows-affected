@@ -3,6 +3,7 @@ package server;
 public class Parser {
     private Host host;
     private boolean parserError = false;
+    private String otherError = "";
     public Parser(String input, Host host) {
         this.host = host;
         System.out.println("Parser : " + input);
@@ -49,10 +50,20 @@ public class Parser {
             String[] split = input.split(" ");
             String tableName = split[2];
             String contents = split[3];
-            new CreateTable(tableName, currentDatabase, contents);
+            new CreateTable(tableName, currentDatabase, contents,this);
+
+            if (otherError.equals("")) {
+                host.setError("");
+            } else {
+                host.setError(otherError);
+                otherError = "";
+            }
         }
     }
     public void setParserError(boolean parserError) {
         this.parserError = parserError;
+    }
+    public void setOtherError(String otherError) {
+        this.otherError = otherError;
     }
 }
