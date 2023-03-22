@@ -13,19 +13,28 @@ public class Parser {
             String databaseName = split[1];
 
             new UseDatabase(databaseName,this);
-            if (!parserError) {
+            if (parserError) {
+                parserError = false;
+                host.setError("Database does not exist");
+            } else {
                 host.setCurrentDatabase(databaseName);
                 System.out.println("databaseName: " + databaseName);
-            } else {
-                host.setError("Database does not exist");
             }
         }
+
+        // CREATE DATABASE
         if (input.contains("CREATE DATABASE")) {
             System.out.println("CREATE DATABASE");
             String[] split = input.split(" ");
             String databaseName = split[2];
             new CreateDatabase(databaseName,this);
+            if (parserError) {
+                parserError = false;
+                host.setError("Database already exists");
+            }
         }
+
+        // DROP DATABASE
         if (input.contains("DROP DATABASE")) {
             System.out.println("DROP DATABASE");
             String[] split = input.split(" ");
@@ -33,8 +42,8 @@ public class Parser {
             new DropDatabase(databaseName);
         }
 
+        // CREATE TABLE
         String currentDatabase = host.getCurrentDatabase();
-
         if (input.contains("CREATE TABLE")) {
             System.out.println("CREATE TABLE");
             String[] split = input.split(" ");

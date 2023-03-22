@@ -92,7 +92,7 @@ public class Host {
                     // parse the input
                     Parser parser = new Parser(inputLine, this);
                     if (error.length() > 0) {
-                        out.println(error);
+                        out.println("ERROR: " + error);
                         error = "";
                     }
                     else {

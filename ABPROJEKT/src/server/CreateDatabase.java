@@ -27,11 +27,20 @@ public class CreateDatabase {
             String databaseNameInCatalog = (String) databaseContents.get("_dataBaseName");
             if (databaseNameInCatalog.equals(databaseName)) {
                 parser.setParserError(true);
+                try {
+                    FileWriter fileWriter = new FileWriter("Catalog.json");
+                    fileWriter.write(catalog.toJSONString());
+                    fileWriter.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 return;
             }
         }
 
-        databases.add(catalog.get("Databases"));
+//        databases.add(catalog.get("Databases"));
+
+        databases = (JSONArray) catalog.get("Databases");
 
         JSONObject database = new JSONObject();
         JSONArray tables = new JSONArray();
