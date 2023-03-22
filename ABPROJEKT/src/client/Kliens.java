@@ -13,7 +13,6 @@ public class Kliens extends JFrame implements Runnable {
 
     private JTextArea textArea;
     private JTextArea outText;
-
     private JTable table;
 
     private boolean connected = false;

@@ -23,7 +23,6 @@ public class Syntax {
     }
 
     private void readSyntaxFile() {
-
         try (
                 BufferedReader fr = new BufferedReader(new FileReader("syntax.txt"));
         ) {
@@ -38,7 +37,6 @@ public class Syntax {
 
     private Boolean isSyntax(String word) {
         String w = word.toUpperCase();
-
         for (String s : syntax) {
             if (w.equals(s))
                 return true;

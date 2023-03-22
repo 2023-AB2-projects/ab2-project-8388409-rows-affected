@@ -10,13 +10,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Host {
-    JSONObject catalog = new JSONObject();
+    private JSONObject catalog = new JSONObject();
+    private String currentDatabase = "";
 
     public Host() {
         Create_load_catalog();
         Create_socket_communication();
     }
-    private void Create_load_catalog(){
+
+    private void Create_load_catalog() {
         System.out.println("Starting server...");
 
         JSONObject databases = new JSONObject();
@@ -85,7 +87,7 @@ public class Host {
                     }
 
                     // parse the input
-                    Parser parser = new Parser(inputLine);
+                    Parser parser = new Parser(inputLine, this);
 
                 }
 
@@ -97,8 +99,8 @@ public class Host {
         }
     }
 
-    private void CREATE_DATABASE(){
-
+    public void setCurrentDatabase(String currentDatabase) {
+        this.currentDatabase = currentDatabase;
     }
 
     public static void main(String[] args) {
