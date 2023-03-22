@@ -20,7 +20,7 @@ public class CreateDatabase {
         }
 
         JSONArray databases = new JSONArray();
-        databases = (JSONArray) catalog.get("Databases");
+        databases.add(catalog.get("Databases"));
 
         JSONObject database = new JSONObject();
         JSONArray tables = new JSONArray();
@@ -28,6 +28,7 @@ public class CreateDatabase {
         database.put("Database", databasecontents);
         databasecontents.put("Tables", tables);
         databasecontents.put("_dataBaseName", databaseName);
+
 
         databases.add(database);
         catalog.put("Databases", databases);
