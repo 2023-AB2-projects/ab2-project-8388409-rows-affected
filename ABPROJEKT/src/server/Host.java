@@ -13,7 +13,10 @@ public class Host {
     private JSONObject catalog = new JSONObject();
     private String currentDatabase = "";
 
+    private String error;
+
     public Host() {
+        error = "";
         Create_load_catalog();
         Create_socket_communication();
     }
@@ -88,7 +91,13 @@ public class Host {
 
                     // parse the input
                     Parser parser = new Parser(inputLine, this);
-
+                    if (error.length() > 0) {
+                        out.println(error);
+                        error = "";
+                    }
+                    else {
+                        out.println("ok");
+                    }
                 }
 
             }
@@ -97,6 +106,10 @@ public class Host {
         } catch (IOException e) {
             System.err.println("Exception caught when trying to listen on port " + portNumber + " or listening for a connection: " + e.getMessage());
         }
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 
     public void setCurrentDatabase(String currentDatabase) {
