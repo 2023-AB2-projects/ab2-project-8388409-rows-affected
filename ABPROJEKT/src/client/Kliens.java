@@ -25,8 +25,7 @@ public class Kliens extends JFrame implements Runnable {
     private boolean send = false;
 
     private JButton connectionButton;
-
-    private List<String> syntax;
+    private Syntax syntax;
 
     public Kliens() {
 
@@ -35,8 +34,7 @@ public class Kliens extends JFrame implements Runnable {
         setSize(800, 500);
         setLocationRelativeTo(null);
 
-        syntax = new ArrayList<>();
-        readSyntaxFile();
+        syntax = new Syntax(this);
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 15));
@@ -158,7 +156,7 @@ public class Kliens extends JFrame implements Runnable {
                                         }
 
                                         if (e.getKeyCode() == KeyEvent.VK_SPACE)
-                                            syntaxHighlighting();
+                                            syntax.syntaxHighlighting();
                                     }
                                 }
         );
@@ -177,82 +175,6 @@ public class Kliens extends JFrame implements Runnable {
         setVisible(true);
 
     }
-
-    private void readSyntaxFile(){
-
-        try(
-                BufferedReader fr = new BufferedReader(new FileReader("syntax.txt"));
-        ){
-            String line;
-            while((line = fr.readLine()) != null){
-                syntax.addAll(Arrays.asList(line.split(" ")));
-            }
-        } catch (IOException e) {
-            print("Error while reading syntax file");
-        }
-    }
-    private Boolean isSyntax(String word) {
-        String w = word.toUpperCase();
-
-        for (String s : syntax) {
-            if (w.equals(s))
-                return true;
-        }
-        return false;
-
-    }
-
-    private void syntaxHighlighting() {
-        // TODO
-
-        SimpleAttributeSet attrs = new SimpleAttributeSet();
-        StyleConstants.setForeground(attrs, Color.blue);
-
-        StringBuilder newTextArea = new StringBuilder();
-
-
-        for (String line : textArea.getText().split("\n")) {
-            System.out.println(line);
-
-            for (String word : line.split(" ")) {
-                if (isSyntax(word)) {
-
-//                    set word color to blue
-                    newTextArea.append(word.toUpperCase()).append(" ");
-
-                } else {
-                    newTextArea.append(word).append(" ");
-                }
-            }
-            newTextArea.append("\n");
-
-        }
-
-        textArea.setText(newTextArea.toString());
-
-        JTextArea cTextArea = new JTextArea();
-        cTextArea.setText(newTextArea.toString());
-        cTextArea.setForeground(Color.blue);
-
-        try {
-            for (String line : cTextArea.getText().split("\n")) {
-                System.out.println(line);
-
-                for (String word : line.split(" ")) {
-
-                    if (isSyntax(word)) {
-                        textArea.getHighlighter().addHighlight(textArea.getText().indexOf(word), textArea.getText().indexOf(word) + word.length(), new DefaultHighlighter.DefaultHighlightPainter(new Color(173, 255, 177)));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            print(e.getMessage());
-        }
-
-        textArea.setCaretPosition(textArea.getText().length() - 1);
-    }
-
     private int connectToServer() {
         String hostName = "localhost";
         int portNumber = 1234;
@@ -311,10 +233,9 @@ public class Kliens extends JFrame implements Runnable {
 
     }
 
-    private void print(String s){
+    public void print(String s) {
         outText.setText(outText.getText() + "\n" + s);
         System.out.println(s);
-
     }
 
     public static void main(String[] args) {
@@ -329,4 +250,13 @@ public class Kliens extends JFrame implements Runnable {
             connectionButton.setText("Connect");
         }
     }
+
+    public JTextArea getTextArea() {
+        return textArea;
+    }
+
+    public void setTextArea(String text) {
+        this.textArea.setText(text);
+    }
 }
+
