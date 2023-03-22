@@ -19,7 +19,8 @@ public class CreateDatabase {
             throw new RuntimeException(e);
         }
 
-        JSONArray databases = (JSONArray) catalog.get("Databases");
+        JSONArray databases = new JSONArray();
+        databases.add(catalog.get("Databases"));
 
         JSONObject database = new JSONObject();
         JSONArray tables = new JSONArray();
