@@ -159,7 +159,7 @@ public class Kliens extends JFrame implements Runnable {
                         Thread.sleep(100);
                         if (in.ready()){
                             serverResponse = in.readLine();
-                            print("server: " + serverResponse);
+                            print("Server: " + serverResponse);
                         }
 //                        if ((serverResponse = in.readLine())!= null){
 //                            print(serverResponse);
