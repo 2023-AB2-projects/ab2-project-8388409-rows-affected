@@ -110,48 +110,12 @@ public class Kliens extends JFrame implements Runnable {
 
                                         super.keyReleased(e);
 
-                                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_ALT) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_CAPS_LOCK) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_TAB) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_UP) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                                            return;
-                                        }
-                                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                                            return;
-                                        }
 
                                         if (e.getKeyCode() == KeyEvent.VK_SPACE)
                                             syntax.syntaxHighlighting();
+                                        if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                                            syntax.syntaxHighlighting();
+                                        return;
                                     }
                                 }
         );
