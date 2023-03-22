@@ -16,9 +16,9 @@ public class Parser {
             if (parserError) {
                 parserError = false;
                 host.setError("Database does not exist");
+                host.setCurrentDatabase("");
             } else {
                 host.setCurrentDatabase(databaseName);
-                System.out.println("databaseName: " + databaseName);
             }
         }
 

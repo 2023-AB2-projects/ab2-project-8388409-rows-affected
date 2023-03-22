@@ -30,9 +30,9 @@ public class UseDatabase {
             JSONObject databaseContents = (JSONObject) databaseObject.get("Database");
             String databaseNameInCatalog = (String) databaseContents.get("_dataBaseName");
             if (databaseNameInCatalog.equals(currentDatabase)) {
-                parser.setParserError(true);
+                parser.setParserError(false);
                 return;
             }
         }
-    }
+        parser.setParserError(true);}
 }
