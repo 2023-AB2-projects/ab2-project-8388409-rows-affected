@@ -32,12 +32,15 @@ public class Parser {
             String databaseName = split[2];
             new DropDatabase(databaseName);
         }
+
+        String currentDatabase = host.getCurrentDatabase();
+
         if (input.contains("CREATE TABLE")) {
             System.out.println("CREATE TABLE");
             String[] split = input.split(" ");
             String tableName = split[2];
-            String databaseName = split[4];
-            new CreateTable(tableName, databaseName);
+            String contents = split[3];
+            new CreateTable(tableName, currentDatabase, contents);
         }
     }
 }

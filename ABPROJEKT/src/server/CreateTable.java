@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class CreateTable {
-    public CreateTable(String tableName, String databaseName) {
+    public CreateTable(String tableName, String databaseName, String contents) {
         JSONObject catalog;
         try {
             Reader reader = new FileReader("Catalog.json");

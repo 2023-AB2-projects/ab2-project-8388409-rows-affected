@@ -116,6 +116,10 @@ public class Host {
         this.currentDatabase = currentDatabase;
     }
 
+    public String getCurrentDatabase() {
+        return currentDatabase;
+    }
+
     public static void main(String[] args) {
         Host host = new Host();
     }
