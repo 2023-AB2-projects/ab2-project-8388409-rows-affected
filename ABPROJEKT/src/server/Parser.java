@@ -14,14 +14,12 @@ public class Parser {
             String[] split = input.split(" ");
             String databaseName = split[1];
 
-            boolean ok = new UseDatabase().databaseExists(databaseName);
-            if (ok) {
+            boolean dbExists = new UseDatabase().databaseExists(databaseName);
+            if (dbExists) {
                 host.setCurrentDatabase(databaseName);
                 System.out.println("databaseName: " + databaseName);
+            } else {
             }
-//            else {
-//                host.
-//            }
         }
         if (input.contains("CREATE DATABASE")) {
             System.out.println("CREATE DATABASE");
