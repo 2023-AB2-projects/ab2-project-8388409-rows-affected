@@ -2,7 +2,7 @@ package server;
 
 public class Parser {
     private Host host;
-
+    private boolean parserError = false;
     public Parser(String input, Host host) {
         this.host = host;
         System.out.println("Parser : " + input);
@@ -12,8 +12,8 @@ public class Parser {
             String[] split = input.split(" ");
             String databaseName = split[1];
 
-            boolean dbExists = new UseDatabase().databaseExists(databaseName);
-            if (dbExists) {
+            new UseDatabase(databaseName,this);
+            if (!parserError) {
                 host.setCurrentDatabase(databaseName);
                 System.out.println("databaseName: " + databaseName);
             } else {
@@ -24,7 +24,7 @@ public class Parser {
             System.out.println("CREATE DATABASE");
             String[] split = input.split(" ");
             String databaseName = split[2];
-            new CreateDatabase(databaseName);
+            new CreateDatabase(databaseName,this);
         }
         if (input.contains("DROP DATABASE")) {
             System.out.println("DROP DATABASE");
@@ -42,5 +42,8 @@ public class Parser {
             String contents = split[3];
             new CreateTable(tableName, currentDatabase, contents);
         }
+    }
+    public void setParserError(boolean parserError) {
+        this.parserError = parserError;
     }
 }

@@ -11,7 +11,7 @@ import java.io.Reader;
 
 public class UseDatabase {
 
-    public boolean databaseExists(String currentDatabase) {
+    public UseDatabase(String currentDatabase,Parser parser) {
 
         JSONObject catalog;
         try {
@@ -30,9 +30,9 @@ public class UseDatabase {
             JSONObject databaseContents = (JSONObject) databaseObject.get("Database");
             String databaseNameInCatalog = (String) databaseContents.get("_dataBaseName");
             if (databaseNameInCatalog.equals(currentDatabase)) {
-                return true;
+                parser.setParserError(true);
+                return;
             }
         }
-        return false;
     }
 }

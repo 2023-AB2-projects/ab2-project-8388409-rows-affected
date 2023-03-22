@@ -8,7 +8,7 @@ import org.json.simple.parser.ParseException;
 import java.io.*;
 
 public class CreateDatabase {
-    public CreateDatabase(String databaseName) {
+    public CreateDatabase(String databaseName, Parser parser) {
         JSONObject catalog;
         try {
             Reader reader = new FileReader("Catalog.json");
@@ -19,7 +19,18 @@ public class CreateDatabase {
             throw new RuntimeException(e);
         }
 
-        JSONArray databases = new JSONArray();
+        JSONArray databases = (JSONArray) catalog.get("Databases");
+
+        for (int i = 0; i < databases.size(); i++) {
+            JSONObject database = (JSONObject) databases.get(i);
+            JSONObject databaseContents = (JSONObject) database.get("Database");
+            String databaseNameInCatalog = (String) databaseContents.get("_dataBaseName");
+            if (databaseNameInCatalog.equals(databaseName)) {
+                parser.setParserError(true);
+                return;
+            }
+        }
+
         databases.add(catalog.get("Databases"));
 
         JSONObject database = new JSONObject();
