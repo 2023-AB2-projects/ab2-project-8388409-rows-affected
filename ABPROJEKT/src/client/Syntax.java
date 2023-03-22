@@ -68,10 +68,13 @@ public class Syntax {
                 } else {
                     newTextArea.append(word).append(" ");
                 }
+
             }
-            newTextArea.append("\n");
+        newTextArea.append("\n");
 
         }
+
+        newTextArea.deleteCharAt(newTextArea.length() - 1);
 
         textArea.setText(newTextArea.toString());
 
@@ -95,6 +98,6 @@ public class Syntax {
             kliens.print(e.getMessage());
         }
 
-        textArea.setCaretPosition(textArea.getText().length() - 1);
+//        textArea.setCaretPosition(textArea.getText().length() - 1);
     }
 }

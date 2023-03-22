@@ -111,8 +111,6 @@ public class Kliens extends JFrame implements Runnable {
 
                                         if (e.getKeyCode() == KeyEvent.VK_SPACE)
                                             syntax.syntaxHighlighting();
-                                        if (e.getKeyCode() == KeyEvent.VK_ENTER)
-                                            syntax.syntaxHighlighting();
 
                                     }
                                 }
