@@ -27,13 +27,6 @@ public class Host {
         try {
             Reader reader = new FileReader("Catalog.json");
             catalog = (JSONObject) new JSONParser().parse(reader);
-            // if empty, initialize
-            if (catalog.isEmpty()) {
-                reader.close();
-                FileWriter fileWriter = new FileWriter("Catalog.json");
-                fileWriter.write(databases.toJSONString());
-                fileWriter.close();
-            }
         } catch (FileNotFoundException e) {
             try {
                 FileWriter fileWriter = new FileWriter("Catalog.json");
@@ -42,7 +35,25 @@ public class Host {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-        } catch (IOException | ParseException e) {
+        } catch (ParseException e) {
+            System.out.println("Catalog is empty, initializing...");
+            FileWriter fileWriter = null;
+            try {
+                fileWriter = new FileWriter("Catalog.json");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            try {
+                fileWriter.write(databases.toJSONString());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            try {
+                fileWriter.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 

@@ -1,15 +1,17 @@
 package server;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
 
-public class CreateDatabase {
-    public CreateDatabase(String databaseName) {
-        JSONObject catalog;
+public class DropDatabase {
+    public DropDatabase(String databaseName) {
+        JSONObject catalog = new JSONObject();
         try {
             Reader reader = new FileReader("Catalog.json");
             JSONParser jsonParser = new JSONParser();
@@ -18,19 +20,7 @@ public class CreateDatabase {
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
-
-        JSONArray databases = new JSONArray();
-        databases = (JSONArray) catalog.get("Databases");
-
-        JSONObject database = new JSONObject();
-        JSONArray tables = new JSONArray();
-        JSONObject databasecontents = new JSONObject();
-        database.put("Database", databasecontents);
-        databasecontents.put("Tables", tables);
-        databasecontents.put("_dataBaseName", databaseName);
-
-        databases.add(database);
-        catalog.put("Databases", databases);
+        catalog.remove(databaseName);
         try {
             FileWriter fileWriter = new FileWriter("Catalog.json");
             fileWriter.write(catalog.toJSONString());
