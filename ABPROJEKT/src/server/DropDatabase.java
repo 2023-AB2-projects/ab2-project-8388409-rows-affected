@@ -23,6 +23,7 @@ public class DropDatabase {
         }
 
         JSONArray databases = (JSONArray) catalog.get("Databases");
+
         for (int i = 0; i < databases.size(); i++) {
             JSONObject database = (JSONObject) databases.get(i);
             JSONObject databaseContents = (JSONObject) database.get("Database");
