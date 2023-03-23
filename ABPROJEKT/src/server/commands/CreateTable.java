@@ -67,6 +67,12 @@ public class CreateTable {
         contents = contents.replace("\n", "");
         contents = contents.trim();
 
+        if (!contents.contains("(") || !contents.contains(")")
+                || contents.indexOf('(') > contents.indexOf(')')) {
+            parser.setOtherError("Invalid syntax");
+            return;
+        }
+
         // Check if the syntax is correct (...)
         if (contents.charAt(0) != '(' || contents.charAt(contents.length() - 1) != ')') {
             parser.setOtherError("Invalid syntax");

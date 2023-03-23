@@ -1,1 +1,1 @@
-{"Databases":[{"Database":{"Tables":[],"_dataBaseName":"ab"}}]}
+{"Databases":[{"Database":{"Tables":[{"Table":{"IndexFiles":{},"_rowLength":"0","uniqueKeys":[],"PrimaryKeys":[],"Structure":{"Attributes":[{"_attributeName":"index","_isnull":"0","_type":"int"}]},"ForeignKeys":[],"_fileName":"tbl.bin","_tableName":"tbl"}}],"_dataBaseName":"ab"}}]}
