@@ -1,5 +1,7 @@
 package server;
 
+import server.commands.*;
+
 public class Parser {
     private Host host;
     private boolean parserError = false;
