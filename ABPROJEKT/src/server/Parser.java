@@ -45,7 +45,7 @@ public class Parser {
                 host.setError("Database already exists");
             }
             else {
-                new UseDatabase(databaseName,this);
+                host.setCurrentDatabase(databaseName);
             }
         }
 
