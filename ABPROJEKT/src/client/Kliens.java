@@ -144,14 +144,7 @@ public class Kliens extends JFrame implements Runnable {
             String serverResponse = in.readLine();
             print("Server: " + serverResponse);
 
-            // Read user input from console and send to server
-//            while ((userInput = stdIn.readLine()) != null) {
-//                out.println(userInput);
-//                serverResponse = in.readLine();
-//                System.out.println("Server: " + serverResponse);
-//            }
 
-//            System.out.println("most kuldok");
             while (connected) {
 
                 while (!send){
@@ -161,9 +154,7 @@ public class Kliens extends JFrame implements Runnable {
                             serverResponse = in.readLine();
                             print("Server: " + serverResponse);
                         }
-//                        if ((serverResponse = in.readLine())!= null){
-//                            print(serverResponse);
-//                        }
+
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         print(e.getMessage());
@@ -171,7 +162,6 @@ public class Kliens extends JFrame implements Runnable {
                 }
 
                 userInput = textArea.getText();
-//                System.out.println("userInput: " + userInput);
                 out.println(userInput);
                 print("Client: " + userInput);
                 send = false;
