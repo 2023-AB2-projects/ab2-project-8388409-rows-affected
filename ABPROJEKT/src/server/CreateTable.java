@@ -110,6 +110,7 @@ public class CreateTable {
 
             }
 
+
             // check if type is valid
             if (!isAcceptedType(type)) {
                 parser.setOtherError("Invalid type");
@@ -136,30 +137,50 @@ public class CreateTable {
         JSONArray attributes = new JSONArray();
         structure.put("Attributes", attributes);
 
+        tableContents.put("Structure", structure);
+        JSONObject primaryKey = new JSONObject();
+        tableContents.put("PrimaryKey", primaryKey);
+
+//        JSONObject IndexFiles = new JSONObject();
+//        tableContents.put("IndexFiles", IndexFiles);
+
+        System.out.println("|=> attributes:" + attributes);
+
         for (int i = 0; i < attr.length; i++) {
             attr[i] = attr[i].trim();
+
+            System.out.println("|=> attr[i]:" + attr[i]);
+
             String[] splattr = attr[i].split(" ");
             String name = splattr[0];
             String type = splattr[1];
+
 
             JSONObject attribute = new JSONObject();
             attribute.put("_attributeName", name);
             attribute.put("_type", type);
             attribute.put("_isnull", "0");
+
             attributes.add(attribute);
+
+            if (attr[i].toUpperCase().contains("PRIMARY KEY")) {
+                primaryKey.put("pkAttribute", name);
+            }
+            if (attr[i].toUpperCase().contains("FOREIGN KEY")) {
+                JSONObject foreignKeys = new JSONObject();
+                tableContents.put("ForeignKeys", foreignKeys);
+                primaryKey.put("pkAttribute", name);
+            }
+
+
+
         }
 
 
 
 
 
-        tableContents.put("Structure", structure);
-        JSONObject primaryKey = new JSONObject();
-        tableContents.put("PrimaryKey", primaryKey);
-        JSONObject foreignKeys = new JSONObject();
-        tableContents.put("ForeignKeys", foreignKeys);
-        JSONObject IndexFiles = new JSONObject();
-        tableContents.put("IndexFiles", IndexFiles);
+
         tableContents.put("_tableName", tableName);
         tableContents.put("_fileName", tableName + ".bin");
         tableContents.put("_rowLength", "0");

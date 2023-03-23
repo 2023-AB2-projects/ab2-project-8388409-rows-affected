@@ -47,8 +47,11 @@ public class Syntax {
 
     public void syntaxHighlighting() {
         // TODO
+//        save cursors position
 
         JTextArea textArea = kliens.getTextArea();
+        int poz = textArea.getCaretPosition();
+
 
         SimpleAttributeSet attrs = new SimpleAttributeSet();
         StyleConstants.setForeground(attrs, Color.blue);
@@ -70,7 +73,7 @@ public class Syntax {
                 }
 
             }
-        newTextArea.append("\n");
+            newTextArea.append("\n");
 
         }
 
@@ -98,6 +101,6 @@ public class Syntax {
             kliens.print(e.getMessage());
         }
 
-//        textArea.setCaretPosition(textArea.getText().length() - 1);
+        textArea.setCaretPosition(poz);
     }
 }
