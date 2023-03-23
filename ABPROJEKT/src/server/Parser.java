@@ -8,6 +8,7 @@ public class Parser {
         this.host = host;
         System.out.println("Parser : " + input);
 
+        // USE
         if (input.contains("USE")) {
             System.out.println("USE");
             String[] split = input.split(" ");

@@ -66,8 +66,6 @@ public class CreateTable {
         contents = contents.replace("\n", "");
         contents = contents.trim();
 
-        System.out.println("contents: "+ contents);
-
         // Check if the syntax is correct (...)
         if (contents.charAt(0) != '(' || contents.charAt(contents.length() - 1) != ')') {
             parser.setOtherError("Invalid syntax");
@@ -75,6 +73,10 @@ public class CreateTable {
         }
 
         contents = contents.substring(1, contents.length() - 1);
+        contents = contents.trim();
+
+        System.out.println("Contents: " + contents);
+
         String[] attr = contents.split(",");
 
         for (int i = 0; i < attr.length; i++) {
@@ -137,6 +139,7 @@ public class CreateTable {
 
         for (int i = 0; i < attr.length; i++) {
             attr[i] = attr[i].trim();
+            System.out.println("attr["+i+"]: " + attr[i]);
             String[] splattr = attr[i].split(" ");
             String name = splattr[0];
             String type = splattr[1];
@@ -146,14 +149,80 @@ public class CreateTable {
             }
             other = other.trim();
 
+            System.out.println("other: " + other);
+
             if (other.toUpperCase().contains("PRIMARY KEY")) {
                 JSONObject primaryKey = new JSONObject();
                 primaryKey.put("pkAttribute", name);
                 primaryKeys.add(primaryKey);
             } else if (other.toUpperCase().contains("FOREIGN KEY")) {
+                //other foreign key stucture: FOREIGN KEY REFERENCES Persons(PersonID)
+
+                // if other doesn't contain () then it's invalid
+                if (!other.contains("(") || !other.contains(")")) {
+                    parser.setOtherError("Invalid syntax: ...tablname --> ( or ) is missing");
+                    return;
+                }
+
                 String[] spl = other.split(" ");
-                String refTable = spl[2];
-                String refAttr = spl[4];
+                for (int s=0; s<spl.length; s++) {
+                    System.out.println("spl["+s+"]: " + spl[s]);
+                }
+
+                // check if the structure is correct
+                if (spl.length != 4) {
+                    parser.setOtherError("Invalid other: incorrect foreign key syntax");
+                    return;
+                }
+
+                // check if () is present
+                if (!spl[3].contains("(") || !spl[3].contains(")")) {
+                    parser.setOtherError("Invalid other: () is missing");
+                    return;
+                }
+
+                String refTableandattr = spl[3];
+
+                String refTable = refTableandattr.substring(0, refTableandattr.indexOf("("));
+                String refAttr = refTableandattr.substring(refTableandattr.indexOf("(") + 1, refTableandattr.indexOf(")"));
+
+                // check if refTable exists
+                boolean refTableExists = false;
+                for (int j = 0; j < tables.size(); j++) {
+                    JSONObject table2 = (JSONObject) tables.get(j);
+                    JSONObject tableContents2 = (JSONObject) table2.get("Table");
+                    String tableNameInCatalog = (String) tableContents2.get("_tableName");
+                    if (tableNameInCatalog.equals(refTable)) {
+                        refTableExists = true;
+                        break;
+                    }
+                }
+                if (!refTableExists) {
+                    parser.setOtherError("Referenced table does not exist");
+                    return;
+                }
+
+                // check if refAttr exists in refTable
+                boolean refAttrExists = false;
+                for (int j = 0; j < tables.size(); j++) {
+                    JSONObject table2 = (JSONObject) tables.get(j);
+                    JSONObject tableContents2 = (JSONObject) table2.get("Table");
+                    String tableNameInCatalog = (String) tableContents2.get("_tableName");
+                    if (tableNameInCatalog.equals(refTable)) {
+                        JSONObject structure2 = (JSONObject) tableContents2.get("Structure");
+                        JSONArray attributes2 = (JSONArray) structure2.get("Attributes");
+                        for (int k = 0; k < attributes2.size(); k++) {
+                            JSONObject attribute2 = (JSONObject) attributes2.get(k);
+                            String attributeName = (String) attribute2.get("_attributeName");
+                            if (attributeName.equals(refAttr)) {
+                                refAttrExists = true;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+
                 JSONObject foreignKey = new JSONObject();
                 foreignKey.put("fkAttribute", name);
                 foreignKey.put("fkRefTable", refTable);
