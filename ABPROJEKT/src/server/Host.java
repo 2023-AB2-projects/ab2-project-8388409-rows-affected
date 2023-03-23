@@ -8,15 +8,29 @@ import org.json.simple.parser.ParseException;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Host {
     private JSONObject catalog = new JSONObject();
     private String currentDatabase = "";
 
     private String error;
+    private List<String> elvSzavak;
+    private  String acc;
+
+    private String answer = "";
 
     public Host() {
+
+        elvSzavak = new ArrayList<>();
+        elvSzavak.add("USE");
+        elvSzavak.add("CREATE");
+        elvSzavak.add("DROP");
         error = "";
+        acc = "";
+
         Create_load_catalog();
         Create_socket_communication();
     }
@@ -63,7 +77,8 @@ public class Host {
         }
 
     }
-    private void Create_socket_communication(){
+
+    private void Create_socket_communication() {
         int portNumber = 1234; // replace with your port number
 
         try (
@@ -79,25 +94,23 @@ public class Host {
             out.println("Welcome to the server!");
 
             String inputLine;
-            while (true){
-//                System.out.println("waiting.");
+
+            while (true) {
                 if ((inputLine = in.readLine()) != null && inputLine.length() > 0) {
 
-                    System.out.println("Received from client: " + inputLine);
-//                    out.println("You said: " + inputLine);
                     if (inputLine.equals("EXIT")) {
                         break;
                     }
 
-                    // parse the input
-                    Parser parser = new Parser(inputLine, this);
-                    if (error.length() > 0) {
-                        out.println("ERROR: " + error);
-                        error = "";
-                    }
-                    else {
-                        out.println("ok");
-                    }
+                    darabol(inputLine);
+                    response(out);
+//                    new Parser(inputLine, this);
+//                    if (error.length() > 0) {
+//                        out.println("ERROR: " + error);
+//                        error = "";
+//                    } else {
+//                        out.println("ok");
+//                    }
                 }
             }
 
@@ -105,6 +118,89 @@ public class Host {
         } catch (IOException e) {
             System.err.println("Exception caught when trying to listen on port " + portNumber + " or listening for a connection: " + e.getMessage());
         }
+    }
+    public void response(PrintWriter out)
+    {
+        if (error.length() > 0) {
+            out.println("ERROR: " + error);
+            error = "";
+            answer = "";
+        } else {
+            if (answer.length() > 0) {
+                out.println("ANSWER: " + answer);
+                answer = "";
+            }
+        }
+    }
+    String reformatParserInput(String fullInput)
+    {
+        fullInput = fullInput.trim();
+//                    remove extra spaces
+        fullInput = fullInput.replaceAll("\\s+", " ");
+//                    replace tabs with spaces
+        fullInput = fullInput.replaceAll("\\t", " ");
+//                    if ( has no space  after it, add one
+        fullInput = fullInput.replaceAll("([^\\s])\\(", "$1 (");
+//                     if ( has no space before it, add one
+        fullInput = fullInput.replaceAll("\\)([^\\s])", ") $1");
+//                    if ) has no space after it, add one
+        fullInput = fullInput.replaceAll("\\)\\(", ") (");
+//                    if ) has no space before it, add one
+        fullInput = fullInput.replaceAll("\\)\\(", ") (");
+        return fullInput;
+    }
+    public void darabol(String input) {
+
+
+        StringBuilder command = new StringBuilder();
+        String[] words = input.split(" ");
+        int command_length = 0;
+        if (!Objects.equals(acc, "")) {
+            command_length = acc.length();
+        }
+
+
+        for (int i = 0; i < words.length; i++) {
+
+//            System.out.println("command_length: " + command_length);
+
+            if (elvSzavak.contains(words[i].trim().toUpperCase())) {
+                if (command_length > 0) {
+
+                    String fullInput = (acc + command);
+                    fullInput = reformatParserInput(fullInput);
+
+                    System.out.println("|=> parsed command: " + fullInput);
+                    new Parser(fullInput, this);
+                    answer = fullInput.split(" ")[0]+" "+fullInput.split(" ")[1]+fullInput.split(" ")[1]+"ok";
+                    acc = "";
+                    command = new StringBuilder();
+                } else {
+                    System.out.println("adding STRONG word: " + words[i]);
+                    command = new StringBuilder();
+                }
+
+                command_length = 0;
+
+            }
+            if(words[i].equals("__end_of_file__"))
+            {
+                String fullInput = (acc + command);
+                fullInput = reformatParserInput(fullInput);
+
+                System.out.println("|=> parsed command: " + fullInput);
+                new Parser(fullInput, this);
+                answer = fullInput.split(" ")[0]+" "+fullInput.split(" ")[1]+fullInput.split(" ")[1]+"ok";
+                acc = "";
+                break;
+            }
+            command.append(" ").append(words[i]);
+            command_length += words[i].length() + 1;
+
+        }
+
+        acc += command.toString();
+
     }
 
     public void setError(String error) {
