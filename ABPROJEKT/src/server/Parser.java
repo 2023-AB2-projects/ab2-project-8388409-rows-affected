@@ -49,8 +49,13 @@ public class Parser {
             System.out.println("CREATE TABLE");
             String[] split = input.split(" ");
             String tableName = split[2];
-            String contents = split[3];
-            new CreateTable(tableName, currentDatabase, contents,this);
+            StringBuilder contents = new StringBuilder();
+            // TODO if split length <= 2 error
+            for (int i = 3; i < split.length; i++) {
+                contents.append(split[i]);
+            }
+
+            new CreateTable(tableName, currentDatabase, contents.toString(),this);
 
             if (otherError.equals("")) {
                 host.setError("");

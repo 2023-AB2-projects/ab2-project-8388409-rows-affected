@@ -11,8 +11,16 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class CreateTable {
+    private boolean isAcceptedType(String type) {
+        String[] acceptedTypes = {"int", "float", "bit", "date", "datetime", "varchar"};
+        for (String acceptedType : acceptedTypes) {
+            if (type.equals(acceptedType)) {
+                return true;
+            }
+        }
+        return false;
+    }
     public CreateTable(String tableName, String databaseName, String contents, Parser parser) {
-        // TODO
         JSONObject catalog;
         try {
             Reader reader = new FileReader("Catalog.json");
@@ -26,6 +34,7 @@ public class CreateTable {
         JSONObject myDatabase = null;
         JSONArray databases = (JSONArray) catalog.get("Databases");
 
+        // Get the database
         for (int i = 0; i < databases.size(); i++) {
             JSONObject database = (JSONObject) databases.get(i);
             JSONObject databaseContents = (JSONObject) database.get("Database");
@@ -35,7 +44,6 @@ public class CreateTable {
                 break;
             }
         }
-
         if (myDatabase == null) {
             parser.setOtherError("Database does not exist");
             return;
@@ -44,6 +52,7 @@ public class CreateTable {
         JSONObject databaseContents = (JSONObject) myDatabase.get("Database");
         JSONArray tables = (JSONArray) databaseContents.get("Tables");
 
+        // Check if table already exists
         for (int i = 0; i < tables.size(); i++) {
             JSONObject table = (JSONObject) tables.get(i);
             JSONObject tableContents = (JSONObject) table.get("Table");
@@ -54,17 +63,20 @@ public class CreateTable {
             }
         }
 
+        contents = contents.replace("\n", "");
+
+        System.out.println("contents: "+ contents);
+
+        // Check if the syntax is correct (...)
         if (contents.charAt(0) != '(' || contents.charAt(contents.length() - 1) != ')') {
             parser.setOtherError("Invalid syntax");
             return;
         }
 
-        contents = contents.replace("\n", "");
         contents = contents.substring(1, contents.length() - 1);
         String[] attr = contents.split(",");
 
         String[] acceptedTypes = {"int", "float", "bit", "date", "datetime", "varchar"};
-
 
         for (int i = 0; i < attr.length; i++) {
             attr[i] = attr[i].trim();
@@ -72,18 +84,20 @@ public class CreateTable {
             String name = splattr[0];
             String type = splattr[1];
 
-            boolean typeOK = false;
-
-            for (String acceptedType : acceptedTypes) {
-                if (type.equals(acceptedType)) {
-                    typeOK = true;
-                    break;
-                }
-            }
-
-            if (!typeOK) {
+            // check if type is valid
+            if (!isAcceptedType(type)) {
                 parser.setOtherError("Invalid type");
                 return;
+            }
+
+            // check for duplicates
+            for (int j = i + 1; j < attr.length; j++) {
+                String[] splattr2 = attr[j].split(" ");
+                String name2 = splattr2[0];
+                if (name.equals(name2)) {
+                    parser.setOtherError("Duplicate attribute name");
+                    return;
+                }
             }
         }
 
@@ -91,20 +105,36 @@ public class CreateTable {
         JSONObject tableContents = new JSONObject();
         table.put("Table", tableContents);
 
+
         JSONObject structure = new JSONObject();
         JSONArray attributes = new JSONArray();
         structure.put("Attributes", attributes);
-        tableContents.put("Structure", structure);
 
+        for (int i = 0; i < attr.length; i++) {
+            attr[i] = attr[i].trim();
+            String[] splattr = attr[i].split(" ");
+            String name = splattr[0];
+            String type = splattr[1];
+
+            JSONObject attribute = new JSONObject();
+            attribute.put("_attributeName", name);
+            attribute.put("_type", type);
+            attribute.put("_length", name.length());
+            attribute.put("_isnull", "0");
+            attributes.add(attribute);
+        }
+
+
+
+
+
+        tableContents.put("Structure", structure);
         JSONObject primaryKey = new JSONObject();
         tableContents.put("PrimaryKey", primaryKey);
-
         JSONObject foreignKeys = new JSONObject();
         tableContents.put("ForeignKeys", foreignKeys);
-
         JSONObject IndexFiles = new JSONObject();
         tableContents.put("IndexFiles", IndexFiles);
-
         tableContents.put("_tableName", tableName);
         tableContents.put("_fileName", tableName + ".bin");
         tableContents.put("_rowLength", "0");
