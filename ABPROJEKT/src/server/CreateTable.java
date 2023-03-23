@@ -145,7 +145,6 @@ public class CreateTable {
             JSONObject attribute = new JSONObject();
             attribute.put("_attributeName", name);
             attribute.put("_type", type);
-            attribute.put("_length", name.length());
             attribute.put("_isnull", "0");
             attributes.add(attribute);
         }
