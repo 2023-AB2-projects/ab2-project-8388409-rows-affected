@@ -151,7 +151,6 @@ public class Host {
     }
     public void darabol(String input) {
 
-
         StringBuilder command = new StringBuilder();
         String[] words = input.split(" ");
         int command_length = 0;
