@@ -1,0 +1,99 @@
+{
+   "Databases": {
+      "DataBase": {
+         "Tables": {
+            "Table": [
+               {
+                  "Structure": {
+                     "Attribute": [
+                        {
+                           "_attributeName": "Specid",
+                           "_type": "char",
+                           "_length": "3",
+                           "_isnull": "0"
+                        },
+                        {
+                           "_attributeName": "SpecName",
+                           "_type": "varchar",
+                           "_length": "30",
+                           "_isnull": "0"
+                        },
+                        {
+                           "_attributeName": "Language",
+                           "_type": "varchar",
+                           "_length": "20",
+                           "_isnull": "0"
+                        }
+                     ]
+                  },
+                  "primaryKey": {
+                     "pkAttribute": "Specid"
+                  },
+                  "uniqueKeys": {
+                     "UniqueAttribute": "SpecName"
+                  },
+                  "IndexFiles": {
+                     "IndexFile": {
+                        "IndexAttributes": {
+                           "IAttribute": "SpecName"
+                        },
+                        "_indexName": "SpecName.ind",
+                        "_keyLength": "30",
+                        "_isUnique": "1",
+                        "_indexType": "BTree"
+                     }
+                  },
+                  "_tableName": "Specialization",
+                  "_fileName": "Spec.bin",
+                  "_rowLength": "53"
+               },
+               {	
+                  "Structure": {
+                     "Attribute": [
+                        {
+                           "_attributeName": "Groupid",
+                           "_type": "char",
+                           "_length": "3",
+                           "_isnull": "0"
+                        },
+                        {
+                           "_attributeName": "Specid",
+                           "_type": "char",
+                           "_length": "3",
+                           "_isnull": "0"
+                        }
+                     ]
+                  },
+                  "primaryKey": {
+                     "pkAttribute": "Groupid"
+                  },
+                  "foreignKeys": {
+                     "foreignKey": {
+                        "fkAttribute": "Specid",
+                        "references": {
+                           "refTable": "Specialization",
+                           "refAttribute": "Specid"
+                        }
+                     }
+                  },
+                  "IndexFiles": {
+                     "IndexFile": {
+                        "IndexAttributes": {
+                           "IAttribute": "Specid"
+                        },
+                        "_indexName": "SpecOnGroup.ind",
+                        "_keyLength": "3",
+                        "_isUnique": "0",
+                        "_indexType": "BTree"
+                     }
+                  },
+                  "_tableName": "Groups",
+                  "_fileName": "Groups.bin",
+                  "_rowLength": "6"
+               }
+            ]
+         },
+         "_dataBaseName": "University"
+      }
+   }
+}
