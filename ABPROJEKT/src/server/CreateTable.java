@@ -92,6 +92,23 @@ public class CreateTable {
             }
             other = other.trim();
 
+            // check if other is valid
+            if (other.toUpperCase().contains("UNIQUE") || other.toUpperCase().contains("PRIMARY KEY") || other.toUpperCase().contains("FOREIGN KEY")) {
+                if (other.toUpperCase().contains("UNIQUE") && other.toUpperCase().contains("PRIMARY KEY")) {
+                    parser.setOtherError("Invalid other");
+                    return;
+                }
+                if (other.toUpperCase().contains("FOREIGN KEY")) {
+                    if (!other.toUpperCase().contains("REFERENCES")) {
+                        parser.setOtherError("Invalid other");
+                        return;
+                    }
+                }
+            } else if (!other.equals("")) {
+                parser.setOtherError("Invalid other");
+                return;
+
+            }
 
             // check if type is valid
             if (!isAcceptedType(type)) {
