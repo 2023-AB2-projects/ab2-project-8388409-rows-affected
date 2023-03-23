@@ -44,6 +44,9 @@ public class Parser {
                 parserError = false;
                 host.setError("Database already exists");
             }
+            else {
+                new UseDatabase(databaseName,this);
+            }
         }
 
         // DROP DATABASE
