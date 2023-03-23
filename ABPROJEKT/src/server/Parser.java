@@ -11,6 +11,10 @@ public class Parser {
         if (input.contains("USE")) {
             System.out.println("USE");
             String[] split = input.split(" ");
+            if (split.length <= 1) {
+                host.setError("Invalid syntax");
+                return;
+            }
             String databaseName = split[1];
 
             new UseDatabase(databaseName,this);
@@ -27,6 +31,10 @@ public class Parser {
         if (input.contains("CREATE DATABASE")) {
             System.out.println("CREATE DATABASE");
             String[] split = input.split(" ");
+            if (split.length <= 2) {
+                host.setError("Invalid syntax");
+                return;
+            }
             String databaseName = split[2];
             new CreateDatabase(databaseName,this);
             if (parserError) {
@@ -39,6 +47,10 @@ public class Parser {
         if (input.contains("DROP DATABASE")) {
             System.out.println("DROP DATABASE");
             String[] split = input.split(" ");
+            if (split.length <= 2) {
+                host.setError("Invalid syntax");
+                return;
+            }
             String databaseName = split[2];
             new DropDatabase(databaseName);
         }
@@ -48,9 +60,13 @@ public class Parser {
         if (input.contains("CREATE TABLE")) {
             System.out.println("CREATE TABLE");
             String[] split = input.split(" ");
+            if (split.length <= 2) {
+                host.setError("Invalid syntax");
+                return;
+            }
+
             String tableName = split[2];
             StringBuilder contents = new StringBuilder();
-            // TODO if split length <= 2 error
             for (int i = 3; i < split.length; i++) {
                 contents.append(split[i]).append(" ");
             }
@@ -69,6 +85,11 @@ public class Parser {
         if (input.contains("DROP TABLE")) {
             System.out.println("DROP TABLE");
             String[] split = input.split(" ");
+            if (split.length <= 2) {
+                host.setError("Invalid syntax");
+                return;
+            }
+
             String tableName = split[2];
             new DropTable(tableName, currentDatabase, this);
             if (otherError.equals("")) {
