@@ -64,6 +64,20 @@ public class Parser {
                 otherError = "";
             }
         }
+
+        // DROP TABLE
+        if (input.contains("DROP TABLE")) {
+            System.out.println("DROP TABLE");
+            String[] split = input.split(" ");
+            String tableName = split[2];
+            new DropTable(tableName, currentDatabase, this);
+            if (otherError.equals("")) {
+                host.setError("");
+            } else {
+                host.setError(otherError);
+                otherError = "";
+            }
+        }
     }
     public void setParserError(boolean parserError) {
         this.parserError = parserError;

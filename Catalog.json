@@ -2,34 +2,7 @@
   "Databases": [
     {
       "Database": {
-        "Tables": [
-          {
-            "Table": {
-              "IndexFiles": {},
-              "_rowLength": "0",
-              "PrimaryKey": {},
-              "Structure": {
-                "Attributes": [
-                  {
-                    "_attributeName": "almafaID",
-                    "_isnull": "0",
-                    "_type": "int",
-                    "_length": 8
-                  },
-                  {
-                    "_attributeName": "almafaMagassag",
-                    "_isnull": "0",
-                    "_type": "int",
-                    "_length": 14
-                  }
-                ]
-              },
-              "ForeignKeys": {},
-              "_fileName": "almafak.bin",
-              "_tableName": "almafak"
-            }
-          }
-        ],
+        "Tables":[],
         "_dataBaseName": "ab"
       }
     }

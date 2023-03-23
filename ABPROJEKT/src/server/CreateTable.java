@@ -69,8 +69,6 @@ public class CreateTable {
         System.out.println("contents: "+ contents);
 
         // Check if the syntax is correct (...)
-        System.out.println("contents.charAt(0): "+ contents.charAt(0));
-        System.out.println("contents.charAt(contents.length() - 1): "+ contents.charAt(contents.length() - 1));
         if (contents.charAt(0) != '(' || contents.charAt(contents.length() - 1) != ')') {
             parser.setOtherError("Invalid syntax");
             return;
@@ -135,13 +133,25 @@ public class CreateTable {
         JSONObject structure = new JSONObject();
         JSONArray attributes = new JSONArray();
         structure.put("Attributes", attributes);
+        JSONArray primaryKeys = new JSONArray();
+        JSONObject foreignKeys = new JSONObject();
 
         for (int i = 0; i < attr.length; i++) {
             attr[i] = attr[i].trim();
             String[] splattr = attr[i].split(" ");
             String name = splattr[0];
             String type = splattr[1];
+            String other = ""; // foregin key, primary key, etc.
+            for (int j = 2; j < splattr.length; j++) {
+                other += splattr[j] + " ";
+            }
+            other = other.trim();
 
+            if (other.toUpperCase().contains("PRIMARY KEY")) {
+                JSONObject primaryKey = new JSONObject();
+                primaryKey.put("pkAttribute", name);
+                primaryKeys.add(primaryKey);
+            }
             JSONObject attribute = new JSONObject();
             attribute.put("_attributeName", name);
             attribute.put("_type", type);
@@ -150,13 +160,8 @@ public class CreateTable {
         }
 
 
-
-
-
         tableContents.put("Structure", structure);
-        JSONObject primaryKey = new JSONObject();
-        tableContents.put("PrimaryKey", primaryKey);
-        JSONObject foreignKeys = new JSONObject();
+        tableContents.put("PrimaryKeys", primaryKeys);
         tableContents.put("ForeignKeys", foreignKeys);
         JSONObject IndexFiles = new JSONObject();
         tableContents.put("IndexFiles", IndexFiles);
