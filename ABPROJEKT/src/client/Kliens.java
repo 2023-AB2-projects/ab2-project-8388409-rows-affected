@@ -25,7 +25,7 @@ public class Kliens extends JFrame implements Runnable {
 
         setTitle("client.Kliens");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 500);
+        setSize(1000, 700);
         setLocationRelativeTo(null);
 
         syntax = new Syntax(this);
@@ -69,6 +69,7 @@ public class Kliens extends JFrame implements Runnable {
         execButton.addActionListener(e -> {
             print("Execute");
             syntax.syntaxHighlighting();
+
             send = true;
         });
 
@@ -163,7 +164,7 @@ public class Kliens extends JFrame implements Runnable {
                 }
 
                 userInput = textArea.getText();
-                out.println(userInput);
+                out.println(userInput+"\n__end_of_file__");
                 print("Client: " + userInput);
                 send = false;
                 if(userInput.equals("EXIT")){
