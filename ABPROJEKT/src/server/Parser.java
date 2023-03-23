@@ -52,7 +52,7 @@ public class Parser {
             StringBuilder contents = new StringBuilder();
             // TODO if split length <= 2 error
             for (int i = 3; i < split.length; i++) {
-                contents.append(split[i]);
+                contents.append(split[i]).append(" ");
             }
 
             new CreateTable(tableName, currentDatabase, contents.toString(),this);

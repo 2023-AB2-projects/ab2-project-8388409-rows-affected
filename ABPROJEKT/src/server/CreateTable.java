@@ -64,10 +64,13 @@ public class CreateTable {
         }
 
         contents = contents.replace("\n", "");
+        contents = contents.trim();
 
         System.out.println("contents: "+ contents);
 
         // Check if the syntax is correct (...)
+        System.out.println("contents.charAt(0): "+ contents.charAt(0));
+        System.out.println("contents.charAt(contents.length() - 1): "+ contents.charAt(contents.length() - 1));
         if (contents.charAt(0) != '(' || contents.charAt(contents.length() - 1) != ')') {
             parser.setOtherError("Invalid syntax");
             return;
@@ -83,6 +86,12 @@ public class CreateTable {
             String[] splattr = attr[i].split(" ");
             String name = splattr[0];
             String type = splattr[1];
+            String other = ""; // foregin key, primary key, etc.
+            for (int j = 2; j < splattr.length; j++) {
+                other += splattr[j] + " ";
+            }
+            other = other.trim();
+
 
             // check if type is valid
             if (!isAcceptedType(type)) {
