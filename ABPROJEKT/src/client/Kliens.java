@@ -68,6 +68,7 @@ public class Kliens extends JFrame implements Runnable {
 
         execButton.addActionListener(e -> {
             print("Execute");
+            syntax.syntaxHighlighting();
             send = true;
         });
 
