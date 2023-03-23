@@ -103,14 +103,17 @@ public class Host {
                     }
 
                     darabol(inputLine);
-                    response(out);
-//                    new Parser(inputLine, this);
-//                    if (error.length() > 0) {
-//                        out.println("ERROR: " + error);
-//                        error = "";
-//                    } else {
-//                        out.println("ok");
-//                    }
+
+                    if (answer.equals("ok")){
+
+                        if (error.length() > 0) {
+                            out.println("ERROR: " + error);
+                            error = "";
+                        } else {
+                            out.println("ok");
+                        }
+                        answer = "";
+                    }
                 }
             }
 
@@ -119,19 +122,7 @@ public class Host {
             System.err.println("Exception caught when trying to listen on port " + portNumber + " or listening for a connection: " + e.getMessage());
         }
     }
-    public void response(PrintWriter out)
-    {
-        if (error.length() > 0) {
-            out.println("ERROR: " + error);
-            error = "";
-            answer = "";
-        } else {
-            if (answer.length() > 0) {
-                out.println("ANSWER: " + answer);
-                answer = "";
-            }
-        }
-    }
+
     String reformatParserInput(String fullInput)
     {
         fullInput = fullInput.trim();
@@ -172,7 +163,7 @@ public class Host {
 
                     System.out.println("|=> parsed command: " + fullInput);
                     new Parser(fullInput, this);
-                    answer = fullInput.split(" ")[0]+" "+fullInput.split(" ")[1]+fullInput.split(" ")[1]+"ok";
+
                     acc = "";
                     command = new StringBuilder();
                 } else {
@@ -190,8 +181,8 @@ public class Host {
 
                 System.out.println("|=> parsed command: " + fullInput);
                 new Parser(fullInput, this);
-                answer = fullInput.split(" ")[0]+" "+fullInput.split(" ")[1]+fullInput.split(" ")[1]+"ok";
                 acc = "";
+                answer = "ok";
                 break;
             }
             command.append(" ").append(words[i]);
