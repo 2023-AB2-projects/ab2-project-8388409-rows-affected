@@ -109,7 +109,7 @@ public class CreateTable {
             }
 
             // check if type is valid
-            if (!isAcceptedType(type)) {
+            if (!isAcceptedType(type.toLowerCase())) {
                 parser.setOtherError("Invalid type");
                 return;
             }
