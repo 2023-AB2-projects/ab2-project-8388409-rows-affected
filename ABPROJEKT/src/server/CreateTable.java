@@ -77,8 +77,6 @@ public class CreateTable {
         contents = contents.substring(1, contents.length() - 1);
         String[] attr = contents.split(",");
 
-        String[] acceptedTypes = {"int", "float", "bit", "date", "datetime", "varchar"};
-
         for (int i = 0; i < attr.length; i++) {
             attr[i] = attr[i].trim();
             String[] splattr = attr[i].split(" ");
@@ -134,7 +132,8 @@ public class CreateTable {
         JSONArray attributes = new JSONArray();
         structure.put("Attributes", attributes);
         JSONArray primaryKeys = new JSONArray();
-        JSONObject foreignKeys = new JSONObject();
+        JSONArray foreignKeys = new JSONArray();
+        JSONArray uniqueKeys = new JSONArray();
 
         for (int i = 0; i < attr.length; i++) {
             attr[i] = attr[i].trim();
@@ -151,7 +150,21 @@ public class CreateTable {
                 JSONObject primaryKey = new JSONObject();
                 primaryKey.put("pkAttribute", name);
                 primaryKeys.add(primaryKey);
+            } else if (other.toUpperCase().contains("FOREIGN KEY")) {
+                String[] spl = other.split(" ");
+                String refTable = spl[2];
+                String refAttr = spl[4];
+                JSONObject foreignKey = new JSONObject();
+                foreignKey.put("fkAttribute", name);
+                foreignKey.put("fkRefTable", refTable);
+                foreignKey.put("fkRefAttribute", refAttr);
+                foreignKeys.add(foreignKey);
+            } else if (other.toUpperCase().contains("UNIQUE")) {
+                JSONObject uniqueKey = new JSONObject();
+                uniqueKey.put("ukAttribute", name);
+                uniqueKeys.add(uniqueKey);
             }
+
             JSONObject attribute = new JSONObject();
             attribute.put("_attributeName", name);
             attribute.put("_type", type);
@@ -159,10 +172,11 @@ public class CreateTable {
             attributes.add(attribute);
         }
 
-
         tableContents.put("Structure", structure);
         tableContents.put("PrimaryKeys", primaryKeys);
         tableContents.put("ForeignKeys", foreignKeys);
+        tableContents.put("uniqueKeys", uniqueKeys);
+
         JSONObject IndexFiles = new JSONObject();
         tableContents.put("IndexFiles", IndexFiles);
         tableContents.put("_tableName", tableName);
@@ -170,7 +184,6 @@ public class CreateTable {
         tableContents.put("_rowLength", "0");
 
         tables.add(table);
-
 
 
         try {
