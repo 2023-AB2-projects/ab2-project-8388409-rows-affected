@@ -146,7 +146,12 @@ public class Parser {
 
             // contents = (columnname,...)
             // check for ( and )
-            if (!(contents.charAt(0) == '(') || !(contents.charAt(contents.length()-1) == ')')) {
+            System.out.println("Contents: " + contents);
+
+            System.out.println("elso " + contents.toString().charAt(0));
+            System.out.println("utolso " + contents.toString().charAt(contents.length()-2));
+
+            if (!(contents.toString().charAt(0) == '(') || !(contents.toString().charAt(contents.length()-2) == ')')) {
                 host.setError("Invalid syntax");
                 return;
             }

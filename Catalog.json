@@ -2,14 +2,40 @@
   "Databases": [
     {
       "Database": {
-        "Tables": [],
+        "Tables": [
+          {
+            "Table": {
+              "IndexFiles": [
+                {
+                  "_indexName": "indeksz.ind",
+                  "IndexFile": {
+                    "IAttributes": "indeksz"
+                  }
+                }
+              ],
+              "_rowLength": "0",
+              "uniqueKeys": [],
+              "PrimaryKeys": [
+                {
+                  "pkAttribute": "id"
+                }
+              ],
+              "Structure": {
+                "Attributes": [
+                  {
+                    "_attributeName": "id",
+                    "_isnull": "0",
+                    "_type": "INT"
+                  }
+                ]
+              },
+              "ForeignKeys": [],
+              "_fileName": "tabla.bin",
+              "_tableName": "tabla"
+            }
+          }
+        ],
         "_dataBaseName": "ab"
-      }
-    },
-    {
-      "Database": {
-        "Tables": [],
-        "_dataBaseName": "ab2"
       }
     }
   ]

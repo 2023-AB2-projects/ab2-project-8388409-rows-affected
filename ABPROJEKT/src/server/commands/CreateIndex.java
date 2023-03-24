@@ -7,6 +7,7 @@ import org.json.simple.parser.ParseException;
 import server.Parser;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.SQLOutput;
@@ -74,5 +75,12 @@ public class CreateIndex {
         indexes.add(indexfile);
         JSONObject indname = new JSONObject();
 
+        try {
+            FileWriter fileWriter = new FileWriter("Catalog.json");
+            fileWriter.write(catalog.toJSONString());
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
