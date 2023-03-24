@@ -164,6 +164,14 @@ public class Host {
                     System.out.println("|=> parsed command: " + fullInput);
                     new Parser(fullInput, this);
 
+
+                    if (fullInput.contains("CREATE DATABASE")){
+//                        add USE DATABASE
+                        fullInput = "USE " + fullInput.substring(16);
+                        System.out.println("|=> parsed command: " + fullInput);
+                        new Parser(fullInput, this);
+                    }
+
                     acc = "";
                     command = new StringBuilder();
                 } else {
