@@ -12,6 +12,7 @@ import static java.lang.System.exit;
 public class Kliens extends JFrame implements Runnable {
 
     private JTextArea textArea;
+    private JTextArea textAreas;
     private JTextArea outText;
     private JTable table;
 
@@ -20,6 +21,7 @@ public class Kliens extends JFrame implements Runnable {
 
     private JButton connectionButton;
     private Syntax syntax;
+
 
     public Kliens() {
 
@@ -82,10 +84,12 @@ public class Kliens extends JFrame implements Runnable {
             System.out.println("Connect");
             if (connectionButton.getText().equals("Connect")) {
                 connectionButton.setText("Disconnect");
+
                 connected = true;
                 new Thread(this).start();
             } else {
                 connectionButton.setText("Connect");
+                textAreas = new JTextArea(textArea.getText());
                 textArea.setText("EXIT");
                 send = true;
 
@@ -169,6 +173,7 @@ public class Kliens extends JFrame implements Runnable {
                 send = false;
                 if(userInput.equals("EXIT")){
                     connected = false;
+                    textArea.setText(textAreas.getText());
                     return 0;
                 }
             }
