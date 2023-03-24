@@ -253,7 +253,7 @@ public class CreateTable {
         tableContents.put("ForeignKeys", foreignKeys);
         tableContents.put("uniqueKeys", uniqueKeys);
 
-        JSONObject IndexFiles = new JSONObject();
+        JSONArray IndexFiles = new JSONArray();
         tableContents.put("IndexFiles", IndexFiles);
         tableContents.put("_tableName", tableName);
         tableContents.put("_fileName", tableName + ".bin");
