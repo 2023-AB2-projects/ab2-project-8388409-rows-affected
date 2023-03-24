@@ -32,9 +32,38 @@ public class Host {
         acc = "";
 
         Create_load_catalog();
+        Create_load_lastCurrentDatabase();
         Create_socket_communication();
     }
-
+    private void Write_lastCurrentDatabase(){
+        try {
+            Writer writer = new FileWriter("currentdatabase.txt");
+            writer.write(currentDatabase);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void Create_load_lastCurrentDatabase(){
+        // currentdatabase.txt contains the last used database name
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("currentdatabase.txt"));
+            String line = br.readLine();
+            if (line != null) {
+                currentDatabase = line;
+            }
+        } catch (FileNotFoundException e) {
+            Writer writer = null;
+            try {
+                writer = new FileWriter("currentdatabase.txt");
+                writer.write("");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void Create_load_catalog() {
         System.out.println("Starting server...");
 
@@ -75,7 +104,6 @@ public class Host {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void Create_socket_communication() {
@@ -118,6 +146,7 @@ public class Host {
             }
 
             System.out.println("Client disconnected.");
+            Write_lastCurrentDatabase();
         } catch (IOException e) {
             System.err.println("Exception caught when trying to listen on port " + portNumber + " or listening for a connection: " + e.getMessage());
         }
