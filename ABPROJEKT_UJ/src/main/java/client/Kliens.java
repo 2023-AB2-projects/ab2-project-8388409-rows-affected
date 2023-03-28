@@ -191,9 +191,7 @@ public class Kliens extends JFrame implements Runnable {
     }
 
     public static void main(String[] args) {
-
         new Kliens();
-
     }
 
     @Override
