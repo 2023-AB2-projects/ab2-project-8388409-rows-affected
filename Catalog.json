@@ -5,14 +5,7 @@
         "Tables": [
           {
             "Table": {
-              "IndexFiles": [
-                {
-                  "_indexName": "indeksz.ind",
-                  "IndexFile": {
-                    "IAttributes": "indeksz"
-                  }
-                }
-              ],
+              "IndexFiles": [],
               "_rowLength": "0",
               "uniqueKeys": [],
               "PrimaryKeys": [
