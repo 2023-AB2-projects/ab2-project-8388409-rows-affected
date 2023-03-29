@@ -1,9 +1,11 @@
 package server;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import server.jacksonclasses.Database;
+import server.jacksonclasses.Databases;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -65,45 +67,53 @@ public class Host {
         }
     }
     private void Create_load_catalog() {
-        System.out.println("Starting server...");
-
-        JSONObject databases = new JSONObject();
-        JSONArray databasesArray = new JSONArray();
-        databases.put("Databases", databasesArray);
-
-
+        ObjectMapper mapper = new ObjectMapper();
+        Databases Databases = new Databases();
         try {
-            Reader reader = new FileReader("Catalog.json");
-            catalog = (JSONObject) new JSONParser().parse(reader);
-        } catch (FileNotFoundException e) {
-            try {
-                FileWriter fileWriter = new FileWriter("Catalog.json");
-                fileWriter.write(databases.toJSONString());
-                fileWriter.close();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        } catch (ParseException e) {
-            System.out.println("Catalog is empty, initializing...");
-            FileWriter fileWriter = null;
-            try {
-                fileWriter = new FileWriter("Catalog.json");
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            try {
-                fileWriter.write(databases.toJSONString());
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            try {
-                fileWriter.close();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            mapper.writeValue(new File("Catalog.json"), Databases);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        System.out.println("Starting server...");
+//
+//        JSONObject databases = new JSONObject();
+//        JSONArray databasesArray = new JSONArray();
+//        databases.put("Databases", databasesArray);
+//
+//
+//        try {
+//            Reader reader = new FileReader("Catalog.json");
+//            catalog = (JSONObject) new JSONParser().parse(reader);
+//        } catch (FileNotFoundException e) {
+//            try {
+//                FileWriter fileWriter = new FileWriter("Catalog.json");
+//                fileWriter.write(databases.toJSONString());
+//                fileWriter.close();
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
+//        } catch (ParseException e) {
+//            System.out.println("Catalog is empty, initializing...");
+//            FileWriter fileWriter = null;
+//            try {
+//                fileWriter = new FileWriter("Catalog.json");
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
+//            try {
+//                fileWriter.write(databases.toJSONString());
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
+//            try {
+//                fileWriter.close();
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     private void Create_socket_communication() {

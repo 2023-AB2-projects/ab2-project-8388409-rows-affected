@@ -3,11 +3,11 @@ package server.jacksonclasses;
 public class Databases {
     private Database[] databases;
 
-    public Databases(Database[] databases) {
-        this.databases = databases;
+    public Databases() {
     }
 
-    public Databases() {
+    public Databases(Database[] databases) {
+        this.databases = databases;
     }
 
     public Database[] getDatabases() {
