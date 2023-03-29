@@ -1,39 +1,28 @@
 package server.commands;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import server.Parser;
+import server.jacksonclasses.Databases;
+import server.jacksonclasses.Database;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 
 public class UseDatabase {
 
     public UseDatabase(String currentDatabase, Parser parser) {
-
-        JSONObject catalog;
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Reader reader = new FileReader("Catalog.json");
-            JSONParser jsonParser = new JSONParser();
-            catalog = (JSONObject) jsonParser.parse(reader);
-            reader.close();
-        } catch (IOException | ParseException e) {
+            Databases databases = objectMapper.readValue(new FileReader("Catalog.json"), Databases.class);
+            for (Database database : databases.getDatabases()) {
+                if (database.get_dataBaseName().equals(currentDatabase)) {
+                    parser.setParserError(false);
+                    return;
+                }
+            }
+            parser.setParserError(true);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        JSONArray databases = (JSONArray) catalog.get("Databases");
-
-        for (Object database : databases) {
-            JSONObject databaseObject = (JSONObject) database;
-            JSONObject databaseContents = (JSONObject) databaseObject.get("Database");
-            String databaseNameInCatalog = (String) databaseContents.get("_dataBaseName");
-            if (databaseNameInCatalog.equals(currentDatabase)) {
-                parser.setParserError(false);
-                return;
-            }
-        }
-        parser.setParserError(true);}
+    }
 }

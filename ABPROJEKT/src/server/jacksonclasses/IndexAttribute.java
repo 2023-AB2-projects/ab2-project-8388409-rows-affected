@@ -3,6 +3,8 @@ package server.jacksonclasses;
 public class IndexAttribute {
     private String IAttribute;
 
+    public IndexAttribute() {
+    }
     public IndexAttribute(String IAttribute) {
         this.IAttribute = IAttribute;
     }

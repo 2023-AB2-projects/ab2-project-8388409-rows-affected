@@ -1,14 +1,18 @@
 package server.jacksonclasses;
 
+import java.util.List;
+
 public class Database {
     private String _dataBaseName;
-    private Table[] Tables;
+    private List<Table> Tables;
 
-    public Database(String _dataBaseName, Table[] tables) {
+    public Database() {
+    }
+
+    public Database(String _dataBaseName, List<Table> tables) {
         this._dataBaseName = _dataBaseName;
         Tables = tables;
     }
-
     public String get_dataBaseName() {
         return _dataBaseName;
     }
@@ -17,11 +21,11 @@ public class Database {
         this._dataBaseName = _dataBaseName;
     }
 
-    public Table[] getTables() {
+    public List<Table> getTables() {
         return Tables;
     }
 
-    public void setTables(Table[] tables) {
+    public void setTables(List<Table> tables) {
         Tables = tables;
     }
 }

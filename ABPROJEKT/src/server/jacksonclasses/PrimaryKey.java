@@ -3,6 +3,9 @@ package server.jacksonclasses;
 public class PrimaryKey {
     private String pkAttribute;
 
+    public PrimaryKey() {
+    }
+
     public PrimaryKey(String pkAttribute) {
         this.pkAttribute = pkAttribute;
     }

@@ -12,7 +12,7 @@ import static java.lang.System.exit;
 public class Kliens extends JFrame implements Runnable {
 
     private JTextArea textArea;
-    private JTextArea textAreas;
+    private JTextArea textAreas = new JTextArea();
     private JTextArea outText = new JTextArea();
     private JTable table;
 

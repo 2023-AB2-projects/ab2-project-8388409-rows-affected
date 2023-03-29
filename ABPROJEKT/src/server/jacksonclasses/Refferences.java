@@ -4,6 +4,9 @@ public class Refferences {
     private String refTable;
     private String refAttribute;
 
+    public Refferences() {
+    }
+
     public Refferences(String refTable, String refAttribute) {
         this.refTable = refTable;
         this.refAttribute = refAttribute;

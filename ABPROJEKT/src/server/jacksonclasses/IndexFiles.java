@@ -1,17 +1,22 @@
 package server.jacksonclasses;
 
-public class IndexFiles {
-    private IndexFile[] IndexFiles;
+import java.util.List;
 
-    public IndexFiles(IndexFile[] indexFiles) {
+public class IndexFiles {
+    private List<IndexFile> IndexFiles;
+
+    public IndexFiles() {
+    }
+
+    public IndexFiles(List<IndexFile> indexFiles) {
         IndexFiles = indexFiles;
     }
 
-    public IndexFile[] getIndexFiles() {
+    public List<IndexFile> getIndexFiles() {
         return IndexFiles;
     }
 
-    public void setIndexFiles(IndexFile[] indexFiles) {
+    public void setIndexFiles(List<IndexFile> indexFiles) {
         IndexFiles = indexFiles;
     }
 }

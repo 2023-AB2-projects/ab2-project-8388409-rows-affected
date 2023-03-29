@@ -1,20 +1,23 @@
 package server.jacksonclasses;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Databases {
-    private Database[] databases;
+    private List<Database> databases;
 
     public Databases() {
     }
 
-    public Databases(Database[] databases) {
+    public Databases(List<Database> databases) {
         this.databases = databases;
     }
 
-    public Database[] getDatabases() {
+    public List<Database> getDatabases() {
         return databases;
     }
 
-    public void setDatabases(Database[] databases) {
+    public void setDatabases(List<Database> databases) {
         this.databases = databases;
     }
 }

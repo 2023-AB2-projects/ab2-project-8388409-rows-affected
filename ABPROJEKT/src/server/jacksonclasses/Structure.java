@@ -1,17 +1,22 @@
 package server.jacksonclasses;
 
-public class Structure {
-    private Attribute[] Attributes;
+import java.util.List;
 
-    public Structure(Attribute[] attributes) {
+public class Structure {
+    private List<Attribute> Attributes;
+
+    public Structure() {
+    }
+
+    public Structure(List<Attribute> attributes) {
         Attributes = attributes;
     }
 
-    public Attribute[] getAttributes() {
+    public List<Attribute> getAttributes() {
         return Attributes;
     }
 
-    public void setAttributes(Attribute[] attributes) {
+    public void setAttributes(List<Attribute> attributes) {
         Attributes = attributes;
     }
 }

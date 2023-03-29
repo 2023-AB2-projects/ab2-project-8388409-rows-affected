@@ -68,11 +68,16 @@ public class Host {
     }
     private void Create_load_catalog() {
         ObjectMapper mapper = new ObjectMapper();
-        Databases Databases = new Databases();
-        try {
-            mapper.writeValue(new File("Catalog.json"), Databases);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        File file = new File("Catalog.json");
+        if (file.length() == 0){
+            System.out.println("Catalog is empty, initializing...");
+            Databases dbs = new Databases();
+            try {
+                mapper.writeValue(file, dbs);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         System.out.println("Starting server...");

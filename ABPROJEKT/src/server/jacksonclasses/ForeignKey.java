@@ -4,6 +4,8 @@ public class ForeignKey {
     private String fkAttribute;
     private Refferences Refferences;
 
+    public ForeignKey() {
+    }
     public ForeignKey(String fkAttribute, server.jacksonclasses.Refferences refferences) {
         this.fkAttribute = fkAttribute;
         Refferences = refferences;

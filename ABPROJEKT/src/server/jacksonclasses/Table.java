@@ -1,16 +1,21 @@
 package server.jacksonclasses;
 
+import java.util.List;
+
 public class Table {
     private IndexFiles IndexFiles;
     private String _tableName;
     private String _rowLength;
-    private UniqueKey[] UniqueKeys;
-    private PrimaryKey[] PrimaryKeys;
-    private ForeignKey[] ForeignKeys;
+    private List<UniqueKey> UniqueKeys;
+    private List<PrimaryKey> PrimaryKeys;
+    private List<ForeignKey> ForeignKeys;
     private Structure Structure;
     private String _fileName;
 
-    public Table(server.jacksonclasses.IndexFiles indexFiles, String _tableName, String _rowLength, UniqueKey[] uniqueKeys, PrimaryKey[] primaryKeys, ForeignKey[] foreignKeys, server.jacksonclasses.Structure structure, String _fileName) {
+    public Table() {
+    }
+
+    public Table(IndexFiles indexFiles, String _tableName, String _rowLength, List<UniqueKey> uniqueKeys, List<PrimaryKey> primaryKeys, List<ForeignKey> foreignKeys, server.jacksonclasses.Structure structure, String _fileName) {
         IndexFiles = indexFiles;
         this._tableName = _tableName;
         this._rowLength = _rowLength;
@@ -45,27 +50,27 @@ public class Table {
         this._rowLength = _rowLength;
     }
 
-    public UniqueKey[] getUniqueKeys() {
+    public List<UniqueKey> getUniqueKeys() {
         return UniqueKeys;
     }
 
-    public void setUniqueKeys(UniqueKey[] uniqueKeys) {
+    public void setUniqueKeys(List<UniqueKey> uniqueKeys) {
         UniqueKeys = uniqueKeys;
     }
 
-    public PrimaryKey[] getPrimaryKeys() {
+    public List<PrimaryKey> getPrimaryKeys() {
         return PrimaryKeys;
     }
 
-    public void setPrimaryKeys(PrimaryKey[] primaryKeys) {
+    public void setPrimaryKeys(List<PrimaryKey> primaryKeys) {
         PrimaryKeys = primaryKeys;
     }
 
-    public ForeignKey[] getForeignKeys() {
+    public List<ForeignKey> getForeignKeys() {
         return ForeignKeys;
     }
 
-    public void setForeignKeys(ForeignKey[] foreignKeys) {
+    public void setForeignKeys(List<ForeignKey> foreignKeys) {
         ForeignKeys = foreignKeys;
     }
 

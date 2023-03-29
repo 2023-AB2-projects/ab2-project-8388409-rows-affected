@@ -5,6 +5,8 @@ public class Attribute {
     private String _isnull;
     private String _type;
 
+    public Attribute() {
+    }
     public Attribute(String _attributeName, String _isnull, String _type) {
         this._attributeName = _attributeName;
         this._isnull = _isnull;

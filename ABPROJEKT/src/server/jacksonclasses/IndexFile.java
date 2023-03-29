@@ -1,23 +1,28 @@
 package server.jacksonclasses;
 
+import java.util.List;
+
 public class IndexFile {
-    private IndexAttribute[] IndexAttributes;
+    private List<IndexAttribute> IndexAttributes;
     private String _indexName;
     private String _keyLength;
     private String _isUnique;
 
-    public IndexFile(IndexAttribute[] indexAttributes, String _indexName, String _keyLength, String _isUnique) {
+    public IndexFile() {
+    }
+
+    public IndexFile(List<IndexAttribute> indexAttributes, String _indexName, String _keyLength, String _isUnique) {
         IndexAttributes = indexAttributes;
         this._indexName = _indexName;
         this._keyLength = _keyLength;
         this._isUnique = _isUnique;
     }
 
-    public IndexAttribute[] getIndexAttributes() {
+    public List<IndexAttribute> getIndexAttributes() {
         return IndexAttributes;
     }
 
-    public void setIndexAttributes(IndexAttribute[] indexAttributes) {
+    public void setIndexAttributes(List<IndexAttribute> indexAttributes) {
         IndexAttributes = indexAttributes;
     }
 

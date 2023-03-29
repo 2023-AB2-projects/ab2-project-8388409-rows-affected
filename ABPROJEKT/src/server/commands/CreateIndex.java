@@ -1,83 +1,64 @@
 package server.commands;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import server.Parser;
+import server.jacksonclasses.*;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
+import java.util.List;
 
 public class CreateIndex {
     public CreateIndex(String indexName,String tableName,String contents,String currentDatabase, Parser parser){
 
-        JSONObject catalog;
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Reader reader = new FileReader("Catalog.json");
-            JSONParser jsonParser = new JSONParser();
-            catalog = (JSONObject) jsonParser.parse(reader);
-            reader.close();
-        } catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        JSONObject myDatabase = null;
-        JSONArray databases = (JSONArray) catalog.get("Databases");
-
-
-        // Get the database
-        for (int i = 0; i < databases.size(); i++) {
-            JSONObject database = (JSONObject) databases.get(i);
-            JSONObject databaseContents = (JSONObject) database.get("Database");
-            String databaseNameInCatalog = (String) databaseContents.get("_dataBaseName");
-            if (databaseNameInCatalog.equals(currentDatabase)) {
-                myDatabase = database;
-                break;
+            Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
+            Database myDatabase = null;
+            for (int i = 0; i < databases.getDatabases().size(); i++) {
+                if (databases.getDatabases().get(i).get_dataBaseName().equals(currentDatabase)) {
+                    myDatabase = databases.getDatabases().get(i);
+                    break;
+                }
             }
-        }
-        if (myDatabase == null) {
-            parser.setOtherError("Database does not exist");
-            return;
-        }
-
-        JSONObject databaseContents = (JSONObject) myDatabase.get("Database");
-        JSONArray tables = (JSONArray) databaseContents.get("Tables");
-        JSONObject myTable = null;
-
-        // Check if table exists
-        for (int i = 0; i < tables.size(); i++) {
-            JSONObject table = (JSONObject) tables.get(i);
-            JSONObject tableContents = (JSONObject) table.get("Table");
-            String tableNameInCatalog = (String) tableContents.get("_tableName");
-            if (tableNameInCatalog.equals(tableName)) {
-                myTable = table;
-                break;
+            if (myDatabase == null) {
+                parser.setOtherError("Database does not exist");
+                return;
             }
-        }
-        if (myTable == null) {
-            parser.setOtherError("Table does not exist");
-            return;
-        }
+            Table myTable = null;
+            for (int i = 0; i < myDatabase.getTables().size(); i++) {
+                if (myDatabase.getTables().get(i).get_tableName().equals(tableName)) {
+                    myTable = myDatabase.getTables().get(i);
+                    break;
+                }
+            }
+            if (myTable == null) {
+                parser.setOtherError("Table does not exist");
+                return;
+            }
 
-        JSONObject tableContents = (JSONObject) myTable.get("Table");
-        JSONArray indexes = (JSONArray) tableContents.get("IndexFiles");
-        JSONObject indexfile = new JSONObject();
-        JSONObject IndexAttributes = new JSONObject();
+            IndexFiles indexFiles = myTable.getIndexFiles();
 
-        IndexAttributes.put("IAttributes", indexName);
-        indexfile.put("IndexFile", IndexAttributes);
-        indexfile.put("_indexName", indexName + ".ind");
+            if (indexFiles.getIndexFiles() == null) {
+                indexFiles.setIndexFiles(new JSONArray());
+            }
+            List<IndexFile> lif = indexFiles.getIndexFiles();
+            for (int i = 0; i < lif.size(); i++) {
+                if (lif.get(i).get_indexName().equals(indexName)) {
+                    parser.setOtherError("Index already exists");
+                    return;
+                }
+            }
 
-        indexes.add(indexfile);
-        JSONObject indname = new JSONObject();
+            IndexFile newIndexFile = new IndexFile();
+            newIndexFile.set_indexName(indexName);
+            newIndexFile.getIndexAttributes().add(new IndexAttribute(indexName));
+            lif.add(newIndexFile);
 
-        try {
-            FileWriter fileWriter = new FileWriter("Catalog.json");
-            fileWriter.write(catalog.toJSONString());
-            fileWriter.close();
+            objectMapper.writeValue(new File("Catalog.json"), databases);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -3,6 +3,9 @@ package server.jacksonclasses;
 public class UniqueKey {
     private String UniqueAttribute;
 
+    public UniqueKey() {
+    }
+
     public UniqueKey(String uniqueAttribute) {
         UniqueAttribute = uniqueAttribute;
     }
