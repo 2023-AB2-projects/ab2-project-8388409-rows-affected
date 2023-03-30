@@ -124,6 +124,8 @@ public class KliensNew extends JFrame implements Runnable {
                     System.out.println(s1);
                 }
                 leftPanel.updateDatabase(databases);
+                leftPanel.repaint();
+                resizeWindowLayout();
                 continue;
             }
             System.out.println("databases added");

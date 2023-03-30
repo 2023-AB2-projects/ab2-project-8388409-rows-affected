@@ -15,7 +15,7 @@ import static java.lang.System.exit;
 
 public class KliensNew extends JFrame implements Runnable {
 
-    private SidePanel leftPanel;
+    private ObjectExplorer leftPanel;
     private SidePanel rightPanel;
     private SidePanel topPanel;
     private JTabbedPane tabbedPane;
@@ -123,7 +123,7 @@ public class KliensNew extends JFrame implements Runnable {
                 for (String s1 : databases) {
                     System.out.println(s1);
                 }
-
+                leftPanel.updateDatabase();
                 continue;
             }
             System.out.println("databases added");
@@ -143,6 +143,9 @@ public class KliensNew extends JFrame implements Runnable {
 
             outText.setText(outText.getText() + "\n" + s);
             System.out.println(s);
+
+            if (tabbedPane == null)
+                return;
 
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (tabbedPane.getComponentAt(i) instanceof QueryPanel) {
