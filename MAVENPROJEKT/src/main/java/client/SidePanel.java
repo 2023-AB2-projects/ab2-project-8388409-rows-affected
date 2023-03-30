@@ -12,6 +12,7 @@ public class SidePanel extends JPanel {
         setBorder(BorderFactory.createLineBorder(Color.black, 0, true));
         setLayout(new FlowLayout());
         initComponents();
+        setBorder(BorderFactory.createEmptyBorder(10,15,10,15));
 
         setVisible(true);
     }

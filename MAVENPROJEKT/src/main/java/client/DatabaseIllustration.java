@@ -21,7 +21,6 @@ public class DatabaseIllustration extends JPanel {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         this.setBounds(100, 100, 100, 100);
         this.databaseName = databaseName;
         button.setBounds(0, 0, 20, 20);
