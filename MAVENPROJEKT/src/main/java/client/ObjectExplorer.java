@@ -39,25 +39,5 @@ public class ObjectExplorer extends SidePanel {
 
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        frame.setSize(500, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-
-
-        ArrayList<String> databaseNames = new ArrayList<>();
-//        databaseNames.add("database5");
-
-        ObjectExplorer oe = new ObjectExplorer(null, databaseNames);
-        databaseNames.add("database1");
-        databaseNames.add("database2");
-        databaseNames.add("database3");
-        databaseNames.add("database4");
-        oe.updateDatabase(databaseNames);
-        frame.add(oe, BorderLayout.CENTER);
-        frame.setVisible(true);
-
-    }
 
 }
