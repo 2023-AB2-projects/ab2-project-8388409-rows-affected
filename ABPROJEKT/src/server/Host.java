@@ -81,44 +81,7 @@ public class Host {
         }
 
         System.out.println("Starting server...");
-//
-//        JSONObject databases = new JSONObject();
-//        JSONArray databasesArray = new JSONArray();
-//        databases.put("Databases", databasesArray);
-//
-//
-//        try {
-//            Reader reader = new FileReader("Catalog.json");
-//            catalog = (JSONObject) new JSONParser().parse(reader);
-//        } catch (FileNotFoundException e) {
-//            try {
-//                FileWriter fileWriter = new FileWriter("Catalog.json");
-//                fileWriter.write(databases.toJSONString());
-//                fileWriter.close();
-//            } catch (IOException ex) {
-//                throw new RuntimeException(ex);
-//            }
-//        } catch (ParseException e) {
-//            System.out.println("Catalog is empty, initializing...");
-//            FileWriter fileWriter = null;
-//            try {
-//                fileWriter = new FileWriter("Catalog.json");
-//            } catch (IOException ex) {
-//                throw new RuntimeException(ex);
-//            }
-//            try {
-//                fileWriter.write(databases.toJSONString());
-//            } catch (IOException ex) {
-//                throw new RuntimeException(ex);
-//            }
-//            try {
-//                fileWriter.close();
-//            } catch (IOException ex) {
-//                throw new RuntimeException(ex);
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+
     }
 
     private void Create_socket_communication() {
@@ -135,7 +98,7 @@ public class Host {
 
             // Send a welcome message to the client
             out.println("Welcome to the server!");
-
+            out.println(new DataBaseNames().getDatabaseNames());
             String inputLine;
 
             while (true) {
@@ -207,6 +170,14 @@ public class Host {
 
                     System.out.println("|=> parsed command: " + fullInput);
                     new Parser(fullInput, this);
+
+
+                    if (fullInput.contains("CREATE DATABASE")){
+//                        add USE DATABASE
+                        fullInput = "USE " + fullInput.substring(16);
+                        System.out.println("|=> parsed command: " + fullInput);
+                        new Parser(fullInput, this);
+                    }
 
                     acc = "";
                     command = new StringBuilder();
