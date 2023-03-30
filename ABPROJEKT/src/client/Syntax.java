@@ -14,9 +14,9 @@ import java.util.List;
 
 public class Syntax {
     private List<String> syntax;
-    private Kliens kliens;
+    private KliensNew kliens;
 
-    public Syntax(Kliens kliens) {
+    public Syntax(KliensNew kliens) {
         this.kliens = kliens;
         syntax = new ArrayList<>();
         readSyntaxFile();
