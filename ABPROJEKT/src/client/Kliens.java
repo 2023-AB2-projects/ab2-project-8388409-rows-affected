@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.Socket;
+
 import static java.lang.System.exit;
 
 
@@ -15,7 +16,7 @@ public class Kliens extends JFrame implements Runnable {
     private JTextArea textAreas = new JTextArea();
     private JTextArea outText = new JTextArea();
     private JTable table;
-
+    private VisualQueryDesigner visualQueryDesignerFrame;
     private boolean connected = false;
     private boolean send = false;
 
@@ -30,7 +31,7 @@ public class Kliens extends JFrame implements Runnable {
         setSize(1000, 700);
         setLocationRelativeTo(null);
 
-        syntax = new Syntax(this);
+//        syntax = new Syntax(this);
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 15));
@@ -59,6 +60,7 @@ public class Kliens extends JFrame implements Runnable {
         JButton execButton = new JButton("Execute");
         JButton clear = new JButton("Clear");
         JButton exit = new JButton("Exit");
+        JButton visualQueryDesigner = new JButton("Visual Query Designer");
 
         JComboBox<String> comboBox = new JComboBox<>();
         comboBox.setEditable(true);
@@ -66,10 +68,11 @@ public class Kliens extends JFrame implements Runnable {
 
         gombPanel.add(comboBox);
         gombPanel.add(connectionButton);
-        gombPanel.setBounds(0,0,getWidth(),10);
+        gombPanel.setBounds(0, 0, getWidth(), 10);
 
         execButton.addActionListener(e -> {
             print("Execute");
+
             syntax.syntaxHighlighting();
 
             send = true;
@@ -78,6 +81,11 @@ public class Kliens extends JFrame implements Runnable {
         clear.addActionListener(e -> {
             print("Clear");
             textArea.setText("");
+        });
+
+        visualQueryDesigner.addActionListener(e -> {
+            print("Visual Query Designer");
+            visualQueryDesignerFrame = new VisualQueryDesigner();
         });
 
         connectionButton.addActionListener(e -> {
@@ -100,7 +108,7 @@ public class Kliens extends JFrame implements Runnable {
             System.out.println("Exit");
             textArea.setText("EXIT");
             send = true;
-            try{
+            try {
                 Thread.sleep(1000);
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
@@ -122,10 +130,13 @@ public class Kliens extends JFrame implements Runnable {
                                 }
         );
 
+
+
         gombPanel.add(execButton, BorderLayout.WEST);
         gombPanel.add(clear, BorderLayout.EAST);
         gombPanel.add(connectionButton, BorderLayout.WEST);
         gombPanel.add(exit, BorderLayout.EAST);
+        gombPanel.add(visualQueryDesigner, BorderLayout.EAST);
 
         panel.add(gombPanel, BorderLayout.NORTH);
         panel.add(scrollText, BorderLayout.CENTER);
@@ -136,6 +147,7 @@ public class Kliens extends JFrame implements Runnable {
         setVisible(true);
 
     }
+
     private int connectToServer() {
         String hostName = "localhost";
         int portNumber = 1234;
@@ -153,10 +165,10 @@ public class Kliens extends JFrame implements Runnable {
 
             while (connected) {
 
-                while (!send){
+                while (!send) {
                     try {
                         Thread.sleep(100);
-                        if (in.ready()){
+                        if (in.ready()) {
                             serverResponse = in.readLine();
                             print("Server: " + serverResponse);
                         }
@@ -168,19 +180,23 @@ public class Kliens extends JFrame implements Runnable {
                 }
 
                 userInput = textArea.getText();
-                out.println(userInput+"\n__end_of_file__");
+                out.println(userInput + "\n__end_of_file__");
                 print("Client: " + userInput);
                 send = false;
-                if(userInput.equals("EXIT")){
+                if (userInput.equals("EXIT")) {
                     connected = false;
+
                     textArea.setText(textAreas.getText());
-                    return 0;
+                    break;
                 }
             }
         } catch (IOException e) {
             System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
+            print("Disconnected");
+            connectionButton.setText("Connect");
             print(e.getMessage());
         }
+        connectionButton.setText("Connect");
         return -1;
 
     }
@@ -188,12 +204,6 @@ public class Kliens extends JFrame implements Runnable {
     public void print(String s) {
         outText.setText(outText.getText() + "\n" + s);
         System.out.println(s);
-    }
-
-    public static void main(String[] args) {
-
-        new Kliens();
-
     }
 
     @Override
@@ -209,6 +219,10 @@ public class Kliens extends JFrame implements Runnable {
 
     public void setTextArea(String text) {
         this.textArea.setText(text);
+    }
+
+    public static void main(String[] args) {
+        new Kliens();
     }
 }
 
