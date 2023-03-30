@@ -19,7 +19,7 @@ public class Parser {
         System.out.println("Parser : " + input);
 
         // USE
-        if (input.contains("USE")) {
+        if (input.toUpperCase().contains("USE")) {
             System.out.println("USE");
             String[] split = input.split(" ");
             if (split.length <= 1) {
@@ -39,7 +39,7 @@ public class Parser {
         }
 
         // CREATE DATABASE
-        if (input.contains("CREATE DATABASE")) {
+        if (input.toUpperCase().contains("CREATE DATABASE")) {
             System.out.println("CREATE DATABASE");
             String[] split = input.split(" ");
             if (split.length <= 2) {
@@ -58,7 +58,7 @@ public class Parser {
         }
 
         // DROP DATABASE
-        if (input.contains("DROP DATABASE")) {
+        if (input.toUpperCase().contains("DROP DATABASE")) {
             System.out.println("DROP DATABASE");
             String[] split = input.split(" ");
             if (split.length <= 2) {
@@ -71,7 +71,7 @@ public class Parser {
 
         // CREATE TABLE
         String currentDatabase = host.getCurrentDatabase();
-        if (input.contains("CREATE TABLE")) {
+        if (input.toUpperCase().contains("CREATE TABLE")) {
             System.out.println("CREATE TABLE");
             String[] split = input.split(" ");
             if (split.length <= 2) {
@@ -96,7 +96,7 @@ public class Parser {
         }
 
         // DROP TABLE
-        if (input.contains("DROP TABLE")) {
+        if (input.toUpperCase().contains("DROP TABLE")) {
             System.out.println("DROP TABLE");
             String[] split = input.split(" ");
             if (split.length <= 2) {
@@ -115,7 +115,7 @@ public class Parser {
         }
 
         // CRERATE INDEX indexname ON tablename (columnname,...)
-        if (input.contains("CREATE INDEX")) {
+        if (input.toUpperCase().contains("CREATE INDEX")) {
             System.out.println("CREATE INDEX");
             String[] split = input.split(" ");
             if (split.length <= 4) {

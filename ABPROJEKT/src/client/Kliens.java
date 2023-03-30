@@ -30,7 +30,7 @@ public class Kliens extends JFrame implements Runnable {
         setSize(1000, 700);
         setLocationRelativeTo(null);
 
-        syntax = new Syntax(this);
+//        syntax = new Syntax(this);
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 15));

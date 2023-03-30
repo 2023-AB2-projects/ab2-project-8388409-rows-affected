@@ -42,7 +42,7 @@ public class KliensNew extends JFrame implements Runnable {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
 
-        syntax = new Syntax(this);
+//        syntax = new Syntax (this);
         tabsCounter = 0;
         leftPanel = new SidePanel(this);
         rightPanel = new SidePanel(this);
@@ -284,7 +284,7 @@ public class KliensNew extends JFrame implements Runnable {
             connectionButton.setText("Connect");
             print(e.getMessage());
         }
-        connectionButton.setText("Connect");
+        connectionButton.setText("Connect"); // TODO java.lang.NullPointerException: Cannot invoke "javax.swing.JButton.setText(String)" because "this.connectionButton" is null
         return -1;
 
     }

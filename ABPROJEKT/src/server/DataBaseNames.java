@@ -18,8 +18,10 @@ public class DataBaseNames {
         try{
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
             Database myDatabase = null;
-            for (Database database : databases.getDatabases()) {
-                databaseNames.add(database.get_dataBaseName());
+            if (databases.getDatabases() != null) {
+                for (Database database : databases.getDatabases()) {
+                    databaseNames.add(database.get_dataBaseName());
+                }
             }
         }catch (Exception e) {
             e.printStackTrace();
