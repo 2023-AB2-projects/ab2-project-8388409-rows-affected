@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SidePanel extends JPanel {
-
     private KliensNew kliensNew;
     public SidePanel(KliensNew kliensNew){
 
@@ -13,7 +12,6 @@ public class SidePanel extends JPanel {
         setBorder(BorderFactory.createLineBorder(Color.black, 0, true));
         setLayout(new FlowLayout());
         initComponents();
-
 
         setVisible(true);
     }
