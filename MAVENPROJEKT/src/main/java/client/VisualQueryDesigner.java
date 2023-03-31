@@ -1,21 +1,19 @@
 package client;
 
 import javax.swing.*;
+import java.awt.*;
 
-public class VisualQueryDesigner extends JFrame {
+public class VisualQueryDesigner extends JPanel {
 
-    public VisualQueryDesigner(){
+    private JTable table;
+    public VisualQueryDesigner(KliensNew kliens){
 
-        this.setTitle("Visual Query Designer");
-        this.setSize(1000, 700);
-        this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBackground(new Color(233, 255, 255));
+        table = new JTable();
 
-
+        this.add(table);
         this.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        new VisualQueryDesigner();
-    }
+
 }

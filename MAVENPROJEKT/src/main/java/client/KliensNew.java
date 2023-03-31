@@ -181,7 +181,10 @@ public class KliensNew extends JFrame implements Runnable {
 
         newVisualQueryDesigner.addActionListener(e -> {
             String tabName = "VQD " + tabsCounter;
+            JComponent VisualQueryDesigner = new VisualQueryDesigner(this);
             tabbedPane.addTab(tabName, VisualQueryDesigner);
+
+            tabsCounter++;
         });
 
         clear.addActionListener(e -> {
