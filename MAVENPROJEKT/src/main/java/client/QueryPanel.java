@@ -35,7 +35,10 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
         JScrollPane scrollTextResp = new JScrollPane(outText);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-//        if cliced on this tab, then set the textArea to the textArea of this tab
+        // set fix size for the text area
+        scrollText.setPreferredSize(new Dimension(1000, 300));
+        scrollTextResp.setPreferredSize(new Dimension(1000, 300));
+
 
         add(scrollText);
         add(scrollTextResp);
