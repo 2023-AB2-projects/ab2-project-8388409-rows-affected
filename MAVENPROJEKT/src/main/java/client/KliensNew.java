@@ -9,16 +9,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import static java.lang.System.exit;
 
 public class KliensNew extends JFrame implements Runnable {
 
-    private SidePanel leftPanel;
+    private ObjectExplorer leftPanel;
     private SidePanel rightPanel;
     private SidePanel topPanel;
     private JTabbedPane tabbedPane;
+    private JTabbedPane rightPanelTabs;
 
+    private JPanel queryPanelOptions;
+    private JPanel visualQueryDesignerOptions;
     private JComponent QueryPanel;
     private JComponent VisualQueryDesigner;
     private JScrollPane scrollTextResp = new JScrollPane();
@@ -27,12 +31,14 @@ public class KliensNew extends JFrame implements Runnable {
     private JTextArea outText = new JTextArea();
     private boolean connected = false;
     private boolean send = false;
-    private JButton connectionButton = new JButton();
+    private JButton connectionButton;
     private int currentTabId = -1;
     private QueryPanel currentQueryPanel;
     private Syntax syntax;
-
+    private boolean responseToUser = true;
     private int tabsCounter;
+
+    private ArrayList<String> databases;
 
     KliensNew() {
 //        InitQueryPanel();
@@ -42,14 +48,27 @@ public class KliensNew extends JFrame implements Runnable {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
 
-//        syntax = new Syntax (this);
+        databases = new ArrayList<>();
+        syntax = new Syntax(this);
         tabsCounter = 0;
-        leftPanel = new SidePanel(this);
+        leftPanel = new ObjectExplorer(this,databases);
         rightPanel = new SidePanel(this);
         topPanel = new SidePanel(this);
         tabbedPane = new JTabbedPane();
+        rightPanelTabs = new JTabbedPane();
         QueryPanel = new JPanel();
         VisualQueryDesigner = new JPanel();
+        queryPanelOptions = new JPanel();
+        visualQueryDesignerOptions = new JPanel();
+        configQueryPanelOptions();
+        configVisualQueryDesignerOptions();
+
+        rightPanelTabs.addTab("Query Opt", queryPanelOptions);
+        rightPanelTabs.addTab("VQD Opt", visualQueryDesignerOptions);
+        rightPanelTabs.setPreferredSize(new Dimension(300, 700));
+        rightPanelTabs.setEnabled(false);
+        rightPanel.add(rightPanelTabs);
+
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 15));
@@ -67,12 +86,6 @@ public class KliensNew extends JFrame implements Runnable {
 
 
         QueryPanel.add(scrollText);
-
-
-//        tabbedPane.addTab("Query", QueryPanel);
-
-//        tabbedPane.addTab("Visual Query Designer", VisualQueryDesigner);
-
 
         JButton connectionButton = new JButton("Connect");
         JButton execButton = new JButton("Execute");
@@ -93,6 +106,7 @@ public class KliensNew extends JFrame implements Runnable {
         ButtonEventsAndActions(connectionButton, execButton, clear, exit, newVisualQueryDesigner, newQuery);
         resizeWindowLayout();
 
+
         this.add(leftPanel);
         this.add(rightPanel);
         this.add(topPanel);
@@ -101,15 +115,73 @@ public class KliensNew extends JFrame implements Runnable {
         this.setVisible(true);
     }
 
-    public void print(String s) {
-        outText.setText(outText.getText() + "\n" + s);
-        System.out.println(s);
+    private void configQueryPanelOptions() {
+        queryPanelOptions.setBackground(new Color(134, 134, 134));
 
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            if (tabbedPane.getComponentAt(i) instanceof QueryPanel) {
-                QueryPanel queryPanel = (QueryPanel) tabbedPane.getComponentAt(i);
-                queryPanel.setOutText(outText.getText());
+    }
+    private void configVisualQueryDesignerOptions() {
+        VisualQueryDesigner.setBackground(new Color(98, 98, 98));
+        VisualQueryDesigner.setLayout(new BoxLayout(VisualQueryDesigner, BoxLayout.Y_AXIS));
+        JButton button = new JButton("New row");
+        visualQueryDesignerOptions.add(button);
+
+
+    }
+    public void processInformation(String valasz) {
+
+//        convert to arrylist valasz
+
+        String[] valaszArray2 = valasz.split(" ");
+
+        for (String s : valaszArray2) {
+            s=s.trim();
+
+            s=s.replace(",", "");
+            System.out.println(s);
+
+            if (s.contains("[__databases__")) {
+                databases.clear();
+                System.out.println("databases cleared");
+                continue;
             }
+            if (s.contains("__databases_end__]")) {
+                responseToUser = true;
+                System.out.println("databases end");
+                for (String s1 : databases) {
+                    System.out.println(s1);
+                }
+                leftPanel.updateDatabase(databases);
+                leftPanel.repaint();
+                resizeWindowLayout();
+                continue;
+            }
+            System.out.println("databases added");
+            databases.add(s);
+            leftPanel.repaint();
+        }
+
+
+    }
+
+    public void print(String s) {
+
+        if (s.contains("__databases__"))
+            responseToUser = false;
+
+        if (responseToUser) {
+
+            outText.setText(outText.getText() + "\n" + s);
+            System.out.println(s);
+
+            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+                if (tabbedPane.getComponentAt(i) instanceof QueryPanel) {
+                    QueryPanel queryPanel = (QueryPanel) tabbedPane.getComponentAt(i);
+                    queryPanel.setOutText(outText.getText());
+                }
+            }
+        }
+        else {
+            processInformation(s);
         }
 
     }
@@ -127,16 +199,35 @@ public class KliensNew extends JFrame implements Runnable {
     }
     private void ButtonEventsAndActions(JButton connectionButton, JButton execButton, JButton clear, JButton exit, JButton newVisualQueryDesigner, JButton newQuery) {
 
+        tabbedPane.addChangeListener(e1 -> {
+            if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
+
+                rightPanelTabs.setSelectedIndex(0);
+            }
+        });
+
+        tabbedPane.addChangeListener(e1 -> {
+            if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
+                rightPanelTabs.setSelectedIndex(1);
+            }
+        });
+
         newQuery.addActionListener(e -> {
             String tabName = "Query " + tabsCounter;
             JComponent queryPanel = new QueryPanel(this, tabbedPane);
             tabbedPane.addTab(tabName, queryPanel);
             tabsCounter++;
+            rightPanelTabs.setSelectedIndex(0);
+
         });
 
         newVisualQueryDesigner.addActionListener(e -> {
             String tabName = "VQD " + tabsCounter;
+            JComponent VisualQueryDesigner = new VisualQueryDesigner(this);
             tabbedPane.addTab(tabName, VisualQueryDesigner);
+            tabsCounter++;
+            rightPanelTabs.setSelectedIndex(1);
+
         });
 
         clear.addActionListener(e -> {
@@ -154,6 +245,8 @@ public class KliensNew extends JFrame implements Runnable {
                 new Thread(this).start();
 
             } else {
+                databases.clear();
+                leftPanel.repaint();
                 connectionButton.setText("Connect");
                 textAreas = new JTextArea(textArea.getText());
                 textArea.setText("EXIT");
@@ -284,7 +377,9 @@ public class KliensNew extends JFrame implements Runnable {
             connectionButton.setText("Connect");
             print(e.getMessage());
         }
-        connectionButton.setText("Connect"); // TODO java.lang.NullPointerException: Cannot invoke "javax.swing.JButton.setText(String)" because "this.connectionButton" is null
+
+        if (connectionButton != null)
+            connectionButton.setText("Connect");
         return -1;
 
     }
@@ -300,7 +395,9 @@ public class KliensNew extends JFrame implements Runnable {
     public void setTextArea(String text) {
         this.textArea.setText(text);
     }
-
+    public void setOptionTabbedPane(int index){
+        tabbedPane.setSelectedIndex(index);
+    }
 
     public static void main(String[] args) {
         new KliensNew();

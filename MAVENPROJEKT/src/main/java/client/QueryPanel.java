@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import javax.swing.border.Border;
 
 public class QueryPanel extends JComponent implements Accessible, MenuElement {
 
@@ -24,8 +25,6 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
         textArea.setBorder(BorderFactory.createLineBorder(Color.black));
 
 
-
-
         JScrollPane scrollText = new JScrollPane(textArea);
 
         outText = new JTextArea();
@@ -36,7 +35,10 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
         JScrollPane scrollTextResp = new JScrollPane(outText);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-//        if cliced on this tab, then set the textArea to the textArea of this tab
+        // set fix size for the text area
+        scrollText.setPreferredSize(new Dimension(1000, 300));
+        scrollTextResp.setPreferredSize(new Dimension(1000, 300));
+
 
         add(scrollText);
         add(scrollTextResp);
@@ -85,4 +87,6 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
     public void setOutText(String text) {
         outText.setText(text);
     }
+
+
 }

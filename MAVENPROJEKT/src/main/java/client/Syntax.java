@@ -50,6 +50,7 @@ public class Syntax {
 //        save cursors position
 
         JTextArea textArea = kliens.getTextArea();
+
         int poz = textArea.getCaretPosition();
 
 
