@@ -20,7 +20,6 @@ public class KliensNew extends JFrame implements Runnable {
     private final SidePanel topPanel;
     private final JTabbedPane tabbedPane;
     private final JTabbedPane rightPanelTabs;
-
     private final JPanel queryPanelOptions;
     private final JPanel visualQueryDesignerOptions;
     private final JComponent QueryPanel;
@@ -68,6 +67,7 @@ public class KliensNew extends JFrame implements Runnable {
         rightPanelTabs.setPreferredSize(new Dimension(300, 700));
         rightPanelTabs.setEnabled(false);
         rightPanel.add(rightPanelTabs);
+        rightPanelTabs.setVisible(false);
 
 
         textArea = new JTextArea();
@@ -87,7 +87,18 @@ public class KliensNew extends JFrame implements Runnable {
 
         QueryPanel.add(scrollText);
 
-        JButton connectionButton = new JButton("Connect");
+        JButton connectionButton = new JButton("Connect") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (connected) {
+                    g.setColor(Color.GREEN);
+                } else {
+                    g.setColor(Color.RED);
+                }
+                g.fillOval(getWidth() / 10, getHeight() / 2 - 1, 3, 3);
+            }
+        };
         JButton execButton = new JButton("Execute");
         JButton clear = new JButton("Clear");
         JButton exit = new JButton("Exit");
@@ -95,12 +106,12 @@ public class KliensNew extends JFrame implements Runnable {
 
         JButton newVisualQueryDesigner = new JButton("Visual Query Designer");
         topPanel.add(connectionButton);
-        topPanel.add(execButton);
-        topPanel.add(clear);
+        topPanel.add(newQuery);
         topPanel.add(newVisualQueryDesigner);
         topPanel.add(exit);
-        topPanel.add(newQuery);
 
+        queryPanelOptions.add(execButton);
+        queryPanelOptions.add(clear);
 //        InitQueryPanel();
         EventsAndActions();
         ButtonEventsAndActions(connectionButton, execButton, clear, exit, newVisualQueryDesigner, newQuery);
@@ -116,7 +127,7 @@ public class KliensNew extends JFrame implements Runnable {
     }
 
     private void configQueryPanelOptions() {
-        queryPanelOptions.setBackground(new Color(134, 134, 134));
+//        queryPanelOptions.setBackground(new Color(134, 134, 134));
 
     }
     private void configVisualQueryDesignerOptions() {
@@ -124,7 +135,6 @@ public class KliensNew extends JFrame implements Runnable {
         VisualQueryDesigner.setLayout(new BoxLayout(VisualQueryDesigner, BoxLayout.Y_AXIS));
         JButton button = new JButton("New row");
         visualQueryDesignerOptions.add(button);
-
 
     }
     public void processInformation(String valasz) {
@@ -200,16 +210,16 @@ public class KliensNew extends JFrame implements Runnable {
 
         tabbedPane.addChangeListener(e1 -> {
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
-
+                rightPanelTabs.setVisible(true);
                 rightPanelTabs.setSelectedIndex(0);
+            } else if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
+                rightPanelTabs.setVisible(true);
+                rightPanelTabs.setSelectedIndex(1);
+            } else {
+                rightPanelTabs.setVisible(false);
             }
         });
 
-        tabbedPane.addChangeListener(e1 -> {
-            if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
-                rightPanelTabs.setSelectedIndex(1);
-            }
-        });
 
         newQuery.addActionListener(e -> {
             String tabName = "Query " + tabsCounter;
@@ -319,11 +329,13 @@ public class KliensNew extends JFrame implements Runnable {
         this.currentQueryPanel = queryPanel;
     }
 
-
     @Override
     public void run() {
         if (connectToServer() != 0) {
             connectionButton.setText("Connect");
+        } else {
+            connectionButton.setText("Disconnect");
+
         }
     }
 
@@ -373,12 +385,15 @@ public class KliensNew extends JFrame implements Runnable {
         } catch (IOException e) {
             System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
             print("Disconnected");
-            connectionButton.setText("Connect");
+            connected = false;
+
             print(e.getMessage());
         }
 
-        if (connectionButton != null)
+        if (connectionButton != null) {
             connectionButton.setText("Connect");
+            connected = false;
+        }
         return -1;
 
     }
