@@ -14,6 +14,10 @@ public class UseDatabase {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             Databases databases = objectMapper.readValue(new FileReader("Catalog.json"), Databases.class);
+            if (databases.getDatabases() == null) {
+                parser.setParserError(true);
+                return;
+            }
             for (Database database : databases.getDatabases()) {
                 if (database.get_dataBaseName().equals(currentDatabase)) {
                     parser.setParserError(false);

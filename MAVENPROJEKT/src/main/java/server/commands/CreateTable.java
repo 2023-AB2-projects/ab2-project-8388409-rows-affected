@@ -158,21 +158,19 @@ public class CreateTable {
                     }
 
                     // check if the structure is correct
-                    if (spl.length != 4) {
+                    if (spl.length != 5) {
                         parser.setOtherError("Invalid other: incorrect foreign key syntax");
                         return;
                     }
 
                     // check if () is present
-                    if (!spl[3].contains("(") || !spl[3].contains(")")) {
+                    if (!spl[4].contains("(") || !spl[4].contains(")")) {
                         parser.setOtherError("Invalid other: () is missing");
                         return;
                     }
 
-                    String refTableandattr = spl[3];
-
-                    String refTable = refTableandattr.substring(0, refTableandattr.indexOf("("));
-                    String refAttr = refTableandattr.substring(refTableandattr.indexOf("(") + 1, refTableandattr.indexOf(")"));
+                    String refTable = spl[3];
+                    String refAttr = spl[4].substring(spl[4].indexOf('(') + 1, spl[4].indexOf(')'));
 
                     // check if refTable exists
                     boolean refTableExists = false;
@@ -206,6 +204,23 @@ public class CreateTable {
                         parser.setOtherError("Referenced attribute does not exist");
                         return;
                     }
+                    // check if refAttr is primary key and the type is the same
+                    for (int j = 0; j < tables.size(); j++) {
+                        Table table2 = tables.get(j);
+                        if (table2.get_tableName().equals(refTable)) {
+                            for (int k = 0; k < table2.getStructure().getAttributes().size(); k++) {
+                                Attribute attr2 = table2.getStructure().getAttributes().get(k);
+                                if (attr2.get_attributeName().equals(refAttr)) {
+                                    if (!attr2.get_type().equals(type)) {
+                                        parser.setOtherError("Referenced attribute type does not match");
+                                        return;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
 
                     ForeignKey fk = new ForeignKey(name, new Refferences(refTable, refAttr));
                     newTable.getForeignKeys().add(fk);

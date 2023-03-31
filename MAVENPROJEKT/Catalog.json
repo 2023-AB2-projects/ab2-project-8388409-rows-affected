@@ -1,1 +1,75 @@
-{"databases":null}
+{
+  "databases": [
+    {
+      "_dataBaseName": "ab",
+      "tables": [
+        {
+          "_tableName": "tbl",
+          "_rowLength": "0",
+          "_fileName": "tbl.json",
+          "indexFiles": {
+            "indexFiles": null
+          },
+          "uniqueKeys": [],
+          "foreignKeys": [],
+          "primaryKeys": [
+            {
+              "pkAttribute": "id"
+            }
+          ],
+          "structure": {
+            "attributes": [
+              {
+                "_attributeName": "id",
+                "_isnull": "0",
+                "_type": "int"
+              },
+              {
+                "_attributeName": "r",
+                "_isnull": "0",
+                "_type": "float"
+              }
+            ]
+          }
+        },
+        {
+          "_tableName": "tbl2",
+          "_rowLength": "0",
+          "_fileName": "tbl2.json",
+          "indexFiles": {
+            "indexFiles": null
+          },
+          "uniqueKeys": [],
+          "foreignKeys": [
+            {
+              "fkAttribute": "f",
+              "refferences": {
+                "refTable": "tbl",
+                "refAttribute": "r"
+              }
+            }
+          ],
+          "primaryKeys": [
+            {
+              "pkAttribute": "id"
+            }
+          ],
+          "structure": {
+            "attributes": [
+              {
+                "_attributeName": "id",
+                "_isnull": "0",
+                "_type": "int"
+              },
+              {
+                "_attributeName": "f",
+                "_isnull": "0",
+                "_type": "float"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

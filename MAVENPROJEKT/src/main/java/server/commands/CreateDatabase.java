@@ -3,10 +3,6 @@ package server.commands;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import server.Parser;
 import server.jacksonclasses.Database;
 import server.jacksonclasses.Databases;
@@ -14,7 +10,6 @@ import server.jacksonclasses.Databases;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class CreateDatabase {
     public CreateDatabase(String databaseName, Parser parser) {
