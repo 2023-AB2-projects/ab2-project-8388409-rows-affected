@@ -19,7 +19,10 @@ public class KliensNew extends JFrame implements Runnable {
     private SidePanel rightPanel;
     private SidePanel topPanel;
     private JTabbedPane tabbedPane;
+    private JTabbedPane rightPanelTabs;
 
+    private JPanel queryPanelOptions;
+    private JPanel visualQueryDesignerOptions;
     private JComponent QueryPanel;
     private JComponent VisualQueryDesigner;
     private JScrollPane scrollTextResp = new JScrollPane();
@@ -52,8 +55,20 @@ public class KliensNew extends JFrame implements Runnable {
         rightPanel = new SidePanel(this);
         topPanel = new SidePanel(this);
         tabbedPane = new JTabbedPane();
+        rightPanelTabs = new JTabbedPane();
         QueryPanel = new JPanel();
         VisualQueryDesigner = new JPanel();
+        queryPanelOptions = new JPanel();
+        visualQueryDesignerOptions = new JPanel();
+        configQueryPanelOptions();
+        configVisualQueryDesignerOptions();
+
+        rightPanelTabs.addTab("Query Opt", queryPanelOptions);
+        rightPanelTabs.addTab("VQD Opt", visualQueryDesignerOptions);
+        rightPanelTabs.setPreferredSize(new Dimension(300, 700));
+        rightPanelTabs.setEnabled(false);
+        rightPanel.add(rightPanelTabs);
+
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 15));
@@ -100,6 +115,18 @@ public class KliensNew extends JFrame implements Runnable {
         this.setVisible(true);
     }
 
+    private void configQueryPanelOptions() {
+        queryPanelOptions.setBackground(new Color(134, 134, 134));
+
+    }
+    private void configVisualQueryDesignerOptions() {
+        VisualQueryDesigner.setBackground(new Color(98, 98, 98));
+        VisualQueryDesigner.setLayout(new BoxLayout(VisualQueryDesigner, BoxLayout.Y_AXIS));
+        JButton button = new JButton("New row");
+        visualQueryDesignerOptions.add(button);
+
+
+    }
     public void processInformation(String valasz) {
 
 //        convert to arrylist valasz
@@ -172,19 +199,35 @@ public class KliensNew extends JFrame implements Runnable {
     }
     private void ButtonEventsAndActions(JButton connectionButton, JButton execButton, JButton clear, JButton exit, JButton newVisualQueryDesigner, JButton newQuery) {
 
+        tabbedPane.addChangeListener(e1 -> {
+            if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
+
+                rightPanelTabs.setSelectedIndex(0);
+            }
+        });
+
+        tabbedPane.addChangeListener(e1 -> {
+            if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
+                rightPanelTabs.setSelectedIndex(1);
+            }
+        });
+
         newQuery.addActionListener(e -> {
             String tabName = "Query " + tabsCounter;
             JComponent queryPanel = new QueryPanel(this, tabbedPane);
             tabbedPane.addTab(tabName, queryPanel);
             tabsCounter++;
+            rightPanelTabs.setSelectedIndex(0);
+
         });
 
         newVisualQueryDesigner.addActionListener(e -> {
             String tabName = "VQD " + tabsCounter;
             JComponent VisualQueryDesigner = new VisualQueryDesigner(this);
             tabbedPane.addTab(tabName, VisualQueryDesigner);
-
             tabsCounter++;
+            rightPanelTabs.setSelectedIndex(1);
+
         });
 
         clear.addActionListener(e -> {
@@ -352,7 +395,9 @@ public class KliensNew extends JFrame implements Runnable {
     public void setTextArea(String text) {
         this.textArea.setText(text);
     }
-
+    public void setOptionTabbedPane(int index){
+        tabbedPane.setSelectedIndex(index);
+    }
 
     public static void main(String[] args) {
         new KliensNew();

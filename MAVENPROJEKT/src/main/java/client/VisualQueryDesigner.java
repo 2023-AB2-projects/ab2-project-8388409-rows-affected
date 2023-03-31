@@ -10,7 +10,7 @@ public class VisualQueryDesigner extends JPanel {
 
         setBackground(new Color(233, 255, 255));
         table = new JTable();
-
+        table.setBounds(0, 0, 100, 100);
         this.add(table);
         this.setVisible(true);
     }
