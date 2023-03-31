@@ -5,7 +5,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import server.commands.*;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -149,14 +148,47 @@ public class Parser {
             System.out.println("Contents: " + contents);
 
             System.out.println("elso " + contents.toString().charAt(0));
-            System.out.println("utolso " + contents.toString().charAt(contents.length()-2));
+            System.out.println("utolso " + contents.toString().charAt(contents.length() - 2));
 
-            if (!(contents.toString().charAt(0) == '(') || !(contents.toString().charAt(contents.length()-2) == ')')) {
+            if (!(contents.toString().charAt(0) == '(') || !(contents.toString().charAt(contents.length() - 2) == ')')) {
                 host.setError("Invalid syntax");
                 return;
             }
 
             new CreateIndex(indexName, tableName, contents.toString(), currentDatabase.trim(), this);
+            if (otherError.equals("")) {
+                host.setError("");
+            } else {
+                host.setError(otherError);
+                otherError = "";
+            }
+        }
+
+        // INSERT INTO tablename VALUES (value1, value2, ...)
+        if (input.toUpperCase().contains("INSERT INTO")) {
+            System.out.println("INSERT INTO");
+            String[] split = input.split(" ");
+//            for (int i = 0; i < split.length; i++) {
+//                System.out.println("split[" + i + "] = " + split[i]);
+//            }
+            if (split.length <= 4) {
+                host.setError("Invalid syntax: INSERT INTO tablename VALUES (value1, value2, ...)");
+                return;
+            }
+            if (!split[3].equalsIgnoreCase("VALUES")) {
+                host.setError("Invalid syntax: INSERT INTO");
+                return;
+            }
+
+            String tableName = split[2];
+            String contents = split[4];
+            if (contents.charAt(0) != '(' || contents.charAt(contents.length() - 1) != ')') {
+                host.setError("Invalid syntax: VALUES()");
+                return;
+            }
+            contents = contents.substring(1, contents.length() - 1);
+
+            new InsertInto(currentDatabase, tableName, contents, this);
             if (otherError.equals("")) {
                 host.setError("");
             } else {

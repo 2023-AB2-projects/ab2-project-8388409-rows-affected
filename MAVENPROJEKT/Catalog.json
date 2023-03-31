@@ -1,22 +1,16 @@
 {
   "databases": [
     {
-      "_dataBaseName": "ab",
+      "_dataBaseName": "db",
       "tables": [
         {
-          "_tableName": "tbl",
+          "_tableName": "tabla",
           "_rowLength": "0",
-          "_fileName": "tbl.json",
+          "_fileName": "tabla.json",
           "indexFiles": {
             "indexFiles": null
           },
-          "uniqueKeys": [],
           "foreignKeys": [],
-          "primaryKeys": [
-            {
-              "pkAttribute": "id"
-            }
-          ],
           "structure": {
             "attributes": [
               {
@@ -25,49 +19,23 @@
                 "_type": "int"
               },
               {
-                "_attributeName": "r",
+                "_attributeName": "i2",
                 "_isnull": "0",
-                "_type": "float"
+                "_type": "int"
+              },
+              {
+                "_attributeName": "i3",
+                "_isnull": "0",
+                "_type": "int"
               }
             ]
-          }
-        },
-        {
-          "_tableName": "tbl2",
-          "_rowLength": "0",
-          "_fileName": "tbl2.json",
-          "indexFiles": {
-            "indexFiles": null
           },
           "uniqueKeys": [],
-          "foreignKeys": [
-            {
-              "fkAttribute": "f",
-              "refferences": {
-                "refTable": "tbl",
-                "refAttribute": "r"
-              }
-            }
-          ],
           "primaryKeys": [
             {
               "pkAttribute": "id"
             }
-          ],
-          "structure": {
-            "attributes": [
-              {
-                "_attributeName": "id",
-                "_isnull": "0",
-                "_type": "int"
-              },
-              {
-                "_attributeName": "f",
-                "_isnull": "0",
-                "_type": "float"
-              }
-            ]
-          }
+          ]
         }
       ]
     }

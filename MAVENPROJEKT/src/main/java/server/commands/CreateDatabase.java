@@ -3,16 +3,21 @@ package server.commands;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 import server.Parser;
 import server.jacksonclasses.Database;
 import server.jacksonclasses.Databases;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreateDatabase {
     public CreateDatabase(String databaseName, Parser parser) {
+
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
@@ -34,6 +39,14 @@ public class CreateDatabase {
                 databaseList.add(database);
                 databases.setDatabases(databaseList);
                 objectMapper.writeValue(new File("Catalog.json"), databases);
+
+                String connectionString = "mongodb://localhost:27017";
+                try (MongoClient mongoClient = MongoClients.create(connectionString)) {
+                    // create database in MongoDB
+                    MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
+                    mongoDatabase.createCollection(databaseName);
+                }
+
             } else {
                 parser.setParserError(true);
             }

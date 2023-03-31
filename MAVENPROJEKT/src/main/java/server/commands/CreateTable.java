@@ -1,14 +1,14 @@
 package server.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 import server.Parser;
 import server.jacksonclasses.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +24,7 @@ public class CreateTable {
     }
     public CreateTable(String tableName, String databaseName, String contents, Parser parser) {
         ObjectMapper objectMapper = new ObjectMapper();
+        boolean hasPrimaryKey = false;
         try {
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
             Database myDatabase = null;
@@ -106,7 +107,6 @@ public class CreateTable {
                 } else if (!other.equals("")) {
                     parser.setOtherError("Invalid other");
                     return;
-
                 }
 
                 // check if type is valid
@@ -142,6 +142,7 @@ public class CreateTable {
                 System.out.println("other: " + other);
 
                 if (other.toUpperCase().contains("PRIMARY KEY")) {
+                    hasPrimaryKey = true;
                     newTable.getPrimaryKeys().add(new PrimaryKey(name));
                 } else if (other.toUpperCase().contains("FOREIGN KEY")) {
                     //other foreign key stucture: FOREIGN KEY REFERENCES Persons(PersonID)
@@ -229,13 +230,25 @@ public class CreateTable {
                     newTable.getUniqueKeys().add(uk);
                 }
 
-                structure.getAttributes().add(new Attribute(name,"0",type));
+                structure.getAttributes().add(new Attribute(name, "0", type));
             }
 
+            if (!hasPrimaryKey) {
+                parser.setOtherError("No primary key");
+                return;
+            }
             newTable.setStructure(structure);
             tables.add(newTable);
             myDatabase.setTables(tables);
             objectMapper.writeValue(new File("Catalog.json"), databases);
+
+            String connectionString = "mongodb://localhost:27017";
+            try (MongoClient mongoClient = MongoClients.create(connectionString)) {
+                // create a collection in the database
+                MongoDatabase database = mongoClient.getDatabase(databaseName);
+                database.createCollection(tableName);
+            }
+
             System.out.println("Table created successfully");
 
         } catch (IOException e) {
