@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ObjectExplorer extends SidePanel {
 
-     private ArrayList<DatabaseIllustration> databaseIllustrations = new ArrayList<>();
+     private final ArrayList<DatabaseIllustration> databaseIllustrations = new ArrayList<>();
 
     public ObjectExplorer(KliensNew kliensNew, ArrayList<String> databaseNames) {
         super(kliensNew);

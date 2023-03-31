@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Syntax {
-    private List<String> syntax;
-    private KliensNew kliens;
+    private final List<String> syntax;
+    private final KliensNew kliens;
 
     public Syntax(KliensNew kliens) {
         this.kliens = kliens;
@@ -24,7 +24,7 @@ public class Syntax {
 
     private void readSyntaxFile() {
         try (
-                BufferedReader fr = new BufferedReader(new FileReader("syntax.txt"));
+                BufferedReader fr = new BufferedReader(new FileReader("syntax.txt"))
         ) {
             String line;
             while ((line = fr.readLine()) != null) {

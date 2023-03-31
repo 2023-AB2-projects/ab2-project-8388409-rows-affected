@@ -15,17 +15,17 @@ import static java.lang.System.exit;
 
 public class KliensNew extends JFrame implements Runnable {
 
-    private ObjectExplorer leftPanel;
-    private SidePanel rightPanel;
-    private SidePanel topPanel;
-    private JTabbedPane tabbedPane;
-    private JTabbedPane rightPanelTabs;
+    private final ObjectExplorer leftPanel;
+    private final SidePanel rightPanel;
+    private final SidePanel topPanel;
+    private final JTabbedPane tabbedPane;
+    private final JTabbedPane rightPanelTabs;
 
-    private JPanel queryPanelOptions;
-    private JPanel visualQueryDesignerOptions;
-    private JComponent QueryPanel;
-    private JComponent VisualQueryDesigner;
-    private JScrollPane scrollTextResp = new JScrollPane();
+    private final JPanel queryPanelOptions;
+    private final JPanel visualQueryDesignerOptions;
+    private final JComponent QueryPanel;
+    private final JComponent VisualQueryDesigner;
+    private final JScrollPane scrollTextResp = new JScrollPane();
     private JTextArea textArea;
     private JTextArea textAreas = new JTextArea();
     private JTextArea outText = new JTextArea();
@@ -34,11 +34,11 @@ public class KliensNew extends JFrame implements Runnable {
     private JButton connectionButton;
     private int currentTabId = -1;
     private QueryPanel currentQueryPanel;
-    private Syntax syntax;
+    private final Syntax syntax;
     private boolean responseToUser = true;
     private int tabsCounter;
 
-    private ArrayList<String> databases;
+    private final ArrayList<String> databases;
 
     KliensNew() {
 //        InitQueryPanel();
@@ -174,8 +174,7 @@ public class KliensNew extends JFrame implements Runnable {
             System.out.println(s);
 
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (tabbedPane.getComponentAt(i) instanceof QueryPanel) {
-                    QueryPanel queryPanel = (QueryPanel) tabbedPane.getComponentAt(i);
+                if (tabbedPane.getComponentAt(i) instanceof QueryPanel queryPanel) {
                     queryPanel.setOutText(outText.getText());
                 }
             }
@@ -334,7 +333,7 @@ public class KliensNew extends JFrame implements Runnable {
         try (
                 Socket clientSocket = new Socket(hostName, portNumber);
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
         ) {
             String userInput;
 

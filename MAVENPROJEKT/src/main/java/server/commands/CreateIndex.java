@@ -2,13 +2,10 @@ package server.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import server.Parser;
 import server.jacksonclasses.*;
-
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class CreateIndex {

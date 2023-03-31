@@ -9,10 +9,10 @@ import java.io.IOException;
 
 public class DatabaseIllustration extends JPanel {
 
-    private String databaseName;
-    private BufferedImage image;
+    private final String databaseName;
+    private final BufferedImage image;
     private boolean expanded = false;
-    private JButton button = new JButton("+");
+    private final JButton button = new JButton("+");
     public DatabaseIllustration(String databaseName){
         super();
 

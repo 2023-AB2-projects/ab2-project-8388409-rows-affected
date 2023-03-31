@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class DataBaseNames {
 
-    private ArrayList<String> databaseNames;
+    private final ArrayList<String> databaseNames;
 
     public DataBaseNames() {
         ObjectMapper objectMapper = new ObjectMapper();

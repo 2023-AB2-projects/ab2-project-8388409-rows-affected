@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class VisualQueryDesigner extends JPanel {
 
-    private JTable table;
+    private final JTable table;
     public VisualQueryDesigner(KliensNew kliens){
 
         setBackground(new Color(233, 255, 255));

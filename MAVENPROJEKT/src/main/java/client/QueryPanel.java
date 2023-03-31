@@ -9,11 +9,11 @@ import javax.swing.border.Border;
 
 public class QueryPanel extends JComponent implements Accessible, MenuElement {
 
-    private JTextArea textArea = new JTextArea();
+    private final JTextArea textArea = new JTextArea();
     private JTextArea outText = new JTextArea();
 
-    private JTabbedPane tabbedPane;
-    private KliensNew kliensNew;
+    private final JTabbedPane tabbedPane;
+    private final KliensNew kliensNew;
     public QueryPanel(KliensNew kliensNew, JTabbedPane tabbedPane){
         super();
 

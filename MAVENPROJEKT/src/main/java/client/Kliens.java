@@ -11,15 +11,15 @@ import static java.lang.System.exit;
 
 public class Kliens extends JFrame implements Runnable {
 
-    private JTextArea textArea;
+    private final JTextArea textArea;
     private JTextArea textAreas = new JTextArea();
     private JTextArea outText = new JTextArea();
-    private JTable table;
+    private final JTable table;
 
     private boolean connected = false;
     private boolean send = false;
 
-    private JButton connectionButton;
+    private final JButton connectionButton;
     private Syntax syntax;
 
 
@@ -142,7 +142,7 @@ public class Kliens extends JFrame implements Runnable {
         try (
                 Socket clientSocket = new Socket(hostName, portNumber);
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
         ) {
             String userInput;
 

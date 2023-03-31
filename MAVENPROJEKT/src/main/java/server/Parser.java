@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class Parser {
-    private Host host;
+    private final Host host;
     private boolean parserError = false;
     private String otherError = "";
     public Parser(String input, Host host) {

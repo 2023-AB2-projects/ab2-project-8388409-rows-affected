@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class Host {
-    private JSONObject catalog = new JSONObject();
+    private final JSONObject catalog = new JSONObject();
     private String currentDatabase = "";
 
     private String error;
-    private List<String> elvSzavak;
+    private final List<String> elvSzavak;
     private  String acc;
 
     private String answer = "";

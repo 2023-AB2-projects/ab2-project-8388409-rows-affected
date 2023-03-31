@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SidePanel extends JPanel {
-    private KliensNew kliensNew;
+    private final KliensNew kliensNew;
     public SidePanel(KliensNew kliensNew){
 
         this.kliensNew = kliensNew;
