@@ -2,7 +2,6 @@ package server.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import server.Parser;
 import server.jacksonclasses.*;
@@ -130,9 +129,11 @@ public class InsertInto {
                                         return;
                                     }
                                 } else if (attributeNames.get(i).toLowerCase().contains("varchar")) {
-                                    if (splitValues[i].charAt(0) != '\'' || splitValues[i].charAt(splitValues[i].length() - 1) != '\'') {
+                                    if ((splitValues[i].charAt(0) != '\'' || splitValues[i].charAt(splitValues[i].length() - 1) != '\'') || (splitValues[i].charAt(0) != '\"' || splitValues[i].charAt(splitValues[i].length() - 1) != '\"')) {
                                         parser.setOtherError("The value " + splitValues[i] + " is not a string");
                                         return;
+                                    } else {
+                                        splitValues[i] = splitValues[i].substring(1, splitValues[i].length() - 1);
                                     }
                                 }
                             }
@@ -144,13 +145,16 @@ public class InsertInto {
             contents = contents.replace(",", "#");
             contents = contents.substring(contents.indexOf("#") + 1);
 
+            if (primaryKeyType.equals("varchar")) {
+                primaryKeyValue = primaryKeyValue.substring(1, primaryKeyValue.length() - 1);
+            }
+
+
             String connectionString = "mongodb://localhost:27017";
-            MongoDatabase mongoDatabase;
             try (MongoClient mongoClient = create(connectionString)) {
                 Document document = new Document();
                 document.append(primaryKeyValue, contents);
                 mongoClient.getDatabase(databaseName).getCollection(tableName).insertOne(document);
-                mongoClient.close();
             } catch (Exception e) {
                 System.out.println(e);
                 throw new RuntimeException(e);

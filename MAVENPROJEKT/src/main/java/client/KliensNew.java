@@ -41,16 +41,18 @@ public class KliensNew extends JFrame implements Runnable {
 
     KliensNew() {
 //        InitQueryPanel();
-        this.setTitle("client.Kliens");
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setTitle("AB: Client");
         this.setSize(1000, 700);
         this.setLocationRelativeTo(this);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
+        this.setIconImage(new ImageIcon("src/main/resources/icons/ablogo512.jpg").getImage());
 
         databases = new ArrayList<>();
         syntax = new Syntax(this);
         tabsCounter = 0;
-        leftPanel = new ObjectExplorer(this,databases);
+        leftPanel = new ObjectExplorer(this, databases);
         rightPanel = new SidePanel(this);
         topPanel = new SidePanel(this);
         tabbedPane = new JTabbedPane();

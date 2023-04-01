@@ -10,7 +10,11 @@
           "indexFiles": {
             "indexFiles": null
           },
-          "foreignKeys": [],
+          "primaryKeys": [
+            {
+              "pkAttribute": "id"
+            }
+          ],
           "structure": {
             "attributes": [
               {
@@ -30,12 +34,37 @@
               }
             ]
           },
-          "uniqueKeys": [],
+          "foreignKeys": [],
+          "uniqueKeys": []
+        },
+        {
+          "_tableName": "tbl",
+          "_rowLength": "0",
+          "_fileName": "tbl.json",
+          "indexFiles": {
+            "indexFiles": null
+          },
           "primaryKeys": [
             {
               "pkAttribute": "id"
             }
-          ]
+          ],
+          "structure": {
+            "attributes": [
+              {
+                "_attributeName": "id",
+                "_isnull": "0",
+                "_type": "int"
+              },
+              {
+                "_attributeName": "str",
+                "_isnull": "0",
+                "_type": "varchar"
+              }
+            ]
+          },
+          "foreignKeys": [],
+          "uniqueKeys": []
         }
       ]
     }
