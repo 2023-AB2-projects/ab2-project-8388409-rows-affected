@@ -1,13 +1,12 @@
 package client;
 
+import server.Message;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -34,7 +33,7 @@ public class KliensNew extends JFrame implements Runnable {
     private int currentTabId = -1;
     private QueryPanel currentQueryPanel;
     private final Syntax syntax;
-    private boolean responseToUser = true;
+    private final boolean responseToUser = true;
     private int tabsCounter;
 
     private final ArrayList<String> databases;
@@ -137,66 +136,36 @@ public class KliensNew extends JFrame implements Runnable {
         visualQueryDesignerOptions.add(button);
 
     }
-    public void processInformation(String valasz) {
 
-//        convert to arrylist valasz
 
-        String[] valaszArray2 = valasz.split(" ");
+    private void processMessage(Message mess) {
 
-        for (String s : valaszArray2) {
-            s=s.trim();
+        System.out.println("processMessage");
+        System.out.println("mess.isMessageUserEmpy(): " + mess.isMessageUserEmpy());
+        System.out.println("mess.isMessageServerEmpy(): " + mess.isMessageServerEmpy());
+        System.out.println("mess.isDatabasesEmpty(): " + mess.isDatabasesEmpty());
 
-            s=s.replace(",", "");
-            System.out.println(s);
+        System.out.println("mess Message: " + mess.getMessageUser() + " \n" + mess.getMessageServer() + " \n" + mess.getDatabases() + " ");
+        if (!mess.isMessageUserEmpy()) {
+            System.out.println("mess.getMessageUser(): " + mess.getMessageUser());
+            outText.setText(outText.getText() + "\n" + mess.getMessageUser());
+        }
+        if (!mess.isMessageServerEmpy()) {
 
-            if (s.contains("[__databases__")) {
-                databases.clear();
-                System.out.println("databases cleared");
-                continue;
-            }
-            if (s.contains("__databases_end__]")) {
-                responseToUser = true;
-                System.out.println("databases end");
-                for (String s1 : databases) {
-                    System.out.println(s1);
-                }
-                leftPanel.updateDatabase(databases);
-                leftPanel.repaint();
-                resizeWindowLayout();
-                continue;
-            }
-            System.out.println("databases added");
-            databases.add(s);
+        }
+        if (!mess.isDatabasesEmpty()) {
+            System.out.println("mess.getDatabases(): " + mess.getDatabases());
+            databases.clear();
+            databases.addAll(mess.getDatabases());
+            leftPanel.updateDatabase(databases);
             leftPanel.repaint();
-        }
+            resizeWindowLayout();
 
-
-    }
-
-    public void print(String s) {
-
-        if (s.contains("__databases__"))
-            responseToUser = false;
-
-        if (responseToUser) {
-
-            outText.setText(outText.getText() + "\n" + s);
-            System.out.println(s);
-
-            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (tabbedPane.getComponentAt(i) instanceof QueryPanel queryPanel) {
-                    queryPanel.setOutText(outText.getText());
-                }
-            }
-        }
-        else {
-            processInformation(s);
         }
 
     }
 
     private void resizeWindowLayout(){
-
 
         leftPanel.resizePanel(0, getHeight() / 8, getWidth() / 4, getHeight());
         rightPanel.resizePanel(getWidth() - getWidth() / 4, getHeight() / 8, getWidth() / 4, getHeight());
@@ -212,6 +181,7 @@ public class KliensNew extends JFrame implements Runnable {
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
                 rightPanelTabs.setVisible(true);
                 rightPanelTabs.setSelectedIndex(0);
+                outText = ((QueryPanel) tabbedPane.getSelectedComponent()).getOutText();
             } else if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
                 rightPanelTabs.setVisible(true);
                 rightPanelTabs.setSelectedIndex(1);
@@ -227,6 +197,7 @@ public class KliensNew extends JFrame implements Runnable {
             tabbedPane.addTab(tabName, queryPanel);
             tabsCounter++;
             rightPanelTabs.setSelectedIndex(0);
+            tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 
         });
 
@@ -236,11 +207,11 @@ public class KliensNew extends JFrame implements Runnable {
             tabbedPane.addTab(tabName, VisualQueryDesigner);
             tabsCounter++;
             rightPanelTabs.setSelectedIndex(1);
+            tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 
         });
 
         clear.addActionListener(e -> {
-            print("Clear");
             textArea.setText("");
         });
 
@@ -292,7 +263,6 @@ public class KliensNew extends JFrame implements Runnable {
         );
 
         execButton.addActionListener(e -> {
-            print("Execute");
 
             int id = tabbedPane.getSelectedIndex();
             QueryPanel q = tabbedPane.getComponentAt(id) instanceof QueryPanel ? (QueryPanel) tabbedPane.getComponentAt(id) : null;
@@ -304,7 +274,6 @@ public class KliensNew extends JFrame implements Runnable {
         });
         tabbedPane.addChangeListener(e -> {
             if (tabbedPane.getSelectedComponent() == this) {
-                print("no query panel");
             }
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
                 currentQueryPanel = (QueryPanel) tabbedPane.getSelectedComponent();
@@ -313,6 +282,14 @@ public class KliensNew extends JFrame implements Runnable {
         });
 
 
+    }
+
+    private void print(String execute, int id) {
+
+    }
+
+    void print(String execute) {
+        outText.setText(outText.getText() + "\n" + execute);
     }
 
     private void EventsAndActions() {
@@ -331,74 +308,124 @@ public class KliensNew extends JFrame implements Runnable {
 
     @Override
     public void run() {
-        if (connectToServer() != 0) {
-            connectionButton.setText("Connect");
-        } else {
-            connectionButton.setText("Disconnect");
-
+//        if (connectToServer() != 0) {
+//            connectionButton.setText("Connect");
+//        } else {
+//            connectionButton.setText("Disconnect");
+//
+//        }
+        try {
+            connectSendReceive();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private int connectToServer() {
+    private void connectSendReceive() throws IOException {
         String hostName = "localhost";
         int portNumber = 1234;
         try (
                 Socket clientSocket = new Socket(hostName, portNumber);
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
+//                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+//                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
+                InputStream inputStream = clientSocket.getInputStream();
+                OutputStream outputStream = clientSocket.getOutputStream();
+                ObjectInputStream in = new ObjectInputStream(inputStream);
+                ObjectOutputStream oot = new ObjectOutputStream(outputStream)
         ) {
-            String userInput;
-
-            // Read server response and print to console
-            String serverResponse = in.readLine();
-            print("Server: " + serverResponse);
-
+            System.out.println("Connected to server");
+            Message message = new Message();
 
             while (connected) {
+                if (send) {
+                    message = new Message();
+                    message.setMessageUser(textArea.getText());
+                    message.setKlientID(tabbedPane.getSelectedIndex());
+                    oot.writeObject(message);
+                    oot.flush();
+                    send = false;
 
-                while (!send) {
-                    try {
-                        Thread.sleep(100);
-                        if (in.ready()) {
-                            serverResponse = in.readLine();
-                            print("Server: " + serverResponse);
-                        }
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        print(e.getMessage());
-                    }
                 }
-
-                userInput = textArea.getText();
-                print("Client: " + userInput);
-                out.println(userInput + "\n__end_of_file__");
-                print("Client: " + userInput);
-                send = false;
-                if (userInput.equals("EXIT")) {
-                    connected = false;
-
-                    textArea.setText(textAreas.getText());
-                    break;
+                if (inputStream.available() > 0) {
+                    System.out.println("Waiting for message");
+                    message = null;
+                    message = (Message) in.readObject();
+                    if (message != null) {
+                        System.out.println("New message");
+                        System.out.println(message.getMessageUser());
+                        processMessage(message);
+                    }
                 }
             }
         } catch (IOException e) {
-            System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
-            print("Disconnected");
-            connected = false;
-
-            print(e.getMessage());
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
-
-        if (connectionButton != null) {
-            connectionButton.setText("Connect");
-            connected = false;
-        }
-        return -1;
-
+//        catch (ClassNotFoundException e) {
+////            throw new RuntimeException(e);
+//            System.out.println("Class not found");
+//        }
     }
+//
+//    private int connectToServer() {
+//        String hostName = "localhost";
+//        int portNumber = 1234;
+//        try (
+//                Socket clientSocket = new Socket(hostName, portNumber);
+//                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+//                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
+//        ) {
+//            String userInput;
+//
+//            // Read server response and print to console
+//            String serverResponse = in.readLine();
+//            print("Server: " + serverResponse);
+//
+//            while (connected) {
+//
+//                while (!send) {
+//                    try {
+//                        Thread.sleep(100);
+//                        if (in.ready()) {
+//                            serverResponse = in.readLine();
+//                            print("Server: " + serverResponse);
+//                        }
+//
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                        print(e.getMessage());
+//                    }
+//                }
+//
+//                userInput = textArea.getText();
+//                print("Client: " + userInput);
+//                out.println(userInput + "\n__end_of_file__");
+//                print("Client: " + userInput);
+//                send = false;
+//                if (userInput.equals("EXIT")) {
+//                    connected = false;
+//
+//                    textArea.setText(textAreas.getText());
+//                    break;
+//                }
+//            }
+//        } catch (IOException e) {
+//            System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
+//            print("Disconnected");
+//            connected = false;
+//            print(e.getMessage());
+//        }
+//
+//        if (connectionButton != null) {
+//            connectionButton.setText("Connect");
+//            connected = false;
+//        }
+//        return -1;
+//
+//    }
 
-    public void setCurrentTabId(int id){
+    public void setCurrentTabId(int id) {
         currentTabId = id;
     }
 
