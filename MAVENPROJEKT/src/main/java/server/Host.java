@@ -1,4 +1,5 @@
 package server;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
 import server.jacksonclasses.Database;
@@ -10,7 +11,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Host {
     private final JSONObject catalog = new JSONObject();
@@ -18,7 +18,7 @@ public class Host {
 
     private String error;
     private final List<String> elvSzavak;
-    private  String acc;
+    private final String acc;
 
     private String answer = "";
 
@@ -28,6 +28,12 @@ public class Host {
         elvSzavak.add("USE");
         elvSzavak.add("CREATE");
         elvSzavak.add("DROP");
+        elvSzavak.add("use");
+        elvSzavak.add("create");
+        elvSzavak.add("drop");
+        elvSzavak.add("INSERT");
+        elvSzavak.add("insert");
+
         error = "";
         acc = "";
 
@@ -190,68 +196,32 @@ public class Host {
 
 
         StringBuilder command = new StringBuilder();
+//        newline character to space
+        input = input.replaceAll("\\r\\n|\\r|\\n", " ");
         String[] words = input.split(" ");
-        int command_length = 0;
-        if (!Objects.equals(acc, "")) {
-            command_length = acc.length();
-        }
 
 
+        ArrayList<String> commandList = new ArrayList<>();
+        String fullInput = "";
         for (int i = 0; i < words.length; i++) {
-
-//            System.out.println("command_length: " + command_length);
-
-            if (elvSzavak.contains(words[i].trim().toUpperCase())) {
-                if (command_length > 0) {
-
-                    String fullInput = (acc + command);
-                    fullInput = reformatParserInput(fullInput);
-
-                    System.out.println("|=> parsed command: " + fullInput);
-                    new Parser(fullInput, this);
-
-
-                    if (fullInput.contains("CREATE DATABASE")){
-//                        add USE DATABASE
-                        fullInput = "USE " + fullInput.substring(16);
-                        System.out.println("|=> parsed command: " + fullInput);
-                        new Parser(fullInput, this);
-                    }
-
-                    acc = "";
-                    command = new StringBuilder();
+            if (elvSzavak.contains(words[i].toUpperCase())) {
+                if (i == 0) {
+                    fullInput = words[i] + " ";
                 } else {
-                    System.out.println("adding STRONG word: " + words[i]);
-                    command = new StringBuilder();
+                    fullInput = fullInput.trim();
+                    System.out.println("|=> parsed command: " + fullInput + "|");
+                    new Parser(fullInput, this);
+                    fullInput = words[i] + " ";
                 }
-
-                command_length = 0;
-
+            } else {
+                fullInput += words[i] + " ";
             }
-//            if(words[i].equals("__end_of_file__"))
-//            {
-//                String fullInput = (acc + command);
-//                fullInput = reformatParserInput(fullInput);
-//
-//                System.out.println("|=> parsed command: " + fullInput);
-//                new Parser(fullInput, this);
-//                acc = "";
-//                answer = "ok";
-//                break;
-//            }
-            command.append(" ").append(words[i]);
-            command_length += words[i].length() + 1;
-
         }
-
-        String fullInput = (acc + command);
-        fullInput = reformatParserInput(fullInput);
-
-        System.out.println("|=> parsed command: " + fullInput);
+        fullInput = fullInput.trim();
+        System.out.println("|=> parsed command: " + fullInput + "| ");
         new Parser(fullInput, this);
-        acc = "";
+
         answer = "ok";
-        acc += command.toString();
 
     }
 
