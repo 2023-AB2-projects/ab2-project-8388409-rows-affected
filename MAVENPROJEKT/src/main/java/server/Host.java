@@ -131,45 +131,16 @@ public class Host {
                     outS.writeObject(message);
                     outS.flush();
 
-
                     Thread.sleep(100);
+                    Write_lastCurrentDatabase();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
-
-//            while (true) {
-////                byte[] buffer = new byte[1024];
-////                int read = inputStream.read(buffer);
-////
-//            }
-
-//                if ((inputLine = in.readLine()) != null && inputLine.length() > 0) {
-
-//                    if (inputLine.equals("EXIT")) {
-//                        break;
-//                    }
-//
-//                    darabol(inputLine);
-//
-//                    if (answer.equals("ok")){
-//
-//                        if (error.length() > 0) {
-//                            out.println("ERROR: " + error);
-//                            error = "";
-//                        } else {
-//                            out.println("ok");
-//                        }
-//                        answer = "";
-//                    }
-//                    Message message = new Message();
-//                }
-//            }
-
-//            System.out.println("Client disconnected.");
-//            Write_lastCurrentDatabase();
             // TODO: EZT ITT FENT MIÉRT KOMMENTELTED KI??
+            // ANSWER: mert ijrairtam a kommunikaciot es kb semmi se volt ugy jo
+
         } catch (Exception e) {
             System.out.println("exeption message= " + e.getMessage());
             e.printStackTrace();
@@ -198,7 +169,8 @@ public class Host {
 
         StringBuilder command = new StringBuilder();
 //        newline character to space
-        input = input.replaceAll("\\r\\n|\\r|\\n", " ");
+        input = reformatParserInput(input);
+
         String[] words = input.split(" ");
 
 
