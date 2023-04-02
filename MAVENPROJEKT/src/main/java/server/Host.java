@@ -184,6 +184,13 @@ public class Host {
                     fullInput = fullInput.trim();
                     System.out.println("|=> parsed command: " + fullInput + "|");
                     new Parser(fullInput, this);
+                    if (error.length() > 0) {
+                        answer = "ERROR: " + error;
+                        error = "";
+                        return;
+                    } else {
+                        answer = "ok";
+                    }
                     fullInput = words[i] + " ";
                 }
             } else {
