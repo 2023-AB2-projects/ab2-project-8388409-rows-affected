@@ -169,6 +169,7 @@ public class Host {
 
 //            System.out.println("Client disconnected.");
 //            Write_lastCurrentDatabase();
+            // TODO: EZT ITT FENT MIÉRT KOMMENTELTED KI??
         } catch (Exception e) {
             System.out.println("exeption message= " + e.getMessage());
             e.printStackTrace();
