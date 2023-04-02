@@ -175,7 +175,7 @@ public class InsertInto {
             System.out.println("Trying to connect to MongoDB");
             String connectionString = "mongodb://localhost:27017";
             try (MongoClient mongoClient = create(connectionString)) {
-                Document document = new Document("_id", key).append(key, value);
+                Document document = new Document("_id", key).append("row", value);
                 mongoClient.getDatabase(databaseName).getCollection(tableName).insertOne(document);
             } catch (MongoWriteException e) {
                 if (e.getError().getCode() == 11000) {

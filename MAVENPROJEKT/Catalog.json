@@ -2,7 +2,37 @@
   "databases": [
     {
       "_dataBaseName": "db",
-      "tables": []
+      "tables": [
+        {
+          "_tableName": "tbl",
+          "_rowLength": "0",
+          "_fileName": "tbl.json",
+          "uniqueKeys": [],
+          "foreignKeys": [],
+          "primaryKeys": [
+            {
+              "pkAttribute": "id"
+            }
+          ],
+          "structure": {
+            "attributes": [
+              {
+                "_attributeName": "id",
+                "_isnull": "0",
+                "_type": "int"
+              },
+              {
+                "_attributeName": "randomszam",
+                "_isnull": "0",
+                "_type": "int"
+              }
+            ]
+          },
+          "indexFiles": {
+            "indexFiles": null
+          }
+        }
+      ]
     }
   ]
 }
