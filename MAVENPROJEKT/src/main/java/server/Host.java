@@ -115,7 +115,6 @@ public class Host {
                     databaseArrayList.add(dbn.getDatabase(databaseName));
                 }
                 for (Database db : databaseArrayList) {
-                    System.out.println(db.get_dataBaseName());
                     tableArrayList.addAll(db.getTables());
                 }
                 message.setTables(tableArrayList);
@@ -136,7 +135,7 @@ public class Host {
                         try {
                             message = (Message) inS.readObject(); // TODO : itt meghal EXIT után
                         } catch (Exception e) {
-
+                            System.out.println("Disconnected from client");
                             break;
                         }
 

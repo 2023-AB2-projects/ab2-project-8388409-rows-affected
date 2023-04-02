@@ -143,7 +143,7 @@ public class KliensNew extends JFrame implements Runnable {
         VisualQueryDesigner.setBackground(new Color(98, 98, 98));
 
 //        layout takes care of the size of the components and 1 component per row
-        VisualQueryDesigner.setLayout(new GridLayout(0, 1, 0, 0));
+        VisualQueryDesigner.setLayout(new GridLayout(3, 1));
 
         JButton button = new JButton("New row");
         JComboBox<String> comboBox = new JComboBox<>();
@@ -153,6 +153,7 @@ public class KliensNew extends JFrame implements Runnable {
             System.out.println(database.get_dataBaseName());
             comboBox.addItem(database.get_dataBaseName());
         }
+
 
         comboBox.addActionListener(e -> {
             comboBox2.removeAllItems();
@@ -168,9 +169,8 @@ public class KliensNew extends JFrame implements Runnable {
         visualQueryDesignerOptions.add(button);
         visualQueryDesignerOptions.add(comboBox);
         visualQueryDesignerOptions.add(comboBox2);
-        button.setBounds(10, height - 40, button.getWidth(), button.getHeight());
-        comboBox.setBounds(10, 50, 100, 30);
-        comboBox2.setBounds(10, 90, 100, 30);
+        visualQueryDesignerOptions.setVisible(true);
+
 
     }
 
@@ -198,7 +198,10 @@ public class KliensNew extends JFrame implements Runnable {
             leftPanel.updateDatabase(databases);
             leftPanel.repaint();
             resizeWindowLayout();
+            visualQueryDesignerOptions.removeAll();
+            visualQueryDesignerOptions.validate();
             configVisualQueryDesignerOptions();
+            validate();
 
         }
         for (Table s : mess.getTables()) {
@@ -281,6 +284,8 @@ public class KliensNew extends JFrame implements Runnable {
                 leftPanel.repaint();
                 connected = false;
                 connectionButton.setText("Connect");
+                visualQueryDesignerOptions.removeAll();
+                configVisualQueryDesignerOptions();
 
             }
 //            resizeWindowLayout();
