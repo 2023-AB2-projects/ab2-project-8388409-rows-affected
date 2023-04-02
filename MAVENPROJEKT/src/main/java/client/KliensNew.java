@@ -49,6 +49,7 @@ public class KliensNew extends JFrame implements Runnable {
         this.setLayout(null);
         this.setIconImage(new ImageIcon("src/main/resources/icons/ablogo512.jpg").getImage());
 
+
         databases = new ArrayList<>();
         syntax = new Syntax(this);
         tabsCounter = 0;
@@ -375,7 +376,7 @@ public class KliensNew extends JFrame implements Runnable {
                 userInput = textArea.getText();
                 print("Client: " + userInput);
                 out.println(userInput + "\n__end_of_file__");
-                print("Client: " + userInput);
+//                print("Client: " + userInput); //TODO: remove if not needed
                 send = false;
                 if (userInput.equals("EXIT")) {
                     connected = false;

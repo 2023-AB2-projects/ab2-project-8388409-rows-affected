@@ -196,6 +196,38 @@ public class Parser {
                 otherError = "";
             }
         }
+
+        // DELETE FROM tablename WHERE columnname = value
+        if (input.toUpperCase().contains("DELETE FROM")) {
+            String[] split = input.split(" ");
+            if (split.length <= 4) {
+                host.setError("Invalid syntax: DELETE FROM tablename WHERE columnname = value");
+                return;
+            }
+            if (!split[3].equalsIgnoreCase("WHERE")) {
+                host.setError("Invalid syntax: DELETE FROM");
+                return;
+            }
+
+            String tableName = split[2];
+            String condition = "";
+            for (int i = 4; i < split.length; i++) {
+                condition += split[i] + " ";
+            }
+
+            if (!condition.contains("=")) {
+                host.setError("Invalid syntax: DELETE FROM invalid condition");
+                return;
+            }
+
+            new DeleteFrom(currentDatabase, tableName, condition, this);
+            if (otherError.equals("")) {
+                host.setError("");
+            } else {
+                host.setError(otherError);
+                otherError = "";
+            }
+        }
     }
     public void setParserError(boolean parserError) {
         this.parserError = parserError;
