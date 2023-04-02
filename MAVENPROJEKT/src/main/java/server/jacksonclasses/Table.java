@@ -1,6 +1,7 @@
 package server.jacksonclasses;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Table implements Serializable {
@@ -90,4 +91,11 @@ public class Table implements Serializable {
     public void set_fileName(String _fileName) {
         this._fileName = _fileName;
     }
+
+    public ArrayList<Attribute> getAttributes() {
+        ArrayList<Attribute> attributes = new ArrayList<>();
+        attributes.addAll(Structure.getAttributes());
+        return attributes;
+    }
+
 }

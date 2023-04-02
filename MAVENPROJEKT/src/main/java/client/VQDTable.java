@@ -1,79 +1,101 @@
 package client;
 
+import server.jacksonclasses.Attribute;
+import server.jacksonclasses.Table;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class VQDTable extends JPanel {
 
-    String[] attributeNames;
-    ArrayList<String[]> data;
+    private final Table table;
+    private final int attributeCount;
+    private final ArrayList<Attribute> attributes;
+    private int rows = 2;
+    private JTable jTable;
+    private final String[] attr;
 
-    public VQDTable(String[] attributeNames, String[][] data) {
-        this.attributeNames = attributeNames;
-        this.data = new ArrayList<>();
-        this.data.addAll(Arrays.asList(data));
+    private String[][] attrTypes;
 
-        setLayout(null);
-        setBounds(0, 0, getWidth(), getHeight());
-        setVisible(true);
-    }
+    public VQDTable(Table table) {
 
-    public VQDTable() {
-        attributeNames = new String[]{"Name", "Roll Number", "Department"};
-        data = new ArrayList<>();
-        data.add(new String[]{"Kundan Kumar Jha", "4031", "CSE"});
-        data.add(new String[]{"Anand Jha", "6014", "IT"});
-        setLayout(null);
-        setBounds(0, 0, getWidth(), getHeight());
-        setVisible(true);
-    }
+        setLayout(new BorderLayout());
 
-    public void clear() {
-        attributeNames = new String[]{};
-        data = new ArrayList<>();
-    }
 
-    public void setAttributeNames(String[] attributeNames) {
-        this.attributeNames = attributeNames;
-    }
+        this.table = table;
+        this.attributeCount = table.getStructure().getAttributes().size();
+        this.attributes = table.getAttributes();
 
-    public void addData(String[] data) {
-        this.data.add(data);
-    }
-
-    public void setData(String[][] data) {
-        this.data = new ArrayList<>();
-        this.data.addAll(Arrays.asList(data));
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        System.out.println("painting");
-        for (int i = 0; i < attributeNames.length; i++) {
-            for (int j = 0; j < data.size(); j++) {
-                if (j % 2 == 0)
-                    g.setColor(new Color(131, 131, 131));
-                else
-                    g.setColor(new Color(176, 176, 176));
-                g.fillRect(10 + i * 100, 20 + j * 20, 100, 20);
-                g.setColor(Color.black);
-                g.drawString(data.get(j)[i], 20 + i * 100, 20 + j * 20);
-            }
+        attr = new String[attributeCount];
+        attrTypes = new String[rows][attributeCount];
+        for (Attribute attribute : attributes) {
+            attr[attributes.indexOf(attribute)] = attribute.get_attributeName();
+            attrTypes[0][attributes.indexOf(attribute)] = attribute.get_attributeName() + " ( " + attribute.get_type() + " )";
+            attrTypes[1][attributes.indexOf(attribute)] = "";
         }
 
+        jTable = new JTable(attrTypes, attrTypes);
+        jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        jTable.setPreferredScrollableViewportSize(new Dimension(700, this.getHeight()));
+
+
+        for (int i = 1; i < attributeCount; i++) {
+            jTable.getColumnModel().getColumn(i).setResizable(true);
+            jTable.getColumnModel().getColumn(i).setPreferredWidth(120);
+        }
+
+        this.add(jTable, BorderLayout.CENTER);
+        setVisible(true);
     }
 
-    public static void main(String[] args) {
-        VQDTable vqdTable = new VQDTable();
-        JFrame frame = new JFrame();
-        frame.setSize(500, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-        frame.add(vqdTable, BorderLayout.CENTER);
-        frame.revalidate();
+    public JTable getjTable() {
+        return jTable;
+    }
+
+
+    public void addRow() {
+
+        this.remove(jTable);
+        rows++;
+        String[][] tmp = new String[rows][attributeCount];
+        for (int i = 0; i < rows - 1; i++) {
+            System.arraycopy(attrTypes[i], 0, tmp[i], 0, attributeCount);
+        }
+        for (int i = 0; i < attributeCount; i++) {
+            tmp[rows - 1][i] = "";
+        }
+        attrTypes = tmp;
+        jTable = new JTable(tmp, attr);
+
+
+        for (int i = 1; i < attributeCount; i++) {
+            jTable.getColumnModel().getColumn(i).setPreferredWidth(120);
+        }
+        this.add(jTable, BorderLayout.CENTER);
+        validate();
+        repaint();
+        System.out.println("row added");
+
+    }
+
+    public JTextArea generateQuery(String db) {
+        JTextArea query = new JTextArea();
+        query.setText("USE " + db + "\n");
+        for (int i = 1; i < rows; i++) {
+            query.append("INSERT INTO " + table.get_tableName() + " VALUES (");
+            for (int j = 0; j < attributeCount; j++) {
+                if (j == attributeCount - 1) {
+                    query.append(" " + attrTypes[i][j] + "");
+                } else {
+                    query.append(" " + attrTypes[i][j] + ", ");
+                }
+            }
+            query.append(" ) \n");
+
+        }
+        System.out.println(query.getText());
+
+        return query;
     }
 }

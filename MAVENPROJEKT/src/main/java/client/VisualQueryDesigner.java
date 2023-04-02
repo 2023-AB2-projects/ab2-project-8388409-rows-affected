@@ -1,38 +1,48 @@
 package client;
 
-import server.jacksonclasses.Database;
 import server.jacksonclasses.Table;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class VisualQueryDesigner extends JPanel {
 
-    private final JTable table;
+//    private final JTable table;
 
-    private final ArrayList<Database> databases;
-    private final ArrayList<Table> tables;
+    private Table dbTable;
+    private JTable table;
+
+    private VQDTable vqdTable;
 
     public VisualQueryDesigner(KliensNew kliens) {
 
-        databases = kliens.getDatabases();
-        tables = kliens.getTables();
-
         setBackground(new Color(233, 255, 255));
-        String[][] data = {
-                {"Kundan Kumar Jha", "4031", "CSE"},
-                {"Anand Jha", "6014", "IT"}
-        };
 
-        // Column Names
-        String[] columnNames = {"Name", "Roll Number", "Department"};
-
-        table = new JTable(data, columnNames);
-        table.setBounds(0, 0, getWidth(), getHeight());
+        table = new JTable();
+        table.setBounds(0, 0, 700, this.getHeight());
+//        i want to see every column fully
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setPreferredScrollableViewportSize(new Dimension(700, this.getHeight()));
         this.add(table);
         this.setVisible(true);
     }
 
+    public void createTable(Table table) {
+        this.dbTable = table;
+        vqdTable = new VQDTable(table);
+        vqdTable.setBounds(0, 0, getWidth(), getHeight());
+        this.add(vqdTable);
+        this.table = vqdTable.getjTable();
+        validate();
+        this.repaint();
+    }
+
+    public JTextArea generateQuery(String db) {
+        return vqdTable.generateQuery(db);
+    }
+
+    public void addRow() {
+        vqdTable.addRow();
+    }
 
 }

@@ -24,7 +24,7 @@ public class KliensNew extends JFrame implements Runnable {
     private final JPanel queryPanelOptions;
     private final JPanel visualQueryDesignerOptions;
     private final JComponent QueryPanel;
-    private final JComponent VisualQueryDesigner;
+    private JComponent VisualQueryDesigner;
     private final JScrollPane scrollTextResp = new JScrollPane();
     private JTextArea textArea;
     private final JTextArea textAreas = new JTextArea();
@@ -140,20 +140,38 @@ public class KliensNew extends JFrame implements Runnable {
     }
     private void configVisualQueryDesignerOptions() {
 
-        VisualQueryDesigner.setBackground(new Color(98, 98, 98));
+        VisualQueryDesigner = new JPanel();
 
-//        layout takes care of the size of the components and 1 component per row
-        VisualQueryDesigner.setLayout(new GridLayout(3, 1));
+        VisualQueryDesigner.setBackground(new Color(115, 34, 34));
+        int width = visualQueryDesignerOptions.getWidth();
+        int height = visualQueryDesignerOptions.getHeight();
 
-        JButton button = new JButton("New row");
+        VisualQueryDesigner.setLayout(new BoxLayout(VisualQueryDesigner, BoxLayout.Y_AXIS));
+        JPanel panel = new JPanel();
+        panel.setBounds(50, 50, width - 50, height - 50);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JButton button = new JButton("Create");
+        JButton addRow = new JButton("Add Row");
+        JButton execute = new JButton("Execute");
+
         JComboBox<String> comboBox = new JComboBox<>();
         JComboBox<String> comboBox2 = new JComboBox<>();
+
+        panel.add(button, BorderLayout.NORTH);
+        panel.add(addRow, BorderLayout.NORTH);
+        panel.add(execute, BorderLayout.NORTH);
+
+        panel.add(comboBox, BorderLayout.WEST);
+        panel.add(comboBox2, BorderLayout.EAST);
 
         for (Database database : databaseObjects) {
             System.out.println(database.get_dataBaseName());
             comboBox.addItem(database.get_dataBaseName());
         }
 
+        if (comboBox.getItemCount() > 0) {
+            comboBox.setSelectedIndex(0);
+        }
 
         comboBox.addActionListener(e -> {
             comboBox2.removeAllItems();
@@ -163,14 +181,44 @@ public class KliensNew extends JFrame implements Runnable {
             }
             comboBox2.setVisible(comboBox2.getItemCount() > 0);
         });
-        int width = visualQueryDesignerOptions.getWidth();
-        int height = visualQueryDesignerOptions.getHeight();
 
-        visualQueryDesignerOptions.add(button);
-        visualQueryDesignerOptions.add(comboBox);
-        visualQueryDesignerOptions.add(comboBox2);
+        addRow.addActionListener(e -> {
+            VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
+            if (visualQueryDesigner != null) {
+                visualQueryDesigner.addRow();
+            }
+        });
+
+        if (comboBox2.getItemCount() > 0) {
+            comboBox2.setSelectedIndex(0);
+        }
+
+        button.addActionListener(e -> {
+            VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
+            if (visualQueryDesigner != null) {
+                for (Table table : databaseObjects.get(comboBox.getSelectedIndex()).getTables()) {
+                    if (table.get_tableName().equals(comboBox2.getSelectedItem())) {
+                        visualQueryDesigner.createTable(table);
+                        break;
+                    }
+                }
+            }
+        });
+
+        execute.addActionListener(e -> {
+            VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
+            if (visualQueryDesigner != null) {
+                textArea = visualQueryDesigner.generateQuery((String) comboBox.getSelectedItem());
+                send = true;
+            }
+        });
+
+//        visualQueryDesignerOptions.add(comboBox);
+//        visualQueryDesignerOptions.add(comboBox2);
+//        visualQueryDesignerOptions.add(button);
+        visualQueryDesignerOptions.add(panel);
         visualQueryDesignerOptions.setVisible(true);
-
+        validate();
 
     }
 
@@ -400,6 +448,10 @@ public class KliensNew extends JFrame implements Runnable {
                 }
                 if (inputStream.available() > 0) {
                     System.out.println("Waiting for message");
+                    if (clientSocket.isClosed()) {
+                        System.out.println("Socket closed");
+                        break;
+                    }
                     message = null;
                     message = (Message) in.readObject();
                     if (message != null) {
