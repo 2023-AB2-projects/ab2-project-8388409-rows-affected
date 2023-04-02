@@ -162,5 +162,6 @@ public class InsertInto {
             System.out.println(e);
             throw new RuntimeException(e);
         }
+        System.out.println("Inserted into " + tableName + " successfully");
     }
 }
