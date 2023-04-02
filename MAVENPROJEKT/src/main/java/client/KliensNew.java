@@ -1,6 +1,7 @@
 package client;
 
 import server.Message;
+import server.jacksonclasses.Table;
 
 import javax.swing.*;
 import java.awt.*;
@@ -134,7 +135,6 @@ public class KliensNew extends JFrame implements Runnable {
         VisualQueryDesigner.setLayout(new BoxLayout(VisualQueryDesigner, BoxLayout.Y_AXIS));
         JButton button = new JButton("New row");
         visualQueryDesignerOptions.add(button);
-
     }
 
 
@@ -162,7 +162,10 @@ public class KliensNew extends JFrame implements Runnable {
             resizeWindowLayout();
 
         }
+        for (Table s : mess.getTables()) {
+            System.out.println("mess.getTables(): " + s.get_tableName());
 
+        }
     }
 
     private void resizeWindowLayout(){

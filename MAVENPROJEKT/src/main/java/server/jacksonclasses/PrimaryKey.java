@@ -1,6 +1,6 @@
 package server.jacksonclasses;
 
-public class PrimaryKey {
+public class PrimaryKey implements java.io.Serializable {
     private String pkAttribute;
 
     public PrimaryKey() {

@@ -2,7 +2,7 @@ package server.jacksonclasses;
 
 import java.util.List;
 
-public class Database {
+public class Database implements java.io.Serializable {
     private String _dataBaseName;
     private List<Table> Tables;
 

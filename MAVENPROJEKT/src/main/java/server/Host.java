@@ -1,7 +1,9 @@
 package server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
+import server.jacksonclasses.Database;
 import server.jacksonclasses.Databases;
+import server.jacksonclasses.Table;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -95,23 +97,25 @@ public class Host {
             Message message = new Message();
             message.setMessageUser("Welcome to the server!");
             message.setDatabases(new DataBaseNames().getDatabaseNames());
+            DataBaseNames dbn = new DataBaseNames();
+            ArrayList<Database> databaseArrayList = new ArrayList<>();
+            ArrayList<Table> tableArrayList = new ArrayList<>();
+
+            for (String databaseName : dbn.getDatabaseNames()) {
+                System.out.println(databaseName);
+                databaseArrayList.add(dbn.getDatabase(databaseName));
+            }
+            for (Database db : databaseArrayList) {
+                System.out.println(db.get_dataBaseName());
+                tableArrayList.addAll(db.getTables());
+            }
+            message.setTables(tableArrayList);
+            message.setDatabases(dbn.getDatabaseNames());
             outS.writeObject(message);
             outS.flush();
             System.out.println("message sent to client: " + message.getMessageUser());
             while (true) {
                 try {
-//
-//                    message = null;
-//                    message = (Message) inS.readObject();
-//                    if (message != null){
-//                        System.out.println("message received from client: " + message.getMessageUser());
-//                        darabol(message.getMessageUser());
-//                        message.setMessageUser(answer);
-//                        outS.writeObject(message);
-//                        outS.flush();
-//
-//                    }
-
 
                     message = null;
                     message = (Message) inS.readObject();

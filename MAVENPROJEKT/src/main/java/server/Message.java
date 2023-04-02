@@ -85,4 +85,11 @@ public class Message implements Serializable {
         return databases;
     }
 
+    public void setTables(ArrayList<Table> tableArrayList) {
+        tables.addAll(tableArrayList);
+    }
+
+    public ArrayList<Table> getTables() {
+        return tables;
+    }
 }

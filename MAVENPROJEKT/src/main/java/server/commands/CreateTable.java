@@ -1,18 +1,16 @@
 package server.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import server.Parser;
 import server.jacksonclasses.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateTable {
+public class CreateTable implements Serializable {
     private boolean isAcceptedType(String type) {
         String[] acceptedTypes = {"int", "float", "bit", "date", "datetime", "varchar"};
         for (String acceptedType : acceptedTypes) {
@@ -22,6 +20,7 @@ public class CreateTable {
         }
         return false;
     }
+
     public CreateTable(String tableName, String databaseName, String contents, Parser parser) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {

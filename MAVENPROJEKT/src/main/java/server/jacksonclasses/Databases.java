@@ -1,9 +1,8 @@
 package server.jacksonclasses;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class Databases {
+public class Databases implements java.io.Serializable {
     private List<Database> databases;
 
     public Databases() {

@@ -2,7 +2,7 @@ package server.jacksonclasses;
 
 import java.util.List;
 
-public class Structure {
+public class Structure implements java.io.Serializable {
     private List<Attribute> Attributes;
 
     public Structure() {
