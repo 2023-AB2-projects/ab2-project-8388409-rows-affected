@@ -2,45 +2,7 @@
   "databases": [
     {
       "_dataBaseName": "db",
-      "tables": [
-        {
-          "_tableName": "tbl",
-          "_rowLength": "0",
-          "_fileName": "tbl.json",
-          "uniqueKeys": [],
-          "indexFiles": {
-            "indexFiles": null
-          },
-          "primaryKeys": [
-            {
-              "pkAttribute": "id1"
-            },
-            {
-              "pkAttribute": "id2"
-            }
-          ],
-          "foreignKeys": [],
-          "structure": {
-            "attributes": [
-              {
-                "_attributeName": "id1",
-                "_isnull": "0",
-                "_type": "int"
-              },
-              {
-                "_attributeName": "id2",
-                "_isnull": "0",
-                "_type": "int"
-              },
-              {
-                "_attributeName": "nev",
-                "_isnull": "0",
-                "_type": "varchar"
-              }
-            ]
-          }
-        }
-      ]
+      "tables": []
     }
   ]
 }

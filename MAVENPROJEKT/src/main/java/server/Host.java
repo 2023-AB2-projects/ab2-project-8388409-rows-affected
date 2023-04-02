@@ -124,7 +124,7 @@ public class Host {
                 try {
 
                     message = null;
-                    message = (Message) inS.readObject(); // TODO : itt is meghal EXIT után
+                    message = (Message) inS.readObject(); // TODO : itt meghal EXIT után
                     System.out.println("message received from client: " + message.getMessageUser());
                     darabol(message.getMessageUser());
                     message.setMessageUser(answer);

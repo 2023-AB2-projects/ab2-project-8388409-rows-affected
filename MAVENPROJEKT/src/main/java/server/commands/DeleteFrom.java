@@ -17,27 +17,31 @@ public class DeleteFrom {
         System.out.println("tableName = " + tableName);
         System.out.println("condition = " + condition);
         condition = condition.trim();
-        String[] split = condition.split("=");
-        String columnName = split[0].trim();
-        String value = split[1].trim();
-
-        if (value.startsWith("'") && value.endsWith("'") || value.startsWith("\"") && value.endsWith("\"")) {
-            value = value.substring(1, value.length() - 1);
+        String[] conditions = condition.split("and");
+        List<String> conditionsList = new ArrayList<>();
+        for (String s : conditions) {
+            conditionsList.add(s.trim());
         }
-
         String connectionString = "mongodb://localhost:27017";
         try (MongoClient mongoClient = create(connectionString)) {
-            List<String> databaseNames = mongoClient.listDatabaseNames().into(new ArrayList<>());
-            if (!databaseNames.contains(databaseName)) {
-                parser.setOtherError("Database " + databaseName + " does not exist");
-                return;
-            }
             MongoDatabase database = mongoClient.getDatabase(databaseName);
-            // find the value where key = value parameter
             MongoCollection<Document> collection = database.getCollection(tableName);
-        } catch (Exception e) {
-            System.out.println(e);
-            throw new RuntimeException(e);
+            List<Document> documents = collection.find().into(new ArrayList<>());
+            for (Document document : documents) {
+                boolean delete = true;
+                for (String s : conditionsList) {
+                    String[] conditionParts = s.split("=");
+                    String key = conditionParts[0].trim();
+                    String value = conditionParts[1].trim();
+                    if (!document.get(key).equals(value)) {
+                        delete = false;
+                        break;
+                    }
+                }
+                if (delete) {
+                    collection.deleteOne(document);
+                }
+            }
         }
     }
 }
