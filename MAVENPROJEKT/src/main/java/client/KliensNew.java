@@ -347,7 +347,7 @@ public class KliensNew extends JFrame implements Runnable {
                     message = new Message();
                     message.setMessageUser(textArea.getText());
                     message.setKlientID(tabbedPane.getSelectedIndex());
-                    oot.writeObject(message);
+                    oot.writeObject(message); // TODO: MEGHALT ITT java.net.SocketException: Connection reset by peer / java.net.SocketException: An established connection was aborted by the software in your host machine
                     oot.flush();
                     send = false;
 

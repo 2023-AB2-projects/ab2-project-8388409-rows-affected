@@ -124,7 +124,7 @@ public class Host {
                 try {
 
                     message = null;
-                    message = (Message) inS.readObject();
+                    message = (Message) inS.readObject(); // TODO : itt is meghal EXIT után
                     System.out.println("message received from client: " + message.getMessageUser());
                     darabol(message.getMessageUser());
                     message.setMessageUser(answer);
@@ -220,9 +220,12 @@ public class Host {
         fullInput = fullInput.trim();
         System.out.println("|=> parsed command: " + fullInput + "| ");
         new Parser(fullInput, this);
-
-        answer = "ok";
-
+        if (error.length() > 0) {
+            answer = "ERROR: " + error;
+            error = "";
+        } else {
+            answer = "ok";
+        }
     }
 
     public void setError(String error) {

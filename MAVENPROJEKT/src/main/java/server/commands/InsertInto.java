@@ -1,6 +1,7 @@
 package server.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
 import org.bson.Document;
 import server.Parser;
@@ -16,7 +17,6 @@ import static com.mongodb.client.MongoClients.create;
 public class InsertInto {
     public InsertInto(String databaseName, String tableName, String contents, Parser parser) {
         tableName = tableName.trim();
-        String[] values = contents.split(",");
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -59,40 +59,44 @@ public class InsertInto {
                 parser.setOtherError("Table " + tableName + " does not exist");
                 return;
             }
-            String[] splitValues = values;
+            String[] splitValues = contents.split(",");
 
             for (int i = 0; i < splitValues.length; i++) {
                 splitValues[i] = splitValues[i].trim();
             }
 
             // get the primary key of the table
-            String primaryKeyName = "";
+            List<String> primaryKeyNames = new ArrayList<>();
             List<PrimaryKey> primaryKeyList = myTable.getPrimaryKeys();
-            if (primaryKeyList != null) {
-                primaryKeyName = primaryKeyList.get(0).getPkAttribute();
+            for (PrimaryKey primaryKey : primaryKeyList) {
+                primaryKeyNames.add(primaryKey.getPkAttribute());
             }
-            if (primaryKeyName.equals("")) {
+            if (primaryKeyNames.size() == 0) {
                 parser.setOtherError("The table does not have a primary key");
                 return;
             }
 
             // get the primary key value from values
-            int primaryKeyIndex = -1;
-            String primaryKeyType = "";
+            List<Integer> primaryKeyIndexes = new ArrayList<>();
+            List<String> primaryKeyTypes = new ArrayList<>();
             Structure structure = myTable.getStructure();
             List<Attribute> attributeList = structure.getAttributes();
-            for (int i = 0; i < attributeList.size(); i++) {
-                if (attributeList.get(i).get_attributeName().equals(primaryKeyName)) {
-                    primaryKeyIndex = i;
-                    primaryKeyType = attributeList.get(i).get_type();
-                    break;
+            for (String primaryKeyName : primaryKeyNames) {
+                for (int i = 0; i < attributeList.size(); i++) {
+                    if (attributeList.get(i).get_attributeName().equals(primaryKeyName)) {
+                        primaryKeyIndexes.add(i);
+                        primaryKeyTypes.add(attributeList.get(i).get_type());
+                    }
                 }
             }
-            if (primaryKeyIndex == -1) {
+            if (primaryKeyIndexes.size() != primaryKeyNames.size()) {
                 parser.setOtherError("The primary key does not exist in the table");
                 return;
             }
-            String primaryKeyValue = splitValues[primaryKeyIndex];
+            List<String> primaryKeyValue = new ArrayList<>();
+            for (Integer primaryKeyIndex : primaryKeyIndexes) {
+                primaryKeyValue.add(splitValues[primaryKeyIndex]);
+            }
 
             for (Database database : databaseList) {
                 if (database.get_dataBaseName().equals(databaseName)) {
@@ -145,18 +149,42 @@ public class InsertInto {
             contents = contents.replace(",", "#");
             contents = contents.substring(contents.indexOf("#") + 1);
 
-            if (primaryKeyType.equals("varchar")) {
-                primaryKeyValue = primaryKeyValue.substring(1, primaryKeyValue.length() - 1);
+
+            // if varchar, remove the quotes
+            for (int i = 0; i < splitValues.length; i++) {
+                if ((splitValues[i].charAt(0) == '\'' && splitValues[i].charAt(splitValues[i].length() - 1) == '\'') || (splitValues[i].charAt(0) == '\"' && splitValues[i].charAt(splitValues[i].length() - 1) == '\"')) {
+                    splitValues[i] = splitValues[i].substring(1, splitValues[i].length() - 1);
+                }
             }
 
+            String key = "";
+            String value = "";
+            for (int i = 0; i < splitValues.length; i++) {
+                splitValues[i] = splitValues[i].trim();
+                if (primaryKeyIndexes.contains(i)) {
+                    key = key + splitValues[i] + "#";
+                    continue;
+                } else {
+                    value = value + splitValues[i] + "#";
+                }
+            }
 
+            key = key.substring(0, key.length() - 1);
+            value = value.substring(0, value.length() - 1);
+
+            System.out.println("Trying to connect to MongoDB");
             String connectionString = "mongodb://localhost:27017";
             try (MongoClient mongoClient = create(connectionString)) {
-                Document document = new Document(primaryKeyValue, contents);
+                Document document = new Document("_id", key).append(key, value);
                 mongoClient.getDatabase(databaseName).getCollection(tableName).insertOne(document);
-            } catch (Exception e) {
-                System.out.println(e);
-                throw new RuntimeException(e);
+            } catch (MongoWriteException e) {
+                if (e.getError().getCode() == 11000) {
+                    parser.setOtherError("The primary key already exists");
+                    return;
+                } else {
+                    System.out.println(e);
+                    throw new RuntimeException(e);
+                }
             }
         } catch (IOException e) {
             System.out.println(e);
