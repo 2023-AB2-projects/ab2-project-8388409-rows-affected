@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import javax.swing.border.Border;
 
 public class QueryPanel extends JComponent implements Accessible, MenuElement {
 
@@ -89,4 +88,7 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
     }
 
 
+    public JTextArea getOutText() {
+        return outText;
+    }
 }

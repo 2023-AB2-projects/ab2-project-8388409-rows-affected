@@ -1,11 +1,9 @@
 package server;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import server.jacksonclasses.Database;
 import server.jacksonclasses.Databases;
+import server.jacksonclasses.Table;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -90,43 +88,84 @@ public class Host {
         try (
                 ServerSocket serverSocket = new ServerSocket(portNumber);
                 Socket clientSocket = serverSocket.accept();
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
-
+                OutputStream outputStream = clientSocket.getOutputStream();
+                ObjectOutputStream outS = new ObjectOutputStream(outputStream);
+                InputStream inputStream = clientSocket.getInputStream();
+                ObjectInputStream inS = new ObjectInputStream(inputStream)
         ) {
-            System.out.println("Client connected: " + clientSocket.getInetAddress().getHostAddress());
 
-            // Send a welcome message to the client
-            out.println("Welcome to the server!");
-            out.println(new DataBaseNames().getDatabaseNames());
-            String inputLine;
+            Message message = new Message();
+            message.setMessageUser("Welcome to the server!");
+            message.setDatabases(new DataBaseNames().getDatabaseNames());
+            DataBaseNames dbn = new DataBaseNames();
+            ArrayList<Database> databaseArrayList = new ArrayList<>();
+            ArrayList<Table> tableArrayList = new ArrayList<>();
 
+            for (String databaseName : dbn.getDatabaseNames()) {
+                System.out.println(databaseName);
+                databaseArrayList.add(dbn.getDatabase(databaseName));
+            }
+            for (Database db : databaseArrayList) {
+                System.out.println(db.get_dataBaseName());
+                tableArrayList.addAll(db.getTables());
+            }
+            message.setTables(tableArrayList);
+            message.setDatabases(dbn.getDatabaseNames());
+            outS.writeObject(message);
+            outS.flush();
+            System.out.println("message sent to client: " + message.getMessageUser());
             while (true) {
-                if ((inputLine = in.readLine()) != null && inputLine.length() > 0) {
+                try {
 
-                    if (inputLine.equals("EXIT")) {
-                        break;
-                    }
+                    message = null;
+                    message = (Message) inS.readObject();
+                    System.out.println("message received from client: " + message.getMessageUser());
+                    darabol(message.getMessageUser());
+                    message.setMessageUser(answer);
+                    outS.writeObject(message);
+                    outS.flush();
 
-                    darabol(inputLine);
 
-                    if (answer.equals("ok")){
-
-                        if (error.length() > 0) {
-                            out.println("ERROR: " + error);
-                            error = "";
-                        } else {
-                            out.println("ok");
-                        }
-                        answer = "";
-                    }
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
 
-            System.out.println("Client disconnected.");
-            Write_lastCurrentDatabase();
-        } catch (IOException e) {
-            System.err.println("Exception caught when trying to listen on port " + portNumber + " or listening for a connection: " + e.getMessage());
+
+//            while (true) {
+////                byte[] buffer = new byte[1024];
+////                int read = inputStream.read(buffer);
+////
+//            }
+
+//                if ((inputLine = in.readLine()) != null && inputLine.length() > 0) {
+
+//                    if (inputLine.equals("EXIT")) {
+//                        break;
+//                    }
+//
+//                    darabol(inputLine);
+//
+//                    if (answer.equals("ok")){
+//
+//                        if (error.length() > 0) {
+//                            out.println("ERROR: " + error);
+//                            error = "";
+//                        } else {
+//                            out.println("ok");
+//                        }
+//                        answer = "";
+//                    }
+//                    Message message = new Message();
+//                }
+//            }
+
+//            System.out.println("Client disconnected.");
+//            Write_lastCurrentDatabase();
+        } catch (Exception e) {
+            System.out.println("exeption message= " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -189,22 +228,29 @@ public class Host {
                 command_length = 0;
 
             }
-            if(words[i].equals("__end_of_file__"))
-            {
-                String fullInput = (acc + command);
-                fullInput = reformatParserInput(fullInput);
-
-                System.out.println("|=> parsed command: " + fullInput);
-                new Parser(fullInput, this);
-                acc = "";
-                answer = "ok";
-                break;
-            }
+//            if(words[i].equals("__end_of_file__"))
+//            {
+//                String fullInput = (acc + command);
+//                fullInput = reformatParserInput(fullInput);
+//
+//                System.out.println("|=> parsed command: " + fullInput);
+//                new Parser(fullInput, this);
+//                acc = "";
+//                answer = "ok";
+//                break;
+//            }
             command.append(" ").append(words[i]);
             command_length += words[i].length() + 1;
 
         }
 
+        String fullInput = (acc + command);
+        fullInput = reformatParserInput(fullInput);
+
+        System.out.println("|=> parsed command: " + fullInput);
+        new Parser(fullInput, this);
+        acc = "";
+        answer = "ok";
         acc += command.toString();
 
     }

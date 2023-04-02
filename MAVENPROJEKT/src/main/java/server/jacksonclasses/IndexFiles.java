@@ -2,7 +2,7 @@ package server.jacksonclasses;
 
 import java.util.List;
 
-public class IndexFiles {
+public class IndexFiles implements java.io.Serializable {
     private List<IndexFile> IndexFiles;
 
     public IndexFiles() {

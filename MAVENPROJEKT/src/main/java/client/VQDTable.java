@@ -14,6 +14,7 @@ public class VQDTable extends JPanel {
         this.attributeNames = attributeNames;
         this.data = new ArrayList<>();
         this.data.addAll(Arrays.asList(data));
+
         setLayout(null);
         setBounds(0, 0, getWidth(), getHeight());
         setVisible(true);
@@ -50,26 +51,29 @@ public class VQDTable extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(new Color(80, 80, 80));
-        g.drawString("Object Explorer", 20, 20);
-        int x = 20;
-        int y = 50;
-        int width = 120;
-        int height = 60;
-        for (String attributeName : attributeNames) {
-            g.drawString(attributeName, x, y);
-            x += width;
+        System.out.println("painting");
+        for (int i = 0; i < attributeNames.length; i++) {
+            for (int j = 0; j < data.size(); j++) {
+                if (j % 2 == 0)
+                    g.setColor(new Color(131, 131, 131));
+                else
+                    g.setColor(new Color(176, 176, 176));
+                g.fillRect(10 + i * 100, 20 + j * 20, 100, 20);
+                g.setColor(Color.black);
+                g.drawString(data.get(j)[i], 20 + i * 100, 20 + j * 20);
+            }
         }
 
     }
 
     public static void main(String[] args) {
+        VQDTable vqdTable = new VQDTable();
         JFrame frame = new JFrame();
         frame.setSize(500, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-        VQDTable vqdTable = new VQDTable();
-        frame.add(vqdTable);
+        frame.add(vqdTable, BorderLayout.CENTER);
+        frame.revalidate();
     }
 }

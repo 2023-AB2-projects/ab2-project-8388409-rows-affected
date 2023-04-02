@@ -1,8 +1,9 @@
 package server.jacksonclasses;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Table {
+public class Table implements Serializable {
     private IndexFiles IndexFiles;
     private String _tableName;
     private String _rowLength;

@@ -1,6 +1,6 @@
 package server.jacksonclasses;
 
-public class Refferences {
+public class Refferences implements java.io.Serializable {
     private String refTable;
     private String refAttribute;
 

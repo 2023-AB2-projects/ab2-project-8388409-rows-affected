@@ -14,22 +14,42 @@ public class DataBaseNames {
     public DataBaseNames() {
         ObjectMapper objectMapper = new ObjectMapper();
         databaseNames = new ArrayList<>();
-        databaseNames.add("__databases__");
-        try{
+        try {
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
             Database myDatabase = null;
             if (databases.getDatabases() != null) {
                 for (Database database : databases.getDatabases()) {
+
                     databaseNames.add(database.get_dataBaseName());
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        databaseNames.add("__databases_end__");
     }
+
     public ArrayList<String> getDatabaseNames() {
+
         return databaseNames;
+    }
+
+    public Database getDatabase(String databaseName) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
+            Database myDatabase = null;
+            if (databases.getDatabases() != null) {
+                for (Database database : databases.getDatabases()) {
+                    if (database.get_dataBaseName().equals(databaseName)) {
+                        myDatabase = database;
+                    }
+                }
+            }
+            return myDatabase;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

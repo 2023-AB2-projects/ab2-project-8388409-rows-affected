@@ -1,12 +1,13 @@
 package server.jacksonclasses;
 
-public class Attribute {
+public class Attribute implements java.io.Serializable {
     private String _attributeName;
     private String _isnull;
     private String _type;
 
     public Attribute() {
     }
+
     public Attribute(String _attributeName, String _isnull, String _type) {
         this._attributeName = _attributeName;
         this._isnull = _isnull;
