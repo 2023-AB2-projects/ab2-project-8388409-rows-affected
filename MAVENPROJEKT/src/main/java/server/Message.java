@@ -1,5 +1,6 @@
 package server;
 
+import server.jacksonclasses.Database;
 import server.jacksonclasses.Table;
 
 import java.io.Serializable;
@@ -14,6 +15,7 @@ public class Message implements Serializable {
     private int klientID;
     private ArrayList<String> databases;
     private final ArrayList<Table> tables;
+    private ArrayList<Database> databaseObjects;
 
     public Message() {
 
@@ -23,6 +25,7 @@ public class Message implements Serializable {
         klientID = -1;
         databases = new ArrayList<>();
         tables = new ArrayList<>();
+        databaseObjects = new ArrayList<>();
     }
 
     public String getMessageUser() {
@@ -92,4 +95,13 @@ public class Message implements Serializable {
     public ArrayList<Table> getTables() {
         return tables;
     }
+
+    public void setDatabaseObjects(ArrayList<Database> databaseObjects) {
+        this.databaseObjects = databaseObjects;
+    }
+
+    public ArrayList<Database> getDatabaseObjects() {
+        return databaseObjects;
+    }
 }
+

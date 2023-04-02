@@ -1,11 +1,7 @@
 package client;
 
-import org.bson.codecs.pojo.annotations.BsonId;
-
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Set;
 
 public class ObjectExplorer extends SidePanel {
 
@@ -39,5 +35,9 @@ public class ObjectExplorer extends SidePanel {
 
     }
 
-
+    public void emptyDatabase() {
+        databaseIllustrations.clear();
+        removeAll();
+        repaint();
+    }
 }

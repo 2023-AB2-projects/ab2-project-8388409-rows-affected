@@ -1,6 +1,7 @@
 package client;
 
 import server.Message;
+import server.jacksonclasses.Database;
 import server.jacksonclasses.Table;
 
 import javax.swing.*;
@@ -26,7 +27,7 @@ public class KliensNew extends JFrame implements Runnable {
     private final JComponent VisualQueryDesigner;
     private final JScrollPane scrollTextResp = new JScrollPane();
     private JTextArea textArea;
-    private JTextArea textAreas = new JTextArea();
+    private final JTextArea textAreas = new JTextArea();
     private JTextArea outText = new JTextArea();
     private boolean connected = false;
     private boolean send = false;
@@ -38,10 +39,13 @@ public class KliensNew extends JFrame implements Runnable {
     private int tabsCounter;
 
     private final ArrayList<String> databases;
+    private final ArrayList<Table> tableObjects;
+    private final ArrayList<Database> databaseObjects;
+
 
     KliensNew() {
 //        InitQueryPanel();
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setTitle("AB: Client");
         this.setSize(1000, 700);
         this.setLocationRelativeTo(this);
@@ -49,11 +53,12 @@ public class KliensNew extends JFrame implements Runnable {
         this.setLayout(null);
         this.setIconImage(new ImageIcon("src/main/resources/icons/ablogo512.jpg").getImage());
 
-
+        tableObjects = new ArrayList<>();
+        databaseObjects = new ArrayList<>();
         databases = new ArrayList<>();
         syntax = new Syntax(this);
         tabsCounter = 0;
-        leftPanel = new ObjectExplorer(this,databases);
+        leftPanel = new ObjectExplorer(this, databases);
         rightPanel = new SidePanel(this);
         topPanel = new SidePanel(this);
         tabbedPane = new JTabbedPane();
@@ -63,7 +68,7 @@ public class KliensNew extends JFrame implements Runnable {
         queryPanelOptions = new JPanel();
         visualQueryDesignerOptions = new JPanel();
         configQueryPanelOptions();
-        configVisualQueryDesignerOptions();
+//        configVisualQueryDesignerOptions();
 
         rightPanelTabs.addTab("Query Opt", queryPanelOptions);
         rightPanelTabs.addTab("VQD Opt", visualQueryDesignerOptions);
@@ -134,12 +139,40 @@ public class KliensNew extends JFrame implements Runnable {
 
     }
     private void configVisualQueryDesignerOptions() {
-        VisualQueryDesigner.setBackground(new Color(98, 98, 98));
-        VisualQueryDesigner.setLayout(new BoxLayout(VisualQueryDesigner, BoxLayout.Y_AXIS));
-        JButton button = new JButton("New row");
-        visualQueryDesignerOptions.add(button);
-    }
 
+        VisualQueryDesigner.setBackground(new Color(98, 98, 98));
+
+//        layout takes care of the size of the components and 1 component per row
+        VisualQueryDesigner.setLayout(new GridLayout(0, 1, 0, 0));
+
+        JButton button = new JButton("New row");
+        JComboBox<String> comboBox = new JComboBox<>();
+        JComboBox<String> comboBox2 = new JComboBox<>();
+
+        for (Database database : databaseObjects) {
+            System.out.println(database.get_dataBaseName());
+            comboBox.addItem(database.get_dataBaseName());
+        }
+
+        comboBox.addActionListener(e -> {
+            comboBox2.removeAllItems();
+            Database database = databaseObjects.get(comboBox.getSelectedIndex());
+            for (Table table : database.getTables()) {
+                comboBox2.addItem(table.get_tableName());
+            }
+            comboBox2.setVisible(comboBox2.getItemCount() > 0);
+        });
+        int width = visualQueryDesignerOptions.getWidth();
+        int height = visualQueryDesignerOptions.getHeight();
+
+        visualQueryDesignerOptions.add(button);
+        visualQueryDesignerOptions.add(comboBox);
+        visualQueryDesignerOptions.add(comboBox2);
+        button.setBounds(10, height - 40, button.getWidth(), button.getHeight());
+        comboBox.setBounds(10, 50, 100, 30);
+        comboBox2.setBounds(10, 90, 100, 30);
+
+    }
 
     private void processMessage(Message mess) {
 
@@ -160,14 +193,22 @@ public class KliensNew extends JFrame implements Runnable {
             System.out.println("mess.getDatabases(): " + mess.getDatabases());
             databases.clear();
             databases.addAll(mess.getDatabases());
+            databaseObjects.clear();
+            databaseObjects.addAll(mess.getDatabaseObjects());
             leftPanel.updateDatabase(databases);
             leftPanel.repaint();
             resizeWindowLayout();
+            configVisualQueryDesignerOptions();
 
         }
         for (Table s : mess.getTables()) {
             System.out.println("mess.getTables(): " + s.get_tableName());
 
+        }
+        if (!mess.isTablesEmpty()) {
+            System.out.println("mess.getTables(): " + mess.getTables());
+            tableObjects.clear();
+            tableObjects.addAll(mess.getTables());
         }
     }
 
@@ -231,12 +272,15 @@ public class KliensNew extends JFrame implements Runnable {
                 new Thread(this).start();
 
             } else {
+                System.out.println("Disconected");
                 databases.clear();
+                databaseObjects.clear();
+                tableObjects.clear();
+                leftPanel.updateDatabase(databases);
+                leftPanel.emptyDatabase();
                 leftPanel.repaint();
+                connected = false;
                 connectionButton.setText("Connect");
-                textAreas = new JTextArea(textArea.getText());
-                textArea.setText("EXIT");
-                send = true;
 
             }
 //            resizeWindowLayout();
@@ -244,13 +288,7 @@ public class KliensNew extends JFrame implements Runnable {
 
         exit.addActionListener(e -> {
             System.out.println("Exit");
-            textArea.setText("EXIT");
-            send = true;
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
+
             exit(0);
 
         });
@@ -332,8 +370,6 @@ public class KliensNew extends JFrame implements Runnable {
         int portNumber = 1234;
         try (
                 Socket clientSocket = new Socket(hostName, portNumber);
-//                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-//                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
                 InputStream inputStream = clientSocket.getInputStream();
                 OutputStream outputStream = clientSocket.getOutputStream();
                 ObjectInputStream in = new ObjectInputStream(inputStream);
@@ -343,6 +379,12 @@ public class KliensNew extends JFrame implements Runnable {
             Message message = new Message();
 
             while (connected) {
+
+                if (clientSocket.isClosed()) {
+                    System.out.println("Socket closed");
+                    break;
+                }
+
                 if (send) {
                     message = new Message();
                     message.setMessageUser(textArea.getText());
@@ -350,7 +392,6 @@ public class KliensNew extends JFrame implements Runnable {
                     oot.writeObject(message); // TODO: MEGHALT ITT java.net.SocketException: Connection reset by peer / java.net.SocketException: An established connection was aborted by the software in your host machine
                     oot.flush();
                     send = false;
-
                 }
                 if (inputStream.available() > 0) {
                     System.out.println("Waiting for message");
@@ -368,68 +409,9 @@ public class KliensNew extends JFrame implements Runnable {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-//        catch (ClassNotFoundException e) {
-////            throw new RuntimeException(e);
-//            System.out.println("Class not found");
-//        }
+
     }
-//
-//    private int connectToServer() {
-//        String hostName = "localhost";
-//        int portNumber = 1234;
-//        try (
-//                Socket clientSocket = new Socket(hostName, portNumber);
-//                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-//                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
-//        ) {
-//            String userInput;
-//
-//            // Read server response and print to console
-//            String serverResponse = in.readLine();
-//            print("Server: " + serverResponse);
-//
-//            while (connected) {
-//
-//                while (!send) {
-//                    try {
-//                        Thread.sleep(100);
-//                        if (in.ready()) {
-//                            serverResponse = in.readLine();
-//                            print("Server: " + serverResponse);
-//                        }
-//
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                        print(e.getMessage());
-//                    }
-//                }
-//
-//                userInput = textArea.getText();
-//                print("Client: " + userInput);
-//                out.println(userInput + "\n__end_of_file__");
-//                print("Client: " + userInput);
-//                send = false;
-//                if (userInput.equals("EXIT")) {
-//                    connected = false;
-//
-//                    textArea.setText(textAreas.getText());
-//                    break;
-//                }
-//            }
-//        } catch (IOException e) {
-//            System.err.println("Exception caught when trying to connect to server: " + e.getMessage());
-//            print("Disconnected");
-//            connected = false;
-//            print(e.getMessage());
-//        }
-//
-//        if (connectionButton != null) {
-//            connectionButton.setText("Connect");
-//            connected = false;
-//        }
-//        return -1;
-//
-//    }
+
 
     public void setCurrentTabId(int id) {
         currentTabId = id;
@@ -442,7 +424,8 @@ public class KliensNew extends JFrame implements Runnable {
     public void setTextArea(String text) {
         this.textArea.setText(text);
     }
-    public void setOptionTabbedPane(int index){
+
+    public void setOptionTabbedPane(int index) {
         tabbedPane.setSelectedIndex(index);
     }
 
@@ -450,4 +433,11 @@ public class KliensNew extends JFrame implements Runnable {
         new KliensNew();
     }
 
+    public ArrayList<Database> getDatabases() {
+        return this.databaseObjects;
+    }
+
+    public ArrayList<Table> getTables() {
+        return this.tableObjects;
+    }
 }

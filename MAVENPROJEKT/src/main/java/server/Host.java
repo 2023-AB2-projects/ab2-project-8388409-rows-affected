@@ -90,61 +90,78 @@ public class Host {
 
     private void Create_socket_communication() {
         int portNumber = 1234; // replace with your port number
+        while (true) {
 
-        try (
-                ServerSocket serverSocket = new ServerSocket(portNumber);
-                Socket clientSocket = serverSocket.accept();
-                OutputStream outputStream = clientSocket.getOutputStream();
-                ObjectOutputStream outS = new ObjectOutputStream(outputStream);
-                InputStream inputStream = clientSocket.getInputStream();
-                ObjectInputStream inS = new ObjectInputStream(inputStream)
-        ) {
 
-            Message message = new Message();
-            message.setMessageUser("Welcome to the server!");
-            message.setDatabases(new DataBaseNames().getDatabaseNames());
-            DataBaseNames dbn = new DataBaseNames();
-            ArrayList<Database> databaseArrayList = new ArrayList<>();
-            ArrayList<Table> tableArrayList = new ArrayList<>();
+            try (
+                    ServerSocket serverSocket = new ServerSocket(portNumber);
 
-            for (String databaseName : dbn.getDatabaseNames()) {
-                System.out.println(databaseName);
-                databaseArrayList.add(dbn.getDatabase(databaseName));
-            }
-            for (Database db : databaseArrayList) {
-                System.out.println(db.get_dataBaseName());
-                tableArrayList.addAll(db.getTables());
-            }
-            message.setTables(tableArrayList);
-            message.setDatabases(dbn.getDatabaseNames());
-            outS.writeObject(message);
-            outS.flush();
-            System.out.println("message sent to client: " + message.getMessageUser());
-            while (true) {
-                try {
+                    Socket clientSocket = serverSocket.accept();
+                    OutputStream outputStream = clientSocket.getOutputStream();
+                    ObjectOutputStream outS = new ObjectOutputStream(outputStream);
+                    InputStream inputStream = clientSocket.getInputStream();
+                    ObjectInputStream inS = new ObjectInputStream(inputStream)
+            ) {
 
-                    message = null;
-                    message = (Message) inS.readObject(); // TODO : itt meghal EXIT után
-                    System.out.println("message received from client: " + message.getMessageUser());
-                    darabol(message.getMessageUser());
-                    message.setMessageUser(answer);
-                    outS.writeObject(message);
-                    outS.flush();
+                Message message = new Message();
+                message.setMessageUser("Welcome to the server!");
+                message.setDatabases(new DataBaseNames().getDatabaseNames());
+                DataBaseNames dbn = new DataBaseNames();
+                ArrayList<Database> databaseArrayList = new ArrayList<>();
+                ArrayList<Table> tableArrayList = new ArrayList<>();
 
-                    Thread.sleep(100);
-                    Write_lastCurrentDatabase();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                for (String databaseName : dbn.getDatabaseNames()) {
+                    System.out.println(databaseName);
+                    databaseArrayList.add(dbn.getDatabase(databaseName));
                 }
+                for (Database db : databaseArrayList) {
+                    System.out.println(db.get_dataBaseName());
+                    tableArrayList.addAll(db.getTables());
+                }
+                message.setTables(tableArrayList);
+                message.setDatabases(dbn.getDatabaseNames());
+                message.setDatabaseObjects(databaseArrayList);
+                outS.writeObject(message);
+                outS.flush();
+
+                System.out.println("message sent to client: " + message.getMessageUser());
+                while (true) {
+                    try {
+                        if (serverSocket.isClosed()) {
+                            System.out.println("Server socket is closed");
+                            break;
+                        }
+
+                        message = null;
+                        try {
+                            message = (Message) inS.readObject(); // TODO : itt meghal EXIT után
+                        } catch (Exception e) {
+
+                            break;
+                        }
+
+                        System.out.println("message received from client: " + message.getMessageUser());
+                        darabol(message.getMessageUser());
+                        message.setMessageUser(answer);
+                        outS.writeObject(message);
+                        outS.flush();
+
+                        Thread.sleep(100);
+                        Write_lastCurrentDatabase();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // TODO: EZT ITT FENT MIÉRT KOMMENTELTED KI??
+                // ANSWER: mert ijrairtam a kommunikaciot es kb semmi se volt ugy jo
+
+            } catch (Exception e) {
+                System.out.println("exeption message= " + e.getMessage());
+                e.printStackTrace();
             }
-
-            // TODO: EZT ITT FENT MIÉRT KOMMENTELTED KI??
-            // ANSWER: mert ijrairtam a kommunikaciot es kb semmi se volt ugy jo
-
-        } catch (Exception e) {
-            System.out.println("exeption message= " + e.getMessage());
-            e.printStackTrace();
         }
+
     }
 
     String reformatParserInput(String fullInput)

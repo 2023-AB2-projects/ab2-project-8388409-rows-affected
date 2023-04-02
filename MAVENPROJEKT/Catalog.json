@@ -7,13 +7,16 @@
           "_tableName": "tbl",
           "_rowLength": "0",
           "_fileName": "tbl.json",
+          "indexFiles": {
+            "indexFiles": null
+          },
           "uniqueKeys": [],
-          "foreignKeys": [],
           "primaryKeys": [
             {
               "pkAttribute": "id"
             }
           ],
+          "foreignKeys": [],
           "structure": {
             "attributes": [
               {
@@ -27,12 +30,37 @@
                 "_type": "int"
               }
             ]
-          },
+          }
+        },
+        {
+          "_tableName": "kutya",
+          "_rowLength": "0",
+          "_fileName": "kutya.json",
           "indexFiles": {
             "indexFiles": null
+          },
+          "uniqueKeys": [],
+          "primaryKeys": [
+            {
+              "pkAttribute": "kor"
+            }
+          ],
+          "foreignKeys": [],
+          "structure": {
+            "attributes": [
+              {
+                "_attributeName": "kor",
+                "_isnull": "0",
+                "_type": "int"
+              }
+            ]
           }
         }
       ]
+    },
+    {
+      "_dataBaseName": "macska",
+      "tables": []
     }
   ]
 }
