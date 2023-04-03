@@ -1,11 +1,13 @@
 package server.jacksonclasses;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Structure implements java.io.Serializable {
     private List<Attribute> Attributes;
 
     public Structure() {
+        Attributes = new ArrayList<>();
     }
 
     public Structure(List<Attribute> attributes) {
