@@ -182,11 +182,17 @@ public class Parser {
 
             String tableName = split[2];
             String contents = split[4];
+            for (int i = 5; i < split.length; i++) {
+                contents += " " + split[i];
+            }
+
             if (contents.charAt(0) != '(' || contents.charAt(contents.length() - 1) != ')') {
                 host.setError("Invalid syntax: VALUES()");
                 return;
             }
             contents = contents.substring(1, contents.length() - 1);
+            contents = contents.trim();
+//            System.out.println("Contents: " + contents);
 
             new InsertInto(currentDatabase, tableName, contents, this);
             if (otherError.equals("")) {
