@@ -337,9 +337,9 @@ public class KliensNew extends JFrame implements Runnable {
                         rightPanelTabs.setSelectedIndex(1);
                         rightPanelTabs.setVisible(true);
 
-                    } else {
-                        rightPanelTabs.setVisible(false);
                     }
+                } else {
+                    rightPanelTabs.setVisible(false);
                 }
                 connected = true;
                 new Thread(this).start();
