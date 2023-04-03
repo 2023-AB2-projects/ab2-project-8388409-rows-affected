@@ -7,6 +7,18 @@
           "_tableName": "tbl",
           "_rowLength": "0",
           "_fileName": "tbl.json",
+          "attributes": [
+            {
+              "_attributeName": "id",
+              "_isnull": "0",
+              "_type": "int"
+            },
+            {
+              "_attributeName": "randomszam",
+              "_isnull": "0",
+              "_type": "int"
+            }
+          ],
           "indexFiles": {
             "indexFiles": null
           },
@@ -36,6 +48,13 @@
           "_tableName": "kutya",
           "_rowLength": "0",
           "_fileName": "kutya.json",
+          "attributes": [
+            {
+              "_attributeName": "kor",
+              "_isnull": "0",
+              "_type": "int"
+            }
+          ],
           "indexFiles": {
             "indexFiles": null
           },
@@ -50,6 +69,47 @@
             "attributes": [
               {
                 "_attributeName": "kor",
+                "_isnull": "0",
+                "_type": "int"
+              }
+            ]
+          }
+        },
+        {
+          "_tableName": "mind1",
+          "_rowLength": "0",
+          "_fileName": "mind1.json",
+          "attributes": [
+            {
+              "_attributeName": "pk",
+              "_isnull": "0",
+              "_type": "int"
+            },
+            {
+              "_attributeName": "vmi",
+              "_isnull": "0",
+              "_type": "int"
+            }
+          ],
+          "indexFiles": {
+            "indexFiles": null
+          },
+          "uniqueKeys": [],
+          "primaryKeys": [
+            {
+              "pkAttribute": "pk"
+            }
+          ],
+          "foreignKeys": [],
+          "structure": {
+            "attributes": [
+              {
+                "_attributeName": "pk",
+                "_isnull": "0",
+                "_type": "int"
+              },
+              {
+                "_attributeName": "vmi",
                 "_isnull": "0",
                 "_type": "int"
               }

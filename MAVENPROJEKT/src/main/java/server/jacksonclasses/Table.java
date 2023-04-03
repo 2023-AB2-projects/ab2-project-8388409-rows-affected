@@ -93,8 +93,13 @@ public class Table implements Serializable {
     }
 
     public ArrayList<Attribute> getAttributes() {
+
+        if (Structure == null) {
+            return new ArrayList<>();
+        }
         ArrayList<Attribute> attributes = new ArrayList<>();
         attributes.addAll(Structure.getAttributes());
+
         return attributes;
     }
 

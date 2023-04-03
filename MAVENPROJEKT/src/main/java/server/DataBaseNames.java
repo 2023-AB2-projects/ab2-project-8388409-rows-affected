@@ -16,7 +16,6 @@ public class DataBaseNames {
         databaseNames = new ArrayList<>();
         try {
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
-            Database myDatabase = null;
             if (databases.getDatabases() != null) {
                 for (Database database : databases.getDatabases()) {
 
@@ -31,6 +30,10 @@ public class DataBaseNames {
     public ArrayList<String> getDatabaseNames() {
 
         return databaseNames;
+    }
+
+    public boolean empty() {
+        return databaseNames.isEmpty();
     }
 
     public Database getDatabase(String databaseName) {
