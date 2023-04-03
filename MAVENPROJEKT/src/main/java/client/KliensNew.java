@@ -326,8 +326,20 @@ public class KliensNew extends JFrame implements Runnable {
                 connectionButton.setText("Disconnect");
                 rightPanelTabs.setVisible(true);
                 if (tabbedPane.getTabCount() != 0) {
-                    rightPanelTabs.setSelectedIndex(0);
-                    tabbedPane.setSelectedIndex(0);
+                    if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
+                        rightPanelTabs.setVisible(false);
+                        rightPanelTabs.setSelectedIndex(0);
+                        rightPanelTabs.setVisible(true);
+
+                        outText = ((QueryPanel) tabbedPane.getSelectedComponent()).getOutText();
+                    } else if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
+                        rightPanelTabs.setVisible(false);
+                        rightPanelTabs.setSelectedIndex(1);
+                        rightPanelTabs.setVisible(true);
+
+                    } else {
+                        rightPanelTabs.setVisible(false);
+                    }
                 }
                 connected = true;
                 new Thread(this).start();
