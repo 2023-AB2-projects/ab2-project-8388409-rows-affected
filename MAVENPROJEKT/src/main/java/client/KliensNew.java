@@ -281,14 +281,12 @@ public class KliensNew extends JFrame implements Runnable {
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
                 rightPanelTabs.setVisible(true);
                 rightPanelTabs.setSelectedIndex(0);
-                rightPanelTabs.getComponentAt(0).setVisible(true);
-                rightPanelTabs.getComponentAt(1).setVisible(false);
+
                 outText = ((QueryPanel) tabbedPane.getSelectedComponent()).getOutText();
             } else if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
                 rightPanelTabs.setVisible(true);
                 rightPanelTabs.setSelectedIndex(1);
-                rightPanelTabs.getComponentAt(0).setVisible(false);
-                rightPanelTabs.getComponentAt(1).setVisible(true);
+
             } else {
                 rightPanelTabs.setVisible(false);
             }
