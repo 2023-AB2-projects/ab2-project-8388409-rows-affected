@@ -279,16 +279,16 @@ public class KliensNew extends JFrame implements Runnable {
         tabbedPane.addChangeListener(e1 -> {
 
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
-                rightPanelTabs.setVisible(true);
+                rightPanelTabs.setVisible(false);
                 rightPanelTabs.setSelectedIndex(0);
-                rightPanelTabs.getComponentAt(0).setVisible(true);
-                rightPanelTabs.getComponentAt(1).setVisible(false);
+                rightPanelTabs.setVisible(true);
+
                 outText = ((QueryPanel) tabbedPane.getSelectedComponent()).getOutText();
             } else if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
-                rightPanelTabs.setVisible(true);
+                rightPanelTabs.setVisible(false);
                 rightPanelTabs.setSelectedIndex(1);
-                rightPanelTabs.getComponentAt(0).setVisible(false);
-                rightPanelTabs.getComponentAt(1).setVisible(true);
+                rightPanelTabs.setVisible(true);
+
             } else {
                 rightPanelTabs.setVisible(false);
             }
@@ -324,12 +324,17 @@ public class KliensNew extends JFrame implements Runnable {
             System.out.println("Connect");
             if (connectionButton.getText().equals("Connect")) {
                 connectionButton.setText("Disconnect");
-
+                rightPanelTabs.setVisible(true);
+                if (tabbedPane.getTabCount() != 0) {
+                    rightPanelTabs.setSelectedIndex(0);
+                    tabbedPane.setSelectedIndex(0);
+                }
                 connected = true;
                 new Thread(this).start();
 
             } else {
                 System.out.println("Disconected");
+                rightPanelTabs.setVisible(false);
                 databases.clear();
                 databaseObjects.clear();
                 tableObjects.clear();
