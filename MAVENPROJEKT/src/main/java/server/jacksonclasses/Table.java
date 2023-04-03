@@ -92,7 +92,7 @@ public class Table implements Serializable {
         this._fileName = _fileName;
     }
 
-    public ArrayList<Attribute> getAttributes() {
+    public ArrayList<Attribute> zAttributumok() {
 
         if (Structure == null) {
             return new ArrayList<>();

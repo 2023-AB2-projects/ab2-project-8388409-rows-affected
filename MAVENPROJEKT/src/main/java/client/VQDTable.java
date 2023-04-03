@@ -25,7 +25,7 @@ public class VQDTable extends JPanel {
 
         this.table = table;
         this.attributeCount = table.getStructure().getAttributes().size();
-        this.attributes = table.getAttributes();
+        this.attributes = table.zAttributumok();
 
         attr = new String[attributeCount];
         attrTypes = new String[rows][attributeCount];
