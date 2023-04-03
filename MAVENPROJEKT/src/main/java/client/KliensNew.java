@@ -194,6 +194,7 @@ public class KliensNew extends JFrame implements Runnable {
         }
 
         button.addActionListener(e -> {
+
             VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
             if (visualQueryDesigner != null) {
                 for (Table table : databaseObjects.get(comboBox.getSelectedIndex()).getTables()) {
@@ -276,13 +277,18 @@ public class KliensNew extends JFrame implements Runnable {
     private void ButtonEventsAndActions(JButton connectionButton, JButton execButton, JButton clear, JButton exit, JButton newVisualQueryDesigner, JButton newQuery) {
 
         tabbedPane.addChangeListener(e1 -> {
+
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
                 rightPanelTabs.setVisible(true);
                 rightPanelTabs.setSelectedIndex(0);
+                rightPanelTabs.getComponentAt(0).setVisible(true);
+                rightPanelTabs.getComponentAt(1).setVisible(false);
                 outText = ((QueryPanel) tabbedPane.getSelectedComponent()).getOutText();
             } else if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
                 rightPanelTabs.setVisible(true);
                 rightPanelTabs.setSelectedIndex(1);
+                rightPanelTabs.getComponentAt(0).setVisible(false);
+                rightPanelTabs.getComponentAt(1).setVisible(true);
             } else {
                 rightPanelTabs.setVisible(false);
             }
