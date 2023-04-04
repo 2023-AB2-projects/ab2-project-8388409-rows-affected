@@ -195,11 +195,11 @@ public class Kliens extends JFrame implements Runnable {
         System.out.println(s);
     }
 
-    public static void main(String[] args) {
-
-        new Kliens();
-
-    }
+//    public static void main(String[] args) {
+//
+//        new Kliens();
+//
+//    }
 
     @Override
     public void run() {
