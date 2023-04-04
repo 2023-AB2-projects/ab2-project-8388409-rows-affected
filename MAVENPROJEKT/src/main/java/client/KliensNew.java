@@ -27,15 +27,15 @@ public class KliensNew extends JFrame implements Runnable {
     private JComponent VisualQueryDesigner;
     private final JScrollPane scrollTextResp = new JScrollPane();
     private JTextArea textArea;
-    private final JTextArea textAreas = new JTextArea();
+    private final JTextArea textAreas = new JTextArea(); // TODO: REMOVE
     private JTextArea outText = new JTextArea();
     private boolean connected = false;
     private boolean send = false;
-    private JButton connectionButton;
+    private JButton connectionButton; // TODO: REMOVE
     private int currentTabId = -1;
     private QueryPanel currentQueryPanel;
     private final Syntax syntax;
-    private final boolean responseToUser = true;
+    private final boolean responseToUser = true; // TODO: REMOVE
     private int tabsCounter;
 
     private final ArrayList<String> databases;
