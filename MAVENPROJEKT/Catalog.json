@@ -1,0 +1,43 @@
+{
+  "databases": [
+    {
+      "_dataBaseName": "db",
+      "tables": [
+        {
+          "_tableName": "tbl",
+          "_rowLength": "0",
+          "_fileName": "tbl.json",
+          "indexFiles": {
+            "indexFiles": null
+          },
+          "primaryKeys": [
+            {
+              "pkAttribute": "id"
+            }
+          ],
+          "uniqueKeys": [],
+          "foreignKeys": [],
+          "structure": {
+            "attributes": [
+              {
+                "_attributeName": "id",
+                "_isnull": "0",
+                "_type": "int"
+              },
+              {
+                "_attributeName": "vnev",
+                "_isnull": "0",
+                "_type": "varchar"
+              },
+              {
+                "_attributeName": "knev",
+                "_isnull": "0",
+                "_type": "varchar"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

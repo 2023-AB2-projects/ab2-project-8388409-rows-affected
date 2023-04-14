@@ -25,6 +25,7 @@ public class DeleteFrom {
         System.out.println("tableName = " + tableName);
         System.out.println("condition = " + condition);
         condition = condition.trim();
+        condition = condition.replace("AND", "and");
         String[] conditions = condition.split("and");
         List<String> conditionsList = new ArrayList<>();
         for (String s : conditions) {
