@@ -70,8 +70,8 @@ public class KliensNew extends JFrame implements Runnable {
         configQueryPanelOptions();
 //        configVisualQueryDesignerOptions();
 
-        rightPanelTabs.addTab("Query Opt", queryPanelOptions);
-        rightPanelTabs.addTab("VQD Opt", visualQueryDesignerOptions);
+//        rightPanelTabs.addTab("Query Opt", queryPanelOptions);
+//        rightPanelTabs.addTab("VQD Opt", visualQueryDesignerOptions);
         rightPanelTabs.setPreferredSize(new Dimension(300, 700));
         rightPanelTabs.setEnabled(false);
         rightPanel.add(rightPanelTabs);
@@ -279,28 +279,31 @@ public class KliensNew extends JFrame implements Runnable {
         tabbedPane.addChangeListener(e1 -> {
 
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
-                rightPanelTabs.setVisible(false);
-                rightPanelTabs.setSelectedIndex(0);
+                rightPanelTabs.removeAll();
+                rightPanelTabs.addTab("Query Opt", queryPanelOptions);
+                rightPanelTabs.validate();
                 rightPanelTabs.setVisible(true);
+                validate();
 
                 outText = ((QueryPanel) tabbedPane.getSelectedComponent()).getOutText();
             } else if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
-                rightPanelTabs.setVisible(false);
-                rightPanelTabs.setSelectedIndex(1);
+                rightPanelTabs.removeAll();
+                rightPanelTabs.addTab("VQD Opt", visualQueryDesignerOptions);
                 rightPanelTabs.setVisible(true);
+                rightPanelTabs.validate();
+                validate();
 
             } else {
                 rightPanelTabs.setVisible(false);
             }
         });
 
-
         newQuery.addActionListener(e -> {
             String tabName = "Query " + tabsCounter;
             JComponent queryPanel = new QueryPanel(this, tabbedPane);
             tabbedPane.addTab(tabName, queryPanel);
             tabsCounter++;
-            rightPanelTabs.setSelectedIndex(0);
+//            rightPanelTabs.setSelectedIndex(0);
             tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 
         });
@@ -310,7 +313,7 @@ public class KliensNew extends JFrame implements Runnable {
             JComponent VisualQueryDesigner = new VisualQueryDesigner(this);
             tabbedPane.addTab(tabName, VisualQueryDesigner);
             tabsCounter++;
-            rightPanelTabs.setSelectedIndex(1);
+//            rightPanelTabs.setSelectedIndex(1);
             tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 
         });
