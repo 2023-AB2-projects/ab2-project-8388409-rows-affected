@@ -3,6 +3,8 @@ package server.commands;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import server.Parser;
 import server.jacksonclasses.*;
@@ -59,10 +61,10 @@ public class InsertInto {
                 parser.setOtherError("Table " + tableName + " does not exist");
                 return;
             }
-            String[] splitValues = contents.split(",");
+            String[] splitInsertValues = contents.split(",");
 
-            for (int i = 0; i < splitValues.length; i++) {
-                splitValues[i] = splitValues[i].trim();
+            for (int i = 0; i < splitInsertValues.length; i++) {
+                splitInsertValues[i] = splitInsertValues[i].trim();
             }
 
             // get the primary key of the table
@@ -95,7 +97,7 @@ public class InsertInto {
             }
             List<String> primaryKeyValue = new ArrayList<>();
             for (Integer primaryKeyIndex : primaryKeyIndexes) {
-                primaryKeyValue.add(splitValues[primaryKeyIndex]);
+                primaryKeyValue.add(splitInsertValues[primaryKeyIndex]);
             }
 
             for (Database database : databaseList) {
@@ -110,34 +112,34 @@ public class InsertInto {
                             for (Attribute attribute : attributeList) {
                                 attributeNames.add(attribute.get_attributeName());
                             }
-                            if (attributeNames.size() != splitValues.length) {
+                            if (attributeNames.size() != splitInsertValues.length) {
                                 parser.setOtherError("The number of values does not match the number of columns");
                                 return;
                             }
                             for (int i = 0; i < attributeNames.size(); i++) {
-                                if (splitValues[i].equals("null")) {
+                                if (splitInsertValues[i].equals("null")) {
                                     continue;
                                 }
                                 if (attributeNames.get(i).toLowerCase().contains("int")) {
                                     try {
-                                        Integer.parseInt(splitValues[i]);
+                                        Integer.parseInt(splitInsertValues[i]);
                                     } catch (NumberFormatException e) {
-                                        parser.setOtherError("The value " + splitValues[i] + " is not an integer");
+                                        parser.setOtherError("The value " + splitInsertValues[i] + " is not an integer");
                                         return;
                                     }
                                 } else if (attributeNames.get(i).toLowerCase().contains("float")) {
                                     try {
-                                        Float.parseFloat(splitValues[i]);
+                                        Float.parseFloat(splitInsertValues[i]);
                                     } catch (NumberFormatException e) {
-                                        parser.setOtherError("The value " + splitValues[i] + " is not a float");
+                                        parser.setOtherError("The value " + splitInsertValues[i] + " is not a float");
                                         return;
                                     }
                                 } else if (attributeNames.get(i).toLowerCase().contains("varchar")) {
-                                    if ((splitValues[i].charAt(0) != '\'' || splitValues[i].charAt(splitValues[i].length() - 1) != '\'') || (splitValues[i].charAt(0) != '\"' || splitValues[i].charAt(splitValues[i].length() - 1) != '\"')) {
-                                        parser.setOtherError("The value " + splitValues[i] + " is not a string");
+                                    if ((splitInsertValues[i].charAt(0) != '\'' || splitInsertValues[i].charAt(splitInsertValues[i].length() - 1) != '\'') || (splitInsertValues[i].charAt(0) != '\"' || splitInsertValues[i].charAt(splitInsertValues[i].length() - 1) != '\"')) {
+                                        parser.setOtherError("The value " + splitInsertValues[i] + " is not a string");
                                         return;
                                     } else {
-                                        splitValues[i] = splitValues[i].substring(1, splitValues[i].length() - 1);
+                                        splitInsertValues[i] = splitInsertValues[i].substring(1, splitInsertValues[i].length() - 1);
                                     }
                                 }
                             }
@@ -146,34 +148,102 @@ public class InsertInto {
                 }
             }
 
+            // get unique values
+            List<UniqueKey> uniqueKeyList = myTable.getUniqueKeys();
+            List<String> uniqueKeyNames = new ArrayList<>();
+            for (UniqueKey uniqueKey : uniqueKeyList) {
+                uniqueKeyNames.add(uniqueKey.getUniqueAttribute());
+            }
+
+            List<Integer> uniqueKeyIndexesInsert = new ArrayList<>();
+            List<Integer> uniqueKeyIndexesDB = new ArrayList<>();
+            int j = 0;
+            int k = 0;
+            for (Attribute attribute : attributeList) {
+                if (uniqueKeyNames.contains(attribute.get_attributeName())) {
+                    uniqueKeyIndexesInsert.add(j);
+                }
+                if (!primaryKeyNames.contains(attribute.get_attributeName())) {
+                    uniqueKeyIndexesDB.add(k);
+                    k++;
+                }
+                j++;
+            }
+
+            // check if the unique values are unique
+            String connectionString = "mongodb://localhost:27017";
+            try (MongoClient mongoClient = create(connectionString)) {
+                MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
+                MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(tableName);
+                mongoCollection.find().forEach((Document document) -> {
+                    String value = document.get("row").toString();
+                    String[] splitValueDB = value.split("#");
+                    for (Integer uniqueKeyIndex : uniqueKeyIndexesInsert) {
+                        for (Integer uniqueKeyIndexDB : uniqueKeyIndexesDB) {
+                            //System.out.println(splitValueDB[uniqueKeyIndexDB] + " =?= " + splitInsertValues[uniqueKeyIndex]);
+                            if (splitValueDB[uniqueKeyIndexDB].equals(splitInsertValues[uniqueKeyIndex])) {
+                                parser.setOtherError("The value " + splitInsertValues[uniqueKeyIndex] + " is not unique");
+                                return;
+                            }
+                        }
+                    }
+                });
+            }
+
             contents = contents.replace(",", "#");
             contents = contents.substring(contents.indexOf("#") + 1);
 
 
             // if varchar, remove the quotes
-            for (int i = 0; i < splitValues.length; i++) {
-                if ((splitValues[i].charAt(0) == '\'' && splitValues[i].charAt(splitValues[i].length() - 1) == '\'') || (splitValues[i].charAt(0) == '\"' && splitValues[i].charAt(splitValues[i].length() - 1) == '\"')) {
-                    splitValues[i] = splitValues[i].substring(1, splitValues[i].length() - 1);
+            for (int i = 0; i < splitInsertValues.length; i++) {
+                if ((splitInsertValues[i].charAt(0) == '\'' && splitInsertValues[i].charAt(splitInsertValues[i].length() - 1) == '\'') || (splitInsertValues[i].charAt(0) == '\"' && splitInsertValues[i].charAt(splitInsertValues[i].length() - 1) == '\"')) {
+                    splitInsertValues[i] = splitInsertValues[i].substring(1, splitInsertValues[i].length() - 1);
                 }
             }
 
             String key = "";
             String value = "";
-            for (int i = 0; i < splitValues.length; i++) {
-                splitValues[i] = splitValues[i].trim();
+            for (int i = 0; i < splitInsertValues.length; i++) {
+                splitInsertValues[i] = splitInsertValues[i].trim();
                 if (primaryKeyIndexes.contains(i)) {
-                    key = key + splitValues[i] + "#";
-                    continue;
+                    key = key + splitInsertValues[i] + "#";
                 } else {
-                    value = value + splitValues[i] + "#";
+                    value = value + splitInsertValues[i] + "#";
                 }
             }
+
+            // check if the primary key already exists
+            try (MongoClient mongoClient = create(connectionString)) {
+                for (Document document : mongoClient.getDatabase(databaseName).getCollection(tableName).find()) {
+                    String documentKey = document.get("_id").toString();
+                    String[] splitDocumentKey = documentKey.split("#");
+                    boolean same = true;
+                    for (int i = 0; i < splitDocumentKey.length; i++) {
+                        if (!splitDocumentKey[i].equals(primaryKeyValue.get(i))) {
+                            same = false;
+                            break;
+                        }
+                    }
+                    if (same) {
+                        parser.setOtherError("The primary key already exists");
+                        return;
+                    }
+                }
+            } catch (MongoWriteException e) {
+                if (e.getError().getCode() == 11000) {
+                    parser.setOtherError("The primary key already exists");
+                    return;
+                } else {
+                    System.out.println(e);
+                    throw new RuntimeException(e);
+                }
+            }
+
 
             key = key.substring(0, key.length() - 1);
             value = value.substring(0, value.length() - 1);
 
             System.out.println("Trying to connect to MongoDB");
-            String connectionString = "mongodb://localhost:27017";
             try (MongoClient mongoClient = create(connectionString)) {
                 Document document = new Document("_id", key).append("row", value);
                 mongoClient.getDatabase(databaseName).getCollection(tableName).insertOne(document);
