@@ -1,0 +1,4 @@
+# file: ~/.gitignore_global
+# ignore .class files
+
+*.class
