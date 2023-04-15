@@ -151,8 +151,9 @@ public class KliensNew extends JFrame implements Runnable {
         panel.setBounds(50, 50, width - 50, height - 50);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JButton button = new JButton("Create");
+        JButton buttonDelete = new JButton("Delete");
         JButton addRow = new JButton("Add Row");
-        JButton execute = new JButton("Execute");
+        JButton execute = new JButton("Insert");
 
         JComboBox<String> comboBox = new JComboBox<>();
         JComboBox<String> comboBox2 = new JComboBox<>();
@@ -160,6 +161,7 @@ public class KliensNew extends JFrame implements Runnable {
         panel.add(button, BorderLayout.NORTH);
         panel.add(addRow, BorderLayout.NORTH);
         panel.add(execute, BorderLayout.NORTH);
+        panel.add(buttonDelete, BorderLayout.NORTH);
 
         panel.add(comboBox, BorderLayout.WEST);
         panel.add(comboBox2, BorderLayout.EAST);
@@ -210,6 +212,13 @@ public class KliensNew extends JFrame implements Runnable {
             VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
             if (visualQueryDesigner != null) {
                 textArea = visualQueryDesigner.generateQuery((String) comboBox.getSelectedItem());
+                send = true;
+            }
+        });
+        buttonDelete.addActionListener(e -> {
+            VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
+            if (visualQueryDesigner != null) {
+                textArea = visualQueryDesigner.generateQueryDelete((String) comboBox.getSelectedItem());
                 send = true;
             }
         });
