@@ -118,11 +118,11 @@ public class Parser {
             System.out.println("CREATE INDEX");
             String[] split = input.split(" ");
             if (split.length <= 4) {
-                host.setError("Invalid syntax");
+                host.setError("Invalid syntax LENGTH");
                 return;
             }
             if (!split[3].equalsIgnoreCase("ON")) {
-                host.setError("Invalid syntax");
+                host.setError("Invalid syntax ON");
                 return;
             }
 
@@ -138,24 +138,17 @@ public class Parser {
                 throw new RuntimeException(e);
             }
 
-            StringBuilder contents = new StringBuilder();
-            for (int i = 5; i < split.length; i++) {
-                contents.append(split[i]).append(" ");
-            }
-
-            // contents = (columnname,...)
-            // check for ( and )
+            String contents = split[5];
+            contents = contents.trim();
             System.out.println("Contents: " + contents);
 
-            System.out.println("elso " + contents.toString().charAt(0));
-            System.out.println("utolso " + contents.toString().charAt(contents.length() - 2));
-
-            if (!(contents.toString().charAt(0) == '(') || !(contents.toString().charAt(contents.length() - 2) == ')')) {
+            if (!(contents.charAt(0) == '(') || !(contents.charAt(contents.length() - 1) == ')')) {
                 host.setError("Invalid syntax");
                 return;
             }
+            contents = contents.substring(1, contents.length() - 1);
 
-            new CreateIndex(indexName, tableName, contents.toString(), currentDatabase.trim(), this);
+            new CreateIndex(indexName, tableName, contents, currentDatabase.trim(), this);
             if (otherError.equals("")) {
                 host.setError("");
             } else {

@@ -1,6 +1,8 @@
 package server.jacksonclasses;
 
-public class UniqueKey {
+import java.io.Serializable;
+
+public class UniqueKey implements Serializable {
     private String UniqueAttribute;
 
     public UniqueKey() {

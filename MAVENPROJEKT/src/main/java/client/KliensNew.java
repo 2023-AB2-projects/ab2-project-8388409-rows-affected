@@ -45,7 +45,7 @@ public class KliensNew extends JFrame implements Runnable {
 
     KliensNew() {
 //        InitQueryPanel();
-//        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setTitle("AB: Client");
         this.setSize(1000, 700);
         this.setLocationRelativeTo(this);
