@@ -8,15 +8,19 @@
           "_rowLength": "0",
           "_fileName": "tbl.json",
           "indexFiles": {
-            "indexFiles": null
+            "indexFiles": [
+              {
+                "_indexName": "idx1",
+                "_keyLength": null,
+                "_isUnique": null,
+                "indexAttributes": [
+                  {
+                    "iattribute": "idx1"
+                  }
+                ]
+              }
+            ]
           },
-          "primaryKeys": [
-            {
-              "pkAttribute": "id"
-            }
-          ],
-          "uniqueKeys": [],
-          "foreignKeys": [],
           "structure": {
             "attributes": [
               {
@@ -25,17 +29,28 @@
                 "_type": "int"
               },
               {
-                "_attributeName": "vnev",
+                "_attributeName": "u",
                 "_isnull": "0",
-                "_type": "varchar"
+                "_type": "int"
               },
               {
-                "_attributeName": "knev",
+                "_attributeName": "str",
                 "_isnull": "0",
                 "_type": "varchar"
               }
             ]
-          }
+          },
+          "uniqueKeys": [
+            {
+              "uniqueAttribute": "u"
+            }
+          ],
+          "foreignKeys": [],
+          "primaryKeys": [
+            {
+              "pkAttribute": "id"
+            }
+          ]
         }
       ]
     }
