@@ -33,6 +33,7 @@ public class Host {
         elvSzavak.add("drop");
         elvSzavak.add("INSERT");
         elvSzavak.add("insert");
+        elvSzavak.add("DELETE");
 
         error = "";
         acc = "";
@@ -107,7 +108,6 @@ public class Host {
                 message.setMessageUser("Welcome to the server!");
                 message.setDatabases(new DataBaseNames().getDatabaseNames());
                 DataBaseNames dbn = new DataBaseNames();
-                System.out.println(dbn);
 
                 ArrayList<Database> databaseArrayList = new ArrayList<>();
                 ArrayList<Table> tableArrayList = new ArrayList<>();
