@@ -20,7 +20,6 @@ public class VisualQueryDesigner extends JPanel {
 
         table = new JTable();
         table.setBounds(0, 0, 700, this.getHeight());
-//        i want to see every column fully
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setPreferredScrollableViewportSize(new Dimension(700, this.getHeight()));
         this.add(table);
@@ -39,6 +38,10 @@ public class VisualQueryDesigner extends JPanel {
 
     public JTextArea generateQuery(String db) {
         return vqdTable.generateQuery(db);
+    }
+
+    public JTextArea generateQueryDelete(String db) {
+        return vqdTable.generateQueryDelete(db);
     }
 
     public void addRow() {

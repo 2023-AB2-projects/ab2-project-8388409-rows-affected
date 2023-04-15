@@ -86,12 +86,42 @@ public class VQDTable extends JPanel {
             query.append("INSERT INTO " + table.get_tableName() + " VALUES (");
             for (int j = 0; j < attributeCount; j++) {
                 if (j == attributeCount - 1) {
-                    query.append(" " + attrTypes[i][j] + "");
+                    query.append(attrTypes[i][j]);
                 } else {
-                    query.append(" " + attrTypes[i][j] + ", ");
+                    query.append(attrTypes[i][j] + ",");
                 }
             }
             query.append(" ) \n");
+
+        }
+        System.out.println(query.getText());
+
+        return query;
+    }
+
+    public JTextArea generateQueryDelete(String db) {
+
+        boolean first = true;
+        JTextArea query = new JTextArea();
+        query.setText("USE " + db + "\n");
+        for (int i = 1; i < rows; i++) {
+            query.append("DELETE FROM " + table.get_tableName() + " WHERE ");
+            for (int j = 0; j < attributeCount; j++) {
+                if (j == attributeCount - 1) {
+                    if (!attrTypes[i][j].equals(""))
+                        query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
+                } else {
+                    if (!attrTypes[i][j].equals("")) {
+                        if (!first) {
+                            query.append(" AND ");
+                        } else {
+                            first = false;
+                        }
+                        query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
+                    }
+                }
+            }
+            query.append(" \n");
 
         }
         System.out.println(query.getText());
