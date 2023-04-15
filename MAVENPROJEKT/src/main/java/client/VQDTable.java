@@ -40,10 +40,10 @@ public class VQDTable extends JPanel {
         jTable.setPreferredScrollableViewportSize(new Dimension(700, this.getHeight()));
 
 
-        for (int i = 1; i < attributeCount; i++) {
-            jTable.getColumnModel().getColumn(i).setResizable(true);
-            jTable.getColumnModel().getColumn(i).setPreferredWidth(120);
-        }
+//        for (int i = 1; i < attributeCount; i++) {
+//            jTable.getColumnModel().getColumn(i).setResizable(true);
+//            jTable.getColumnModel().getColumn(i).setPreferredWidth(120);
+//        }
 
         this.add(jTable, BorderLayout.CENTER);
         setVisible(true);
