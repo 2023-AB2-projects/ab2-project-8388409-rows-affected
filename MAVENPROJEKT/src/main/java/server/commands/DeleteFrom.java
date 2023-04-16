@@ -122,6 +122,7 @@ public class DeleteFrom {
         }
         pkValue = pkValue.substring(0, pkValue.length() - 1);
 
+        // TODO: UPDATE INDEXES
         String connectionString = "mongodb://localhost:27017";
         try (MongoClient mongoClient = create(connectionString)) {
             MongoDatabase database = mongoClient.getDatabase(databaseName);
