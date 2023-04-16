@@ -263,10 +263,50 @@ public class InsertInto {
                     throw new RuntimeException(e);
                 }
             }
-        } catch (IOException e) {
+            IndexFiles indexFiles = myTable.getIndexFiles();
+            List<IndexFile> indexFileList = indexFiles.getIndexFiles();
+            for (IndexFile indexFile : indexFileList) {
+                String indexName = indexFile.get_indexName();
+                String indexType = indexFile.get_indexType();
+                List<IndexAttribute> indexAttributes = indexFile.getIndexAttributes();
+                String indexAttribute = indexAttributes.get(0).getIAttribute();
+                try (MongoClient mongoClient = create(connectionString)) {
+                    MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
+                    MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(indexName);
+                    switch (indexType) {
+                        case "primary":
+                            System.out.println(indexName + " " + indexType + " type index updated");
+                            break;
+                        case "unique":
+                            int indexOfIndexAttribute = -1;
+                            for (Attribute attribute : attributeList) {
+                                if (attribute.get_attributeName().equals(indexAttribute)) {
+                                    indexOfIndexAttribute = attributeList.indexOf(attribute);
+                                    break;
+                                }
+                            }
+                            if (indexOfIndexAttribute == -1) {
+                                parser.setOtherError("Index Update Error: The index attribute does not exist");
+                                return;
+                            }
+                            String indexValue = splitInsertValues[indexOfIndexAttribute];
+                            mongoDatabase.getCollection(indexName).insertOne(new Document(indexValue, key));
+                            System.out.println(indexName + " " + indexType + " type index updated");
+                            break;
+                        case "non": // TODO: update the index
+                            break;
+                        default:
+                            parser.setOtherError("Invalid index type");
+                            return;
+                    }
+                }
+            }
+        } catch (
+                IOException e) {
             System.out.println(e);
             throw new RuntimeException(e);
         }
         System.out.println("Inserted into " + tableName + " successfully");
+
     }
 }

@@ -134,7 +134,7 @@ public class CreateIndex {
             if (newIndexFile.getIndexAttributes() == null) {
                 newIndexFile.setIndexAttributes(new JSONArray());
             }
-            newIndexFile.getIndexAttributes().add(new IndexAttribute(indexName));
+            newIndexFile.getIndexAttributes().add(new IndexAttribute(contents));
             lif.add(newIndexFile);
 
             objectMapper.writeValue(new File("Catalog.json"), databases);
