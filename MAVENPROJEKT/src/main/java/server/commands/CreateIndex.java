@@ -12,6 +12,7 @@ import server.jacksonclasses.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mongodb.client.MongoClients.create;
@@ -45,27 +46,48 @@ public class CreateIndex {
                 return;
             }
 
-            int index = -1;
-            for (int i = 0; i < myTable.getStructure().getAttributes().size(); i++) {
-                if (myTable.getStructure().getAttributes().get(i).get_attributeName().equals(contents)) {
-                    index = i;
+            // get the primary key names
+            List<String> primaryKeysNames = new ArrayList<>();
+            for (int i = 0; i < myTable.getPrimaryKeys().size(); i++) {
+                primaryKeysNames.add(myTable.getPrimaryKeys().get(i).getPkAttribute());
+            }
+
+            // check if contents is an attribute
+            boolean attributeExists = false;
+            for (Attribute attribute : myTable.getStructure().getAttributes()) {
+                if (attribute.get_attributeName().equals(contents)) {
+                    attributeExists = true;
                     break;
                 }
             }
-            if (index == -1) {
+            if (!attributeExists) {
                 parser.setOtherError("Attribute does not exist");
                 return;
             }
 
             // check if contents is primary key
-            boolean isPrimaryKey = false;
-            List<PrimaryKey> primaryKeys = myTable.getPrimaryKeys();
-            for (int i = 0; i < primaryKeys.size(); i++) {
-                if (primaryKeys.get(i).getPkAttribute().equals(contents)) {
-                    isPrimaryKey = true;
-                    break;
+            boolean isPrimaryKey = primaryKeysNames.contains(contents);
+
+            // get the DB index of the attribute if it is not a primary key
+            int index = 0;
+            List<Attribute> attributes = myTable.getStructure().getAttributes();
+            if (!isPrimaryKey) {
+                boolean indexFound = false;
+                for (Attribute attribute : attributes) {
+                    if (!primaryKeysNames.contains(attribute.get_attributeName())) {
+                        if (attribute.get_attributeName().equals(contents)) {
+                            indexFound = true;
+                            break;
+                        }
+                        index++;
+                    }
+                }
+                if (!indexFound) {
+                    parser.setOtherError("Attribute is not found in table");
+                    return;
                 }
             }
+
 
             // check if contents is unique
             boolean isUnique = false;
@@ -87,6 +109,10 @@ public class CreateIndex {
                 indexFiles.setIndexFiles(new JSONArray());
             }
             List<IndexFile> lif = indexFiles.getIndexFiles();
+            if (lif == null) {
+                lif = new JSONArray();
+                indexFiles.setIndexFiles(lif);
+            }
             for (int i = 0; i < lif.size(); i++) {
                 if (lif.get(i).get_indexName().equals(indexName)) {
                     parser.setOtherError("Index already exists");
@@ -96,6 +122,15 @@ public class CreateIndex {
 
             IndexFile newIndexFile = new IndexFile();
             newIndexFile.set_indexName(indexName);
+
+            if (isPrimaryKey) {
+                newIndexFile.set_indexType("primary");
+            } else if (isUnique) {
+                newIndexFile.set_indexType("unique");
+            } else {
+                newIndexFile.set_indexType("non");
+            }
+
             if (newIndexFile.getIndexAttributes() == null) {
                 newIndexFile.setIndexAttributes(new JSONArray());
             }
@@ -104,7 +139,6 @@ public class CreateIndex {
 
             objectMapper.writeValue(new File("Catalog.json"), databases);
 
-            System.out.println("DEBUG");
             String connectionString = "mongodb://localhost:27017";
             try (MongoClient mongoClient = create(connectionString)) {
                 MongoDatabase database = mongoClient.getDatabase(currentDatabase);
@@ -113,22 +147,49 @@ public class CreateIndex {
                 if (isPrimaryKey) {
                     System.out.println("Index created on primary key");
                 } else if (isUnique) {
-                    System.out.println("Index created on unique key");
                     // get keys from collection
-                    int finalIndex = index;
-                    collection.find().forEach((Document document) -> {
-                        // get value of key
-                        System.out.println("_id = " + document.get("_id"));
-                        System.out.println("row = " + document.get("row"));
+                    for (Document document : collection.find()) {// get value of key
                         String[] row = document.get("row").toString().split("#");
-                        String uniqueKey = row[finalIndex];
+                        String uniqueKey = row[index];
                         // create new document with key and value
                         Document newDocument = new Document();
                         newDocument.append(uniqueKey, document.get("_id").toString());
                         // insert into index collection
                         indexCollection.insertOne(newDocument);
-                    });
+                    }
+                    System.out.println("Index created on unique key");
                 } else {
+                    for (Document document : collection.find()) {
+                        // get value of key
+                        String[] row = document.get("row").toString().split("#");
+                        String nonkey = row[index];
+                        String pk = document.get("_id").toString();
+                        System.out.println(pk + ": " + nonkey);
+                        StringBuilder allPrimaryKeys = new StringBuilder();
+                        allPrimaryKeys.append(pk).append("$");
+                        for (Document document2 : collection.find()) {
+                            String pk2 = document2.get("_id").toString();
+                            if (pk2.equals(pk)) {
+                                System.out.println(pk + " == " + pk2 + " so continue");
+                                continue;
+                            }
+                            String[] row2 = document2.get("row").toString().split("#");
+                            String nonkey2 = row2[index];
+                            System.out.println("\t" + pk2 + ": " + nonkey2);
+                            if (nonkey2.equals(nonkey)) {
+                                System.out.println("\t" + nonkey2 + " == " + nonkey + " so add to allPrimaryKeys");
+                                allPrimaryKeys.append(pk2).append("$");
+                            }
+                        }
+                        // remove last $
+                        allPrimaryKeys.deleteCharAt(allPrimaryKeys.length() - 1);
+                        System.out.println("allPrimaryKeys: " + allPrimaryKeys);
+                        // create new document with key and value
+                        Document newDocument = new Document();
+                        newDocument.append(nonkey, allPrimaryKeys.toString());
+                        // insert into index collection
+                        indexCollection.insertOne(newDocument);
+                    }
                     System.out.println("Index created on non-key");
                 }
             } catch (MongoException e) {

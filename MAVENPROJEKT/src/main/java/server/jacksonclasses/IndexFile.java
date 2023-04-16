@@ -5,17 +5,15 @@ import java.util.List;
 public class IndexFile implements java.io.Serializable {
     private List<IndexAttribute> IndexAttributes;
     private String _indexName;
-    private String _keyLength;
-    private String _isUnique;
+    private String _indexType;
 
     public IndexFile() {
     }
 
-    public IndexFile(List<IndexAttribute> indexAttributes, String _indexName, String _keyLength, String _isUnique) {
-        IndexAttributes = indexAttributes;
+    public IndexFile(List<IndexAttribute> indexAttributes, String _indexName, String _indexType) {
+        this.IndexAttributes = indexAttributes;
         this._indexName = _indexName;
-        this._keyLength = _keyLength;
-        this._isUnique = _isUnique;
+        this._indexType = _indexType;
     }
 
     public List<IndexAttribute> getIndexAttributes() {
@@ -34,19 +32,11 @@ public class IndexFile implements java.io.Serializable {
         this._indexName = _indexName;
     }
 
-    public String get_keyLength() {
-        return _keyLength;
+    public String get_indexType() {
+        return _indexType;
     }
 
-    public void set_keyLength(String _keyLength) {
-        this._keyLength = _keyLength;
-    }
-
-    public String get_isUnique() {
-        return _isUnique;
-    }
-
-    public void set_isUnique(String _isUnique) {
-        this._isUnique = _isUnique;
+    public void set_indexType(String _indexType) {
+        this._indexType = _indexType;
     }
 }

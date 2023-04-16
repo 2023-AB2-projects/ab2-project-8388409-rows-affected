@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.mongodb.client.MongoClients.create;
 
@@ -171,6 +172,7 @@ public class InsertInto {
             }
 
             // check if the unique values are unique
+            AtomicBoolean unique = new AtomicBoolean(true);
             String connectionString = "mongodb://localhost:27017";
             try (MongoClient mongoClient = create(connectionString)) {
                 MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
@@ -183,11 +185,17 @@ public class InsertInto {
                             //System.out.println(splitValueDB[uniqueKeyIndexDB] + " =?= " + splitInsertValues[uniqueKeyIndex]);
                             if (splitValueDB[uniqueKeyIndexDB].equals(splitInsertValues[uniqueKeyIndex])) {
                                 parser.setOtherError("The value " + splitInsertValues[uniqueKeyIndex] + " is not unique");
+                                unique.set(false);
                                 return;
                             }
                         }
                     }
                 });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (!unique.get()) {
+                return;
             }
 
             contents = contents.replace(",", "#");
@@ -238,7 +246,6 @@ public class InsertInto {
                     throw new RuntimeException(e);
                 }
             }
-
 
             key = key.substring(0, key.length() - 1);
             value = value.substring(0, value.length() - 1);
