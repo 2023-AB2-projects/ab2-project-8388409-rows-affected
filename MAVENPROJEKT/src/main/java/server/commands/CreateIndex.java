@@ -170,14 +170,14 @@ public class CreateIndex {
                         for (Document document2 : collection.find()) {
                             String pk2 = document2.get("_id").toString();
                             if (pk2.equals(pk)) {
-                                System.out.println(pk + " == " + pk2 + " so continue");
+//                                System.out.println(pk + " == " + pk2 + " so continue");
                                 continue;
                             }
                             String[] row2 = document2.get("row").toString().split("#");
                             String nonkey2 = row2[index];
                             System.out.println("\t" + pk2 + ": " + nonkey2);
                             if (nonkey2.equals(nonkey)) {
-                                System.out.println("\t" + nonkey2 + " == " + nonkey + " so add to allPrimaryKeys");
+//                                System.out.println("\t" + nonkey2 + " == " + nonkey + " so add to allPrimaryKeys");
                                 allPrimaryKeys.append(pk2).append("$");
                             }
                         }

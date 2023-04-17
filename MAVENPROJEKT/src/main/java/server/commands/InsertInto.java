@@ -20,6 +20,7 @@ import static com.mongodb.client.MongoClients.create;
 public class InsertInto {
     public InsertInto(String databaseName, String tableName, String contents, Parser parser) {
         tableName = tableName.trim();
+        String fullPK = "";
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -248,6 +249,7 @@ public class InsertInto {
             }
 
             key = key.substring(0, key.length() - 1);
+            fullPK = key;
             value = value.substring(0, value.length() - 1);
 
             System.out.println("Trying to connect to MongoDB");
@@ -263,6 +265,8 @@ public class InsertInto {
                     throw new RuntimeException(e);
                 }
             }
+
+            // update the indexes
             IndexFiles indexFiles = myTable.getIndexFiles();
             List<IndexFile> indexFileList = indexFiles.getIndexFiles();
             for (IndexFile indexFile : indexFileList) {
@@ -272,28 +276,44 @@ public class InsertInto {
                 String indexAttribute = indexAttributes.get(0).getIAttribute();
                 try (MongoClient mongoClient = create(connectionString)) {
                     MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
-                    MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(indexName);
+                    MongoCollection<Document> indexCollection = mongoDatabase.getCollection(indexName);
+                    MongoCollection<Document> collection = mongoDatabase.getCollection(tableName);
+                    int indexOfIndexAttribute = -1;
+                    for (Attribute attribute : attributeList) {
+                        if (attribute.get_attributeName().equals(indexAttribute)) {
+                            indexOfIndexAttribute = attributeList.indexOf(attribute);
+                            break;
+                        }
+                    }
+                    if (indexOfIndexAttribute == -1) {
+                        parser.setOtherError("Index Update Error: The index attribute does not exist");
+                        return;
+                    }
+                    String indexValue = splitInsertValues[indexOfIndexAttribute];
                     switch (indexType) {
                         case "primary":
                             System.out.println(indexName + " " + indexType + " type index updated");
                             break;
                         case "unique":
-                            int indexOfIndexAttribute = -1;
-                            for (Attribute attribute : attributeList) {
-                                if (attribute.get_attributeName().equals(indexAttribute)) {
-                                    indexOfIndexAttribute = attributeList.indexOf(attribute);
-                                    break;
-                                }
-                            }
-                            if (indexOfIndexAttribute == -1) {
-                                parser.setOtherError("Index Update Error: The index attribute does not exist");
-                                return;
-                            }
-                            String indexValue = splitInsertValues[indexOfIndexAttribute];
-                            mongoDatabase.getCollection(indexName).insertOne(new Document(indexValue, key));
+                            indexCollection.insertOne(new Document(indexValue, key));
                             System.out.println(indexName + " " + indexType + " type index updated");
                             break;
-                        case "non": // TODO: update the index
+                        case "non":
+                            String indexKey = fullPK;
+                            for (Document document : collection.find()) {
+                                String pk = document.get("_id").toString();
+                                if (pk.equals(fullPK)) {
+                                    continue;
+                                }
+                                String row = document.get("row").toString();
+                                String[] splitRow = row.split("#");
+                                String valueOfIndexAttributeDB = splitRow[indexOfIndexAttribute];
+                                if (valueOfIndexAttributeDB.equals(indexValue)) {
+                                    indexKey = indexKey + "$" + pk;
+                                }
+                            }
+                            indexCollection.insertOne(new Document(indexValue, indexKey));
+                            System.out.println(indexName + " " + indexType + " type index updated");
                             break;
                         default:
                             parser.setOtherError("Invalid index type");

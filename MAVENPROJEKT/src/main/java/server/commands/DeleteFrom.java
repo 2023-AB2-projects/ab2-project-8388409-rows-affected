@@ -6,10 +6,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import server.Parser;
-import server.jacksonclasses.Database;
-import server.jacksonclasses.Databases;
-import server.jacksonclasses.PrimaryKey;
-import server.jacksonclasses.Table;
+import server.jacksonclasses.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +31,7 @@ public class DeleteFrom {
 
 
         ObjectMapper objectMapper = new ObjectMapper();
+        Table myTable = null;
         try {
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
             List<Database> databaseList = databases.getDatabases();
@@ -53,7 +51,6 @@ public class DeleteFrom {
                 return;
             }
             boolean tableExists = false;
-            Table myTable = null;
             for (Database database : databaseList) {
                 if (database.get_dataBaseName().equals(databaseName)) {
                     List<Table> tableList = database.getTables();
@@ -122,12 +119,35 @@ public class DeleteFrom {
         }
         pkValue = pkValue.substring(0, pkValue.length() - 1);
 
-        // TODO: UPDATE INDEXES
         String connectionString = "mongodb://localhost:27017";
         try (MongoClient mongoClient = create(connectionString)) {
             MongoDatabase database = mongoClient.getDatabase(databaseName);
             MongoCollection<Document> collection = database.getCollection(tableName);
             collection.deleteOne(new Document("_id", pkValue));
+
+            // update indexes
+            List<IndexFile> indexFilesList = myTable.getIndexFiles().getIndexFiles();
+            for (IndexFile indexFile : indexFilesList) {
+                String indexName = indexFile.get_indexName();
+                String indexType = indexFile.get_indexName();
+                String indexAttribute = indexFile.getIndexAttributes().get(0).getIAttribute();
+                MongoCollection<Document> indexCollection = database.getCollection(indexName);
+                if (indexType.equals("primary")) {
+                    System.out.println(indexName + " " + indexType + " type index updated");
+                    indexCollection.deleteOne(new Document("_id", pkValue));
+                    // !!! Csak primary keyre kellett deletet kezelni
+                    /*case "unique":
+
+                        System.out.println(indexName + " " + indexType + " type index updated");
+                        break;
+                    case "non":
+                        System.out.println(indexName + " " + indexType + " type index updated");
+                        break;
+                    default:
+                        parser.setOtherError("Invalid index type");
+                        return;*/
+                }
+            }
         }
     }
 }
