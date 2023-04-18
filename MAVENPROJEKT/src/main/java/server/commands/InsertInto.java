@@ -270,6 +270,10 @@ public class InsertInto {
             // update the indexes
             IndexFiles indexFiles = myTable.getIndexFiles();
             List<IndexFile> indexFileList = indexFiles.getIndexFiles();
+            if (indexFileList == null) {
+                indexFileList = new ArrayList<>();
+                indexFiles.setIndexFiles(indexFileList);
+            }
             for (IndexFile indexFile : indexFileList) {
                 String indexName = indexFile.get_indexName();
                 String indexType = indexFile.get_indexType();

@@ -7,20 +7,30 @@
           "_tableName": "tbl",
           "_rowLength": "0",
           "_fileName": "tbl.json",
+          "foreignKeys": [],
+          "primaryKeys": [
+            {
+              "pkAttribute": "id"
+            }
+          ],
           "indexFiles": {
             "indexFiles": [
               {
-                "_indexName": "idx1",
-                "_keyLength": null,
-                "_isUnique": null,
+                "_indexName": "nonindex",
+                "_indexType": "non",
                 "indexAttributes": [
                   {
-                    "iattribute": "idx1"
+                    "iattribute": "str"
                   }
                 ]
               }
             ]
           },
+          "uniqueKeys": [
+            {
+              "uniqueAttribute": "u"
+            }
+          ],
           "structure": {
             "attributes": [
               {
@@ -39,18 +49,7 @@
                 "_type": "varchar"
               }
             ]
-          },
-          "uniqueKeys": [
-            {
-              "uniqueAttribute": "u"
-            }
-          ],
-          "foreignKeys": [],
-          "primaryKeys": [
-            {
-              "pkAttribute": "id"
-            }
-          ]
+          }
         }
       ]
     }
