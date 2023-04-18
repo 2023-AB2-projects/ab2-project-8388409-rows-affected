@@ -119,7 +119,7 @@ public class InsertInto {
                                 return;
                             }
                             for (int i = 0; i < attributeNames.size(); i++) {
-                                if (splitInsertValues[i].equals("null")) {
+                                if (splitInsertValues[i].equalsIgnoreCase("null")) {
                                     continue;
                                 }
                                 if (attributeNames.get(i).toLowerCase().contains("int")) {
@@ -265,6 +265,7 @@ public class InsertInto {
                     throw new RuntimeException(e);
                 }
             }
+
 
             // update the indexes
             IndexFiles indexFiles = myTable.getIndexFiles();
