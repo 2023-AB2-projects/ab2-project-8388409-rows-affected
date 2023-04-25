@@ -4,6 +4,7 @@ import server.jacksonclasses.Attribute;
 import server.jacksonclasses.Table;
 
 import javax.swing.*;
+import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -36,14 +37,13 @@ public class VQDTable extends JPanel {
         }
 
         jTable = new JTable(attrTypes, attrTypes);
-        jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         jTable.setPreferredScrollableViewportSize(new Dimension(700, this.getHeight()));
 
 
-//        for (int i = 1; i < attributeCount; i++) {
-//            jTable.getColumnModel().getColumn(i).setResizable(true);
-//            jTable.getColumnModel().getColumn(i).setPreferredWidth(120);
-//        }
+        for (int i = 0; i < attributeCount; i++) {
+            jTable.getColumnModel().getColumn(i).setResizable(true);
+//            jTable.getColumnModel().getColumn(i).setPreferredWidth(150);
+        }
 
         this.add(jTable, BorderLayout.CENTER);
         setVisible(true);
@@ -55,6 +55,9 @@ public class VQDTable extends JPanel {
 
 
     public void addRow() {
+
+        TableCellEditor editor = jTable.getCellEditor();
+        System.out.println("EDIT stopped: " + editor.stopCellEditing());
 
         this.remove(jTable);
         rows++;
@@ -70,7 +73,7 @@ public class VQDTable extends JPanel {
 
 
         for (int i = 1; i < attributeCount; i++) {
-            jTable.getColumnModel().getColumn(i).setPreferredWidth(120);
+            jTable.getColumnModel().getColumn(i).setPreferredWidth(170);
         }
         this.add(jTable, BorderLayout.CENTER);
         validate();
@@ -81,10 +84,29 @@ public class VQDTable extends JPanel {
 
     public JTextArea generateQuery(String db) {
         JTextArea query = new JTextArea();
+        query.requestFocus();
+
+        jTable.setCellSelectionEnabled(false);
+        jTable.clearSelection();
+
+        TableCellEditor editor = jTable.getCellEditor();
+        System.out.println("EDIT stopped: " + editor.stopCellEditing());
+
+
+        for (int i = 1; i < rows; i++) {
+            for (int j = 0; j < attributeCount; j++) {
+                if (attrTypes[i][j].equals("")) {
+                    attrTypes[i][j] = "NULL";
+
+                }
+            }
+        }
+
         query.setText("USE " + db + "\n");
         for (int i = 1; i < rows; i++) {
             query.append("INSERT INTO " + table.get_tableName() + " VALUES (");
             for (int j = 0; j < attributeCount; j++) {
+
                 if (j == attributeCount - 1) {
                     query.append(attrTypes[i][j]);
                 } else {
@@ -94,7 +116,7 @@ public class VQDTable extends JPanel {
             query.append(" ) \n");
 
         }
-        System.out.println(query.getText());
+//        editor.isCellEditable(null);
 
         return query;
     }
@@ -102,30 +124,45 @@ public class VQDTable extends JPanel {
     public JTextArea generateQueryDelete(String db) {
 
         boolean first = true;
+//        set jtable uneditable
+        TableCellEditor editor = jTable.getCellEditor();
+        System.out.println("EDIT stopped: " + editor.stopCellEditing());
+
+
         JTextArea query = new JTextArea();
         query.setText("USE " + db + "\n");
         for (int i = 1; i < rows; i++) {
             query.append("DELETE FROM " + table.get_tableName() + " WHERE ");
             for (int j = 0; j < attributeCount; j++) {
-                if (j == attributeCount - 1) {
-                    if (!attrTypes[i][j].equals(""))
-                        query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
-                } else {
-                    if (!attrTypes[i][j].equals("")) {
-                        if (!first) {
-                            query.append(" AND ");
-                        } else {
-                            first = false;
-                        }
-                        query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
-                    }
+//                if (j == attributeCount - 1) {
+//                        query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
+//                }
+//                else {
+//                    if (!attrTypes[i][j].equals("")) {
+//                        if (!first) {
+//                            query.append(" AND ");
+//                            first = true;
+//                        }
+//                        query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
+//                    }
+//                }
+
+                if (attrTypes[i][j].equals("")) {
+                    continue;
                 }
+                if (!first) {
+                    query.append(" AND ");
+                    first = true;
+                }
+                query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
+
             }
             query.append(" \n");
 
         }
-        System.out.println(query.getText());
 
+
+        System.out.println(query.getText());
         return query;
     }
 }
