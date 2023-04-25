@@ -123,7 +123,6 @@ public class DeleteFrom {
         try (MongoClient mongoClient = create(connectionString)) {
             MongoDatabase database = mongoClient.getDatabase(databaseName);
             MongoCollection<Document> collection = database.getCollection(tableName);
-            collection.deleteOne(new Document("_id", pkValue));
 
             // update indexes
             List<IndexFile> indexFilesList = myTable.getIndexFiles().getIndexFiles();
@@ -135,19 +134,37 @@ public class DeleteFrom {
                 if (indexType.equals("primary")) {
                     System.out.println(indexName + " " + indexType + " type index updated");
                     indexCollection.deleteOne(new Document("_id", pkValue));
-                    // !!! Csak primary keyre kellett deletet kezelni
-                    /*case "unique":
-
-                        System.out.println(indexName + " " + indexType + " type index updated");
-                        break;
-                    case "non":
-                        System.out.println(indexName + " " + indexType + " type index updated");
-                        break;
-                    default:
-                        parser.setOtherError("Invalid index type");
-                        return;*/
+                } else if (indexType.equals("unique")) {
+                    List<Attribute> attributeList = myTable.getStructure().getAttributes();
+                    List<String> primaryKeyNames = myTable.getPrimaryKeys().stream().map(PrimaryKey::getPkAttribute).toList();
+                    int indexDB = -1;
+                    boolean indexFound = false;
+                    for (Attribute attribute : attributeList) {
+                        if (!primaryKeyNames.contains(attribute.get_attributeName())) {
+                            indexDB++;
+                        }
+                        if (attribute.get_attributeName().equals(indexAttribute)) {
+                            indexFound = true;
+                            break;
+                        }
+                    }
+                    if (!indexFound) {
+                        parser.setOtherError("Index attribute " + indexName + " does not exist");
+                        return;
+                    }
+                    String indexValue = "";
+                    for (Document document : collection.find(new Document("_id", pkValue))) {
+                        indexValue = document.get("row").toString().split("#")[indexDB];
+                    }
+                    if (indexValue.equals("")) {
+                        parser.setOtherError("Index value is empty");
+                        return;
+                    }
+                    indexCollection.deleteOne(new Document(indexValue, pkValue));
                 }
+                // TODO : non keyre is
             }
+            collection.deleteOne(new Document("_id", pkValue));
         }
     }
 }
