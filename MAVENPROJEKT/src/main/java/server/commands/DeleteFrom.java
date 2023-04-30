@@ -106,7 +106,6 @@ public class DeleteFrom {
                     return;
                 }
             }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -118,6 +117,17 @@ public class DeleteFrom {
             pkValue += value + "#";
         }
         pkValue = pkValue.substring(0, pkValue.length() - 1);
+
+        boolean fkExists = false;
+        List<ForeignKey> foreignKeyList = myTable.getForeignKeys();
+        List<String> referencedTables = new ArrayList<>();
+        for (ForeignKey foreignKey : foreignKeyList) {
+            referencedTables.add(foreignKey.getRefferences().getRefTable());
+        }
+        if (referencedTables.contains(tableName)) {
+            parser.setOtherError("Table " + tableName + " is referenced by another table");
+            return;
+        }
 
         String connectionString = "mongodb://localhost:27017";
         try (MongoClient mongoClient = create(connectionString)) {
@@ -161,8 +171,45 @@ public class DeleteFrom {
                         return;
                     }
                     indexCollection.deleteOne(new Document(indexValue, pkValue));
+                } else if (indexType.equals("non")) {
+                    List<Attribute> attributeList = myTable.getStructure().getAttributes();
+                    // get the mongoDB index of the attribute
+                    int indexDB = -1;
+                    boolean indexFound = false;
+                    for (Attribute attribute : attributeList) {
+                        if (attribute.get_attributeName().equals(indexAttribute)) {
+                            indexFound = true;
+                            break;
+                        }
+                        indexDB++;
+                    }
+                    if (!indexFound) {
+                        parser.setOtherError("Index attribute " + indexName + " does not exist");
+                        return;
+                    }
+                    String indexValue = "";
+                    for (Document document : collection.find(new Document("_id", pkValue))) {
+                        indexValue = document.get("row").toString().split("#")[indexDB];
+                        for (Document indexdoc : indexCollection.find()) {
+                            String indexdocPkValue = indexdoc.get(indexValue).toString();
+                            String[] indexdocPkValueParts = indexdocPkValue.split("\\$");
+                            List<String> newIndexdocPkValueParts = new ArrayList<>();
+                            boolean needToRemove = false;
+                            for (String pkValueParts : indexdocPkValueParts) {
+                                if (!pkValueParts.equals(pkValue)) {
+                                    newIndexdocPkValueParts.add(pkValueParts);
+                                } else {
+                                    needToRemove = true;
+                                }
+                            }
+                            String newIndexdocPkValue = String.join("$", newIndexdocPkValueParts);
+                            if (needToRemove) {
+                                indexCollection.deleteOne(new Document(indexValue, indexdocPkValue));
+                                indexCollection.insertOne(new Document(indexValue, newIndexdocPkValue));
+                            }
+                        }
+                    }
                 }
-                // TODO : non keyre is
             }
             collection.deleteOne(new Document("_id", pkValue));
         }

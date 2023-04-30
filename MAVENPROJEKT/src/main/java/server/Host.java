@@ -156,7 +156,6 @@ public class Host {
                     }
                 }
 
-                // TODO: EZT ITT FENT MIÉRT KOMMENTELTED KI??
                 // ANSWER: mert ijrairtam a kommunikaciot es kb semmi se volt ugy jo
 
             } catch (Exception e) {

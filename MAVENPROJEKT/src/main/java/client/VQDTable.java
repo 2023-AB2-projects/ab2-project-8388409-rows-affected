@@ -41,7 +41,12 @@ public class VQDTable extends JPanel {
 
 
         for (int i = 0; i < attributeCount; i++) {
-            jTable.getColumnModel().getColumn(i).setResizable(true);
+            jTable.getColumnModel().getColumn(i).setResizable(true); /* TODO: Exception in thread "AWT-EventQueue-0" java.lang.ArrayIndexOutOfBoundsException: 2 >= 2
+            at java.base/java.util.Vector.elementAt(Vector.java:466)
+            at java.desktop/javax.swing.table.DefaultTableColumnModel.getColumn(DefaultTableColumnModel.java:298)
+            at client.VQDTable.<init>(VQDTable.java:44)
+            */
+
 //            jTable.getColumnModel().getColumn(i).setPreferredWidth(150);
         }
 

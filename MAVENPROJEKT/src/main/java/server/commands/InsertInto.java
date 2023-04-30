@@ -267,7 +267,7 @@ public class InsertInto {
             }
 
 
-            // update the indexes
+            // Update the indexes
             IndexFiles indexFiles = myTable.getIndexFiles();
             List<IndexFile> indexFileList = indexFiles.getIndexFiles();
             if (indexFileList == null) {
@@ -284,9 +284,14 @@ public class InsertInto {
                     MongoCollection<Document> indexCollection = mongoDatabase.getCollection(indexName);
                     MongoCollection<Document> collection = mongoDatabase.getCollection(tableName);
                     int indexOfIndexAttribute = -1;
+                    boolean found = false;
                     for (Attribute attribute : attributeList) {
+                        if (primaryKeyNames.contains(attribute.get_attributeName())) {
+                            continue;
+                        }
+                        indexOfIndexAttribute++;
                         if (attribute.get_attributeName().equals(indexAttribute)) {
-                            indexOfIndexAttribute = attributeList.indexOf(attribute);
+                            found = true;
                             break;
                         }
                     }
@@ -300,7 +305,7 @@ public class InsertInto {
                             System.out.println(indexName + " " + indexType + " type index updated");
                             break;
                         case "unique":
-                            indexCollection.insertOne(new Document(indexValue, key));
+                            indexCollection.insertOne(new Document("_id", indexValue).append("indexvalue", key));
                             System.out.println(indexName + " " + indexType + " type index updated");
                             break;
                         case "non":
@@ -311,7 +316,12 @@ public class InsertInto {
                                     continue;
                                 }
                                 String row = document.get("row").toString();
+                                System.out.println("row: " + row);
                                 String[] splitRow = row.split("#");
+                                System.out.println("splitRow");
+                                for (String s : splitRow) {
+                                    System.out.println(s);
+                                }
                                 String valueOfIndexAttributeDB = splitRow[indexOfIndexAttribute];
                                 if (valueOfIndexAttributeDB.equals(indexValue)) {
                                     indexKey = indexKey + "$" + pk;

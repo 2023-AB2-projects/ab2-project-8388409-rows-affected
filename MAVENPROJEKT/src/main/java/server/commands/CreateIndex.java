@@ -152,8 +152,7 @@ public class CreateIndex {
                         String[] row = document.get("row").toString().split("#");
                         String uniqueKey = row[index];
                         // create new document with key and value
-                        Document newDocument = new Document();
-                        newDocument.append(uniqueKey, document.get("_id").toString());
+                        Document newDocument = new Document("_id", uniqueKey).append("indexvalue", document.get("_id").toString());
                         // insert into index collection
                         indexCollection.insertOne(newDocument);
                     }
@@ -185,8 +184,7 @@ public class CreateIndex {
                         allPrimaryKeys.deleteCharAt(allPrimaryKeys.length() - 1);
                         System.out.println("allPrimaryKeys: " + allPrimaryKeys);
                         // create new document with key and value
-                        Document newDocument = new Document();
-                        newDocument.append(nonkey, allPrimaryKeys.toString());
+                        Document newDocument = new Document("_id", nonkey).append("indexvalue", allPrimaryKeys.toString());
                         // insert into index collection
                         indexCollection.insertOne(newDocument);
                     }
