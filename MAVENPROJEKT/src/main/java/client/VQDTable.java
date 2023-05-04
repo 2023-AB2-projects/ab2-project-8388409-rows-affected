@@ -2,6 +2,7 @@ package client;
 
 import server.jacksonclasses.Attribute;
 import server.jacksonclasses.Table;
+import server.mongobongo.DataColumn;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -37,18 +38,16 @@ public class VQDTable extends JPanel {
         }
 
         jTable = new JTable(attrTypes, attrTypes);
-        jTable.setPreferredScrollableViewportSize(new Dimension(700, this.getHeight()));
+//        jTable.setPreferredScrollableViewportSize(new Dimension(1000, this.getHeight()));
 
-
+        System.out.println("Attribute count: " + attributeCount);
         for (int i = 0; i < attributeCount; i++) {
-            jTable.getColumnModel().getColumn(i).setResizable(true); /* TODO: Exception in thread "AWT-EventQueue-0" java.lang.ArrayIndexOutOfBoundsException: 2 >= 2
-            at java.base/java.util.Vector.elementAt(Vector.java:466)
-            at java.desktop/javax.swing.table.DefaultTableColumnModel.getColumn(DefaultTableColumnModel.java:298)
-            at client.VQDTable.<init>(VQDTable.java:44)
-            */
+            System.out.println("Attribute: " + attr[i] + " " + i);
 
-//            jTable.getColumnModel().getColumn(i).setPreferredWidth(150);
+//            jTable.getColumnModel().getColumn(i).setResizable(true); // TODO: Exception in thread "AWT-EventQueue-0" java.lang.ArrayIndexOutOfBoundsException: 2 >= 2
+//            jTable.getColumnModel().getColumn(i).setPreferredWidth(170);
         }
+//        set table size to fit all columns
 
         this.add(jTable, BorderLayout.CENTER);
         setVisible(true);
@@ -139,18 +138,6 @@ public class VQDTable extends JPanel {
         for (int i = 1; i < rows; i++) {
             query.append("DELETE FROM " + table.get_tableName() + " WHERE ");
             for (int j = 0; j < attributeCount; j++) {
-//                if (j == attributeCount - 1) {
-//                        query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
-//                }
-//                else {
-//                    if (!attrTypes[i][j].equals("")) {
-//                        if (!first) {
-//                            query.append(" AND ");
-//                            first = true;
-//                        }
-//                        query.append(attributes.get(j).get_attributeName() + " = " + attrTypes[i][j]);
-//                    }
-//                }
 
                 if (attrTypes[i][j].equals("")) {
                     continue;
@@ -170,4 +157,22 @@ public class VQDTable extends JPanel {
         System.out.println(query.getText());
         return query;
     }
+}
+
+class tableView extends JPanel {
+
+    private final DataColumn[] columns;
+
+    public tableView(DataColumn[] columns) {
+        this.columns = columns;
+    }
+
+    //    paint component override
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, 100, 100);
+    }
+
 }

@@ -70,6 +70,34 @@ public class ResizeLabel extends JPanel implements MouseListener, MouseMotionLis
     }
 
 
+    public void addButton(String text) {
+        label.setText("");
+        JButton button = new JButton(text);
+        button.setPreferredSize(new Dimension(240, 40));
+        label.setLayout(new BorderLayout());
+        label.add(button, BorderLayout.CENTER);
+
+        label.revalidate();
+        revalidate();
+    }
+
+    public void addInput() {
+        label.setText("");
+        JTextField textField = new JTextField();
+        textField.setPreferredSize(new Dimension(240, 40));
+        label.setLayout(new BorderLayout());
+        label.add(textField, BorderLayout.CENTER);
+        label.revalidate();
+        revalidate();
+    }
+
+    public JButton getButton() {
+        if (label.getComponentCount() == 0) {
+            return null;
+        }
+        return (JButton) label.getComponent(0);
+    }
+
     @Override
     public void mousePressed(MouseEvent e) {
         startX = e.getX();
@@ -120,4 +148,18 @@ public class ResizeLabel extends JPanel implements MouseListener, MouseMotionLis
     }
 
 
+    public Object getText() {
+        return label.getText();
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("ResizeLabel");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
+        frame.setLayout(new FlowLayout());
+        ResizeLabel resizeLabel = new ResizeLabel();
+        frame.add(resizeLabel);
+        resizeLabel.addButton("delete");
+        frame.setVisible(true);
+    }
 }

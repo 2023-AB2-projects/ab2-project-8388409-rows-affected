@@ -3,6 +3,7 @@ package client;
 import server.Message;
 import server.jacksonclasses.Database;
 import server.jacksonclasses.Table;
+import server.mongobongo.DataTable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,25 +28,25 @@ public class KliensNew extends JFrame implements Runnable {
     private JComponent VisualQueryDesigner;
     private final JScrollPane scrollTextResp = new JScrollPane();
     private JTextArea textArea;
-    private final JTextArea textAreas = new JTextArea(); // TODO: REMOVE
+    private final JTextArea textAreas = new JTextArea();
     private JTextArea outText = new JTextArea();
     private boolean connected = false;
     private boolean send = false;
-    private JButton connectionButton; // TODO: REMOVE
+    private JButton connectionButton;
     private int currentTabId = -1;
     private QueryPanel currentQueryPanel;
     private final Syntax syntax;
-    private final boolean responseToUser = true; // TODO: REMOVE
     private int tabsCounter;
 
     private final ArrayList<String> databases;
     private final ArrayList<Table> tableObjects;
     private final ArrayList<Database> databaseObjects;
 
+    private ArrayList<DataTable> dataTables;
 
     KliensNew() {
 //        InitQueryPanel();
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setTitle("AB: Client");
         this.setSize(1000, 700);
         this.setLocationRelativeTo(this);
@@ -53,6 +54,7 @@ public class KliensNew extends JFrame implements Runnable {
         this.setLayout(null);
         this.setIconImage(new ImageIcon("src/main/resources/icons/ablogo512.jpg").getImage());
 
+        dataTables = new ArrayList<>();
         tableObjects = new ArrayList<>();
         databaseObjects = new ArrayList<>();
         databases = new ArrayList<>();
@@ -198,12 +200,18 @@ public class KliensNew extends JFrame implements Runnable {
         button.addActionListener(e -> {
 
             VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
-            if (visualQueryDesigner != null) {
-                for (Table table : databaseObjects.get(comboBox.getSelectedIndex()).getTables()) {
-                    if (table.get_tableName().equals(comboBox2.getSelectedItem())) {
-                        visualQueryDesigner.createTable(table);
-                        break;
-                    }
+//            if (visualQueryDesigner != null) {
+//                for (Table table : databaseObjects.get(comboBox.getSelectedIndex()).getTables()) {
+//                    if (table.get_tableName().equals(comboBox2.getSelectedItem())) {
+//                        visualQueryDesigner.createTable(table);
+//                        break;
+//                    }
+//                }
+//            }
+            for (DataTable dataTable : this.dataTables) {
+                if (dataTable.getTableName().equals(comboBox2.getSelectedItem()) && dataTable.getDatabaseName().equals(comboBox.getSelectedItem())) {
+                    visualQueryDesigner.createTable(dataTable);
+                    break;
                 }
             }
         });
@@ -240,6 +248,13 @@ public class KliensNew extends JFrame implements Runnable {
         System.out.println("mess.isDatabasesEmpty(): " + mess.isDatabasesEmpty());
 
         System.out.println("mess Message: " + mess.getMessageUser() + " \n" + mess.getMessageServer() + " \n" + mess.getDatabases() + " ");
+
+        this.dataTables = mess.getDataTables();
+
+        for (DataTable dataTable : dataTables) {
+            System.out.println("dataTable: " + dataTable.getTableName());
+        }
+
         if (!mess.isMessageUserEmpy()) {
             System.out.println("mess.getMessageUser(): " + mess.getMessageUser());
             outText.setText(outText.getText() + "\n" + mess.getMessageUser());
@@ -247,6 +262,7 @@ public class KliensNew extends JFrame implements Runnable {
         if (!mess.isMessageServerEmpy()) {
 
         }
+
         if (!mess.isDatabasesEmpty()) {
             System.out.println("mess.getDatabases(): " + mess.getDatabases());
             databases.clear();
@@ -271,6 +287,7 @@ public class KliensNew extends JFrame implements Runnable {
             tableObjects.clear();
             tableObjects.addAll(mess.getTables());
         }
+
     }
 
     private void resizeWindowLayout(){
@@ -339,15 +356,9 @@ public class KliensNew extends JFrame implements Runnable {
                 rightPanelTabs.setVisible(true);
                 if (tabbedPane.getTabCount() != 0) {
                     if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
-//                        rightPanelTabs.setVisible(false);
-//                        rightPanelTabs.setSelectedIndex(0);
-//                        rightPanelTabs.setVisible(true);
 
                         outText = ((QueryPanel) tabbedPane.getSelectedComponent()).getOutText();
                     } else if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
-//                        rightPanelTabs.setVisible(false);
-//                        rightPanelTabs.setSelectedIndex(1);
-//                        rightPanelTabs.setVisible(true);
 
                     }
                 } else {
@@ -488,7 +499,12 @@ public class KliensNew extends JFrame implements Runnable {
                         break;
                     }
                     message = null;
-                    message = (Message) in.readObject();
+                    try {
+                        message = (Message) in.readObject();
+                    } catch (EOFException e) {
+                        System.out.println("EOFException");
+                        break;
+                    }
                     if (message != null) {
                         System.out.println("New message");
                         System.out.println(message.getMessageUser());

@@ -2,6 +2,7 @@ package server;
 
 import server.jacksonclasses.Database;
 import server.jacksonclasses.Table;
+import server.mongobongo.DataTable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,6 +17,16 @@ public class Message implements Serializable {
     private ArrayList<String> databases;
     private final ArrayList<Table> tables;
     private ArrayList<Database> databaseObjects;
+
+    private ArrayList<DataTable> dataTables;
+
+    public void setDataTables(ArrayList<DataTable> dataTables) {
+        this.dataTables = dataTables;
+    }
+
+    public ArrayList<DataTable> getDataTables() {
+        return dataTables;
+    }
 
     public Message() {
 

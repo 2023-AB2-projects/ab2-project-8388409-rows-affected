@@ -16,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataTable extends JPanel {
-    private final String database;
-    private final String tableName;
-
-    private ArrayList<DataColumn> columns;
+    protected String databaseName;
+    protected String tableName;
+    protected ArrayList<DataColumn> columns;
 
     public DataTable(String databaseName, String tableName) {
+        setBackground(Color.BLACK);
         setLayout(new FlowLayout());
-        this.database = databaseName;
+        this.databaseName = databaseName;
         this.tableName = tableName;
         columns = new ArrayList<>();
         setCatalogData(databaseName, tableName);
@@ -31,7 +31,36 @@ public class DataTable extends JPanel {
         for (DataColumn column : columns) {
             add(column);
         }
+    }
 
+    public DataTable(DataTable table) {
+        setLayout(new FlowLayout());
+        this.columns = new ArrayList<>();
+        this.databaseName = table.getDatabaseName();
+        this.tableName = table.getTableName();
+        for (DataColumn column : table.getColumns()) {
+            if (column != null)
+                columns.add(new DataColumn(column));
+        }
+        for (DataColumn column : columns) {
+            add(column);
+        }
+    }
+
+    public ArrayList<DataColumn> getColumns() {
+        ArrayList<DataColumn> ret = new ArrayList<>();
+        for (DataColumn column : columns) {
+            ret.add(new DataColumn(column));
+        }
+        return columns;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public String getTableName() {
+        return tableName;
     }
 
     public void setCatalogData(String databaseName, String tableName) {
@@ -87,6 +116,13 @@ public class DataTable extends JPanel {
         System.out.println("Cszice:" + columns.size());
     }
 
+    public void getRow(int index) {
+        ArrayList<String> row = new ArrayList<>();
+        for (DataColumn column : columns) {
+            row = column.getRow(index);
+        }
+    }
+
     public void setMongoData(String db, String table) {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
         MongoDatabase database = mongoClient.getDatabase(db);
@@ -119,13 +155,17 @@ public class DataTable extends JPanel {
         mongoClient.close();
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("DataTable");
-        frame.setLayout(new FlowLayout());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 500);
-        frame.add(new DataTable("ab", "GPU"));
-        frame.setVisible(true);
-
+    public ArrayList<DataColumn> getDataColums() {
+        return columns;
     }
+
+//    public static void main(String[] args) {
+//        JFrame frame = new JFrame("DataTable");
+//        frame.setLayout(new FlowLayout());
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.setSize(500, 500);
+//        frame.add(new DataTable("ab", "GPU"));
+//        frame.setVisible(true);
+//
+//    }
 }
