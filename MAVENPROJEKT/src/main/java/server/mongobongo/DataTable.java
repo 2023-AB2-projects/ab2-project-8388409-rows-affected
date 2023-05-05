@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataTable extends JPanel {
+public class DataTable extends JPanel implements java.io.Serializable {
     protected String databaseName;
     protected String tableName;
     protected ArrayList<DataColumn> columns;
@@ -116,11 +116,12 @@ public class DataTable extends JPanel {
         System.out.println("Cszice:" + columns.size());
     }
 
-    public void getRow(int index) {
-        ArrayList<String> row = new ArrayList<>();
+    public ArrayList<String> getRow(int index) {
+        ArrayList<String> ret = new ArrayList<>();
         for (DataColumn column : columns) {
-            row = column.getRow(index);
+            ret.add(column.getRow(index));
         }
+        return ret;
     }
 
     public void setMongoData(String db, String table) {
@@ -153,19 +154,11 @@ public class DataTable extends JPanel {
 
         }
         mongoClient.close();
+
     }
 
     public ArrayList<DataColumn> getDataColums() {
         return columns;
     }
 
-//    public static void main(String[] args) {
-//        JFrame frame = new JFrame("DataTable");
-//        frame.setLayout(new FlowLayout());
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setSize(500, 500);
-//        frame.add(new DataTable("ab", "GPU"));
-//        frame.setVisible(true);
-//
-//    }
 }

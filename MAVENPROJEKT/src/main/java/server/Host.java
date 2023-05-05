@@ -23,7 +23,7 @@ public class Host {
 
     private String answer = "";
 
-    public Host() {
+    public Host() throws IOException {
 
         elvSzavak = new ArrayList<>();
         elvSzavak.add("USE");
@@ -90,14 +90,11 @@ public class Host {
 
     }
 
-    private void Create_socket_communication() {
-        int portNumber = 1234; // replace with your port number
+    private void handleClient(int portNumber) throws IOException {
         while (true) {
-
 
             try (
                     ServerSocket serverSocket = new ServerSocket(portNumber);
-
                     Socket clientSocket = serverSocket.accept();
                     OutputStream outputStream = clientSocket.getOutputStream();
                     ObjectOutputStream outS = new ObjectOutputStream(outputStream);
@@ -131,10 +128,16 @@ public class Host {
                 message.setDatabases(dbn.getDatabaseNames());
                 message.setDatabaseObjects(databaseArrayList);
 
+//                if outs is not connected to the client
 
-                outS.writeObject(message);
-                outS.flush();
-
+                try {
+                    outS.writeObject(message);
+                    outS.flush();
+                } catch (Exception e) {
+                    System.out.println("Disconnected from client");
+                    serverSocket.close();
+                    return;
+                }
                 System.out.println("message sent to client: " + message.getMessageUser());
                 while (true) {
                     try {
@@ -145,11 +148,11 @@ public class Host {
 
                         message = null;
                         try {
-                            message = (Message) inS.readObject(); // TODO : itt meghal EXIT után
-                        } catch (Exception e) {
+                            message = (Message) inS.readObject();
+                        } catch (Exception e1) {
                             System.out.println("Disconnected from client");
                             serverSocket.close();
-                            break;
+                            return;
                         }
 
                         System.out.println("message received from client: " + message.getMessageUser());
@@ -160,23 +163,27 @@ public class Host {
 
                         Thread.sleep(100);
                         Write_lastCurrentDatabase();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    } catch (InterruptedException e3) {
+                        e3.printStackTrace();
                     }
                 }
 
-                // ANSWER: mert ijrairtam a kommunikaciot es kb semmi se volt ugy jo
 
-            } catch (Exception e) {
-                System.out.println("exeption message= " + e.getMessage());
-                e.printStackTrace();
             }
+        }
+    }
+
+
+    private void Create_socket_communication() throws IOException {
+        int portNumber = 1234; // replace with your port number
+
+        while (true) {
+            handleClient(portNumber);
         }
 
     }
 
-    String reformatParserInput(String fullInput)
-    {
+    String reformatParserInput(String fullInput) {
         fullInput = fullInput.trim();
 //                    remove extra spaces
         fullInput = fullInput.replaceAll("\\s+", " ");
@@ -248,7 +255,7 @@ public class Host {
         return currentDatabase;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Host host = new Host();
     }
 }

@@ -39,7 +39,9 @@ public class VisualQueryDesignerTableEdit extends DataTable {
                 if (button.getText().equals("delete")) {
                     System.out.println("delete");
                     System.out.println(index);
-                    System.out.println();
+
+                    System.out.println(getRow(index));
+
 
 //                    delete();
                 } else if (button.getText().equals("insert")) {
@@ -57,6 +59,22 @@ public class VisualQueryDesignerTableEdit extends DataTable {
 
         setVisible(true);
 
+    }
+
+    private void delete(String[] args) {
+        String sql = "DELETE FROM " + getTableName() + " WHERE ";
+        for (int i = 0; i < args.length; i++) {
+            sql += getColumnName(i) + " = " + args[i];
+            if (i != args.length - 1) {
+                sql += " AND ";
+            }
+        }
+        System.out.println(sql);
+
+    }
+
+    private String getColumnName(int i) {
+        return getDataColums().get(i).getColumnName();
     }
 
 
