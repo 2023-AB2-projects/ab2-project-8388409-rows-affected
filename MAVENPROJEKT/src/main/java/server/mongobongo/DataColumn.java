@@ -271,7 +271,8 @@ public class DataColumn extends JPanel implements java.io.Serializable {
         index += 2;
         ArrayList<String> ret = new ArrayList<>();
         for (ResizeLabel label : this.valueLabels) {
-            ret.add((String) label.getText());
+
+            ret.add(label.getTextFromLabel());
         }
         return ret.get(index);
     }

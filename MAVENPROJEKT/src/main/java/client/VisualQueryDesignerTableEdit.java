@@ -103,6 +103,9 @@ public class VisualQueryDesignerTableEdit extends DataTable {
         }
         sql += ")";
         System.out.println(sql);
+        System.out.println(sql);
+        kliens.setTextArea(sql);
+        kliens.send();
 
     }
 

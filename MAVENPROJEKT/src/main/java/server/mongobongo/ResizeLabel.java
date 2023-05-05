@@ -81,6 +81,14 @@ public class ResizeLabel extends JPanel implements MouseListener, MouseMotionLis
         revalidate();
     }
 
+    public String getTextFromLabel() {
+        if (label.getComponentCount() == 0) {
+            return label.getText();
+        }
+        return ((JTextField) label.getComponent(0)).getText();
+
+    }
+
     public void addInput() {
         label.setText("");
         JTextField textField = new JTextField();
