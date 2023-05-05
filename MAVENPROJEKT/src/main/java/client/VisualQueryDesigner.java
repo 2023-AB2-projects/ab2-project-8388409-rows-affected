@@ -14,8 +14,10 @@ public class VisualQueryDesigner extends JPanel {
     private final JTable table;
 
     private VQDTable vqdTable;
+    private final KliensNew kliens;
 
     public VisualQueryDesigner(KliensNew kliens) {
+        this.kliens = kliens;
 
         setBackground(new Color(233, 255, 255));
         table = new JTable();
@@ -29,7 +31,7 @@ public class VisualQueryDesigner extends JPanel {
     public void createTable(DataTable table) {
 
 //        add horizontal and vertical scroll bar
-        VisualQueryDesignerTableEdit vqdt = new VisualQueryDesignerTableEdit(table);
+        VisualQueryDesignerTableEdit vqdt = new VisualQueryDesignerTableEdit(table, kliens);
         JScrollPane jps = new JScrollPane(vqdt, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         setLayout(new BorderLayout());
         add(jps, BorderLayout.CENTER);

@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DataColumn extends JPanel {
+public class DataColumn extends JPanel implements java.io.Serializable {
     protected final String name;
     protected final String type;
     protected Boolean primaryKey;
@@ -167,7 +167,7 @@ public class DataColumn extends JPanel {
         return valueLabels;
     }
 
-    private Boolean getPrimaryKey() {
+    public Boolean getPrimaryKey() {
         return primaryKey;
     }
 
@@ -187,6 +187,10 @@ public class DataColumn extends JPanel {
 
     public void isPrimaryKey() {
         this.primaryKey = true;
+    }
+
+    public boolean getIsPrimaryKey() {
+        return this.primaryKey;
     }
 
     public void notPrimaryKey() {
@@ -263,11 +267,16 @@ public class DataColumn extends JPanel {
         return ret;
     }
 
-    public ArrayList<String> getRow(int index) {
+    public String getRow(int index) {
+        index += 2;
         ArrayList<String> ret = new ArrayList<>();
         for (ResizeLabel label : this.valueLabels) {
             ret.add((String) label.getText());
         }
-        return ret;
+        return ret.get(index);
+    }
+
+    public String getColumnName() {
+        return this.name;
     }
 }

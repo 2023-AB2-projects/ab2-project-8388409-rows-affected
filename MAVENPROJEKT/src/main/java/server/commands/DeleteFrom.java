@@ -136,76 +136,78 @@ public class DeleteFrom {
 
             // update indexes
             List<IndexFile> indexFilesList = myTable.getIndexFiles().getIndexFiles();
-            for (IndexFile indexFile : indexFilesList) {
-                String indexName = indexFile.get_indexName();
-                String indexType = indexFile.get_indexName();
-                String indexAttribute = indexFile.getIndexAttributes().get(0).getIAttribute();
-                MongoCollection<Document> indexCollection = database.getCollection(indexName);
-                if (indexType.equals("primary")) {
-                    System.out.println(indexName + " " + indexType + " type index updated");
-                    indexCollection.deleteOne(new Document("_id", pkValue));
-                } else if (indexType.equals("unique")) {
-                    List<Attribute> attributeList = myTable.getStructure().getAttributes();
-                    List<String> primaryKeyNames = myTable.getPrimaryKeys().stream().map(PrimaryKey::getPkAttribute).toList();
-                    int indexDB = -1;
-                    boolean indexFound = false;
-                    for (Attribute attribute : attributeList) {
-                        if (!primaryKeyNames.contains(attribute.get_attributeName())) {
+            if (indexFilesList != null) {
+                for (IndexFile indexFile : indexFilesList) {
+                    String indexName = indexFile.get_indexName();
+                    String indexType = indexFile.get_indexName();
+                    String indexAttribute = indexFile.getIndexAttributes().get(0).getIAttribute();
+                    MongoCollection<Document> indexCollection = database.getCollection(indexName);
+                    if (indexType.equals("primary")) {
+                        System.out.println(indexName + " " + indexType + " type index updated");
+                        indexCollection.deleteOne(new Document("_id", pkValue));
+                    } else if (indexType.equals("unique")) {
+                        List<Attribute> attributeList = myTable.getStructure().getAttributes();
+                        List<String> primaryKeyNames = myTable.getPrimaryKeys().stream().map(PrimaryKey::getPkAttribute).toList();
+                        int indexDB = -1;
+                        boolean indexFound = false;
+                        for (Attribute attribute : attributeList) {
+                            if (!primaryKeyNames.contains(attribute.get_attributeName())) {
+                                indexDB++;
+                            }
+                            if (attribute.get_attributeName().equals(indexAttribute)) {
+                                indexFound = true;
+                                break;
+                            }
+                        }
+                        if (!indexFound) {
+                            parser.setOtherError("Index attribute " + indexName + " does not exist");
+                            return;
+                        }
+                        String indexValue = "";
+                        for (Document document : collection.find(new Document("_id", pkValue))) {
+                            indexValue = document.get("row").toString().split("#")[indexDB];
+                        }
+                        if (indexValue.equals("")) {
+                            parser.setOtherError("Index value is empty");
+                            return;
+                        }
+                        indexCollection.deleteOne(new Document(indexValue, pkValue));
+                    } else if (indexType.equals("non")) {
+                        List<Attribute> attributeList = myTable.getStructure().getAttributes();
+                        // get the mongoDB index of the attribute
+                        int indexDB = -1;
+                        boolean indexFound = false;
+                        for (Attribute attribute : attributeList) {
+                            if (attribute.get_attributeName().equals(indexAttribute)) {
+                                indexFound = true;
+                                break;
+                            }
                             indexDB++;
                         }
-                        if (attribute.get_attributeName().equals(indexAttribute)) {
-                            indexFound = true;
-                            break;
+                        if (!indexFound) {
+                            parser.setOtherError("Index attribute " + indexName + " does not exist");
+                            return;
                         }
-                    }
-                    if (!indexFound) {
-                        parser.setOtherError("Index attribute " + indexName + " does not exist");
-                        return;
-                    }
-                    String indexValue = "";
-                    for (Document document : collection.find(new Document("_id", pkValue))) {
-                        indexValue = document.get("row").toString().split("#")[indexDB];
-                    }
-                    if (indexValue.equals("")) {
-                        parser.setOtherError("Index value is empty");
-                        return;
-                    }
-                    indexCollection.deleteOne(new Document(indexValue, pkValue));
-                } else if (indexType.equals("non")) {
-                    List<Attribute> attributeList = myTable.getStructure().getAttributes();
-                    // get the mongoDB index of the attribute
-                    int indexDB = -1;
-                    boolean indexFound = false;
-                    for (Attribute attribute : attributeList) {
-                        if (attribute.get_attributeName().equals(indexAttribute)) {
-                            indexFound = true;
-                            break;
-                        }
-                        indexDB++;
-                    }
-                    if (!indexFound) {
-                        parser.setOtherError("Index attribute " + indexName + " does not exist");
-                        return;
-                    }
-                    String indexValue = "";
-                    for (Document document : collection.find(new Document("_id", pkValue))) {
-                        indexValue = document.get("row").toString().split("#")[indexDB];
-                        for (Document indexdoc : indexCollection.find()) {
-                            String indexdocPkValue = indexdoc.get(indexValue).toString();
-                            String[] indexdocPkValueParts = indexdocPkValue.split("\\$");
-                            List<String> newIndexdocPkValueParts = new ArrayList<>();
-                            boolean needToRemove = false;
-                            for (String pkValueParts : indexdocPkValueParts) {
-                                if (!pkValueParts.equals(pkValue)) {
-                                    newIndexdocPkValueParts.add(pkValueParts);
-                                } else {
-                                    needToRemove = true;
+                        String indexValue = "";
+                        for (Document document : collection.find(new Document("_id", pkValue))) {
+                            indexValue = document.get("row").toString().split("#")[indexDB];
+                            for (Document indexdoc : indexCollection.find()) {
+                                String indexdocPkValue = indexdoc.get(indexValue).toString();
+                                String[] indexdocPkValueParts = indexdocPkValue.split("\\$");
+                                List<String> newIndexdocPkValueParts = new ArrayList<>();
+                                boolean needToRemove = false;
+                                for (String pkValueParts : indexdocPkValueParts) {
+                                    if (!pkValueParts.equals(pkValue)) {
+                                        newIndexdocPkValueParts.add(pkValueParts);
+                                    } else {
+                                        needToRemove = true;
+                                    }
                                 }
-                            }
-                            String newIndexdocPkValue = String.join("$", newIndexdocPkValueParts);
-                            if (needToRemove) {
-                                indexCollection.deleteOne(new Document(indexValue, indexdocPkValue));
-                                indexCollection.insertOne(new Document(indexValue, newIndexdocPkValue));
+                                String newIndexdocPkValue = String.join("$", newIndexdocPkValueParts);
+                                if (needToRemove) {
+                                    indexCollection.deleteOne(new Document(indexValue, indexdocPkValue));
+                                    indexCollection.insertOne(new Document(indexValue, newIndexdocPkValue));
+                                }
                             }
                         }
                     }

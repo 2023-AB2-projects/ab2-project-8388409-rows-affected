@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Host {
@@ -133,8 +134,10 @@ public class Host {
                 try {
                     outS.writeObject(message);
                     outS.flush();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     System.out.println("Disconnected from client");
+                    System.out.println(e.getMessage());
+                    System.out.println(e.getStackTrace());
                     serverSocket.close();
                     return;
                 }
@@ -149,8 +152,10 @@ public class Host {
                         message = null;
                         try {
                             message = (Message) inS.readObject();
-                        } catch (Exception e1) {
+                        } catch (IOException | ClassNotFoundException e1) {
                             System.out.println("Disconnected from client");
+                            System.out.println(e1.getMessage());
+                            System.out.println(Arrays.toString(e1.getStackTrace()));
                             serverSocket.close();
                             return;
                         }

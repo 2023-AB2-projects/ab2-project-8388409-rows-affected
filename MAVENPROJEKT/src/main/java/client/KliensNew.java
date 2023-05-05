@@ -251,8 +251,10 @@ public class KliensNew extends JFrame implements Runnable {
 
         this.dataTables = mess.getDataTables();
 
-        for (DataTable dataTable : dataTables) {
-            System.out.println("dataTable: " + dataTable.getTableName());
+        if (dataTables != null) {
+            for (DataTable dataTable : dataTables) {
+                System.out.println("dataTable: " + dataTable.getTableName());
+            }
         }
 
         if (!mess.isMessageUserEmpy()) {
@@ -445,7 +447,11 @@ public class KliensNew extends JFrame implements Runnable {
 
     }
 
-    public void setCurrentQueryPanel(QueryPanel queryPanel){
+    public void send() {
+        send = true;
+    }
+
+    public void setCurrentQueryPanel(QueryPanel queryPanel) {
         this.currentQueryPanel = queryPanel;
     }
 
