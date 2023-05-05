@@ -171,7 +171,7 @@ public class DeleteFrom {
                             parser.setOtherError("Index value is empty");
                             return;
                         }
-                        indexCollection.deleteOne(new Document(indexValue, pkValue));
+                        indexCollection.deleteOne(new Document("_id", indexValue).append("indexvalue", pkValue));
                     } else if (indexType.equals("non")) {
                         List<Attribute> attributeList = myTable.getStructure().getAttributes();
                         // get the mongoDB index of the attribute
@@ -205,8 +205,8 @@ public class DeleteFrom {
                                 }
                                 String newIndexdocPkValue = String.join("$", newIndexdocPkValueParts);
                                 if (needToRemove) {
-                                    indexCollection.deleteOne(new Document(indexValue, indexdocPkValue));
-                                    indexCollection.insertOne(new Document(indexValue, newIndexdocPkValue));
+                                    indexCollection.deleteOne(new Document("_id", indexValue).append("indexvalue", indexdocPkValue));
+                                    indexCollection.insertOne(new Document("_id", indexValue).append("indexvalue", newIndexdocPkValue));
                                 }
                             }
                         }
