@@ -85,9 +85,6 @@ public class DataTable extends JPanel implements java.io.Serializable {
                             List<UniqueKey> uks = table.getUniqueKeys();
 
                             for (Attribute attribute : attributes) {
-//                                System.out.print(attribute.get_attributeName() + " ");
-//                                System.out.println(attribute.get_type());
-//                                System.out.println(attribute.get_isnull());
 
                                 DataColumn dataColumn = new DataColumn(attribute.get_attributeName(), attribute.get_type());
                                 if (pks != null) {
@@ -126,6 +123,7 @@ public class DataTable extends JPanel implements java.io.Serializable {
 
     public void setMongoData(String db, String table) {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+
         MongoDatabase database = mongoClient.getDatabase(db);
         MongoCollection<Document> collection = database.getCollection(table);
         for (Document document : collection.find()) {

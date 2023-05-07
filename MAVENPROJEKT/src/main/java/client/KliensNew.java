@@ -69,11 +69,7 @@ public class KliensNew extends JFrame implements Runnable {
         VisualQueryDesigner = new JPanel();
         queryPanelOptions = new JPanel();
         visualQueryDesignerOptions = new JPanel();
-        configQueryPanelOptions();
-//        configVisualQueryDesignerOptions();
 
-//        rightPanelTabs.addTab("Query Opt", queryPanelOptions);
-//        rightPanelTabs.addTab("VQD Opt", visualQueryDesignerOptions);
         rightPanelTabs.setPreferredSize(new Dimension(300, 700));
         rightPanelTabs.setEnabled(false);
         rightPanel.add(rightPanelTabs);
@@ -110,6 +106,7 @@ public class KliensNew extends JFrame implements Runnable {
             }
         };
         JButton execButton = new JButton("Execute");
+        JButton closeTab = new JButton("Close this Tab");
         JButton clear = new JButton("Clear");
         JButton exit = new JButton("Exit");
         JButton newQuery = new JButton("New Query");
@@ -122,11 +119,10 @@ public class KliensNew extends JFrame implements Runnable {
 
         queryPanelOptions.add(execButton);
         queryPanelOptions.add(clear);
-//        InitQueryPanel();
+        queryPanelOptions.add(closeTab);
         EventsAndActions();
-        ButtonEventsAndActions(connectionButton, execButton, clear, exit, newVisualQueryDesigner, newQuery);
+        ButtonEventsAndActions(connectionButton, execButton, closeTab, clear, exit, newVisualQueryDesigner, newQuery);
         resizeWindowLayout();
-
 
         this.add(leftPanel);
         this.add(rightPanel);
@@ -136,10 +132,7 @@ public class KliensNew extends JFrame implements Runnable {
         this.setVisible(true);
     }
 
-    private void configQueryPanelOptions() {
-//        queryPanelOptions.setBackground(new Color(134, 134, 134));
 
-    }
     private void configVisualQueryDesignerOptions() {
 
         VisualQueryDesigner = new JPanel();
@@ -153,17 +146,15 @@ public class KliensNew extends JFrame implements Runnable {
         panel.setBounds(50, 50, width - 50, height - 50);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JButton button = new JButton("Create");
-        JButton buttonDelete = new JButton("Delete");
-        JButton addRow = new JButton("Add Row");
-        JButton execute = new JButton("Insert");
+        JButton closeTab = new JButton("Close Tab");
+
 
         JComboBox<String> comboBox = new JComboBox<>();
         JComboBox<String> comboBox2 = new JComboBox<>();
 
         panel.add(button, BorderLayout.NORTH);
-        panel.add(addRow, BorderLayout.NORTH);
-        panel.add(execute, BorderLayout.NORTH);
-        panel.add(buttonDelete, BorderLayout.NORTH);
+        panel.add(closeTab, BorderLayout.SOUTH);
+
 
         panel.add(comboBox, BorderLayout.WEST);
         panel.add(comboBox2, BorderLayout.EAST);
@@ -186,12 +177,6 @@ public class KliensNew extends JFrame implements Runnable {
             comboBox2.setVisible(comboBox2.getItemCount() > 0);
         });
 
-        addRow.addActionListener(e -> {
-            VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
-            if (visualQueryDesigner != null) {
-                visualQueryDesigner.addRow();
-            }
-        });
 
         if (comboBox2.getItemCount() > 0) {
             comboBox2.setSelectedIndex(0);
@@ -200,14 +185,6 @@ public class KliensNew extends JFrame implements Runnable {
         button.addActionListener(e -> {
 
             VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
-//            if (visualQueryDesigner != null) {
-//                for (Table table : databaseObjects.get(comboBox.getSelectedIndex()).getTables()) {
-//                    if (table.get_tableName().equals(comboBox2.getSelectedItem())) {
-//                        visualQueryDesigner.createTable(table);
-//                        break;
-//                    }
-//                }
-//            }
             for (DataTable dataTable : this.dataTables) {
                 if (dataTable.getTableName().equals(comboBox2.getSelectedItem()) && dataTable.getDatabaseName().equals(comboBox.getSelectedItem())) {
                     visualQueryDesigner.createTable(dataTable);
@@ -216,20 +193,12 @@ public class KliensNew extends JFrame implements Runnable {
             }
         });
 
-        execute.addActionListener(e -> {
+        closeTab.addActionListener(e -> {
             VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
-            if (visualQueryDesigner != null) {
-                textArea = visualQueryDesigner.generateQuery((String) comboBox.getSelectedItem());
-                send = true;
-            }
+            tabbedPane.remove(visualQueryDesigner);
+            revalidate();
         });
-        buttonDelete.addActionListener(e -> {
-            VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
-            if (visualQueryDesigner != null) {
-                textArea = visualQueryDesigner.generateQueryDelete((String) comboBox.getSelectedItem());
-                send = true;
-            }
-        });
+
 
 //        visualQueryDesignerOptions.add(comboBox);
 //        visualQueryDesignerOptions.add(comboBox2);
@@ -292,7 +261,7 @@ public class KliensNew extends JFrame implements Runnable {
 
     }
 
-    private void resizeWindowLayout(){
+    private void resizeWindowLayout() {
 
         leftPanel.resizePanel(0, getHeight() / 8, getWidth() / 4, getHeight());
         rightPanel.resizePanel(getWidth() - getWidth() / 4, getHeight() / 8, getWidth() / 4, getHeight());
@@ -302,7 +271,8 @@ public class KliensNew extends JFrame implements Runnable {
         VisualQueryDesigner.setBounds(getWidth() / 4, getHeight() / 8, getWidth() - getWidth() / 2, getHeight());
         scrollTextResp.setBounds(getWidth() / 4, getHeight() / 8, getWidth() - getWidth() / 2, getHeight() - getHeight() / 4);
     }
-    private void ButtonEventsAndActions(JButton connectionButton, JButton execButton, JButton clear, JButton exit, JButton newVisualQueryDesigner, JButton newQuery) {
+
+    private void ButtonEventsAndActions(JButton connectionButton, JButton execButton, JButton closeTab, JButton clear, JButton exit, JButton newVisualQueryDesigner, JButton newQuery) {
 
         tabbedPane.addChangeListener(e1 -> {
 
@@ -336,6 +306,7 @@ public class KliensNew extends JFrame implements Runnable {
 
         });
 
+
         newVisualQueryDesigner.addActionListener(e -> {
             String tabName = "VQD " + tabsCounter;
             JComponent VisualQueryDesigner = new VisualQueryDesigner(this);
@@ -350,6 +321,16 @@ public class KliensNew extends JFrame implements Runnable {
             textArea.setText("");
         });
 
+        closeTab.addActionListener(e -> {
+//                remove QueryPanel
+            QueryPanel queryPanel = tabbedPane.getSelectedComponent() instanceof QueryPanel ? (QueryPanel) tabbedPane.getSelectedComponent() : null;
+            if (queryPanel != null) {
+                tabbedPane.remove(queryPanel);
+                tabsCounter--;
+                revalidate();
+            }
+
+        });
 
         connectionButton.addActionListener(e -> {
             System.out.println("Connect");
