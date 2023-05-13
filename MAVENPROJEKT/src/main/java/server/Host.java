@@ -22,7 +22,9 @@ public class Host {
     private final List<String> elvSzavak;
     private final String acc;
 
-    private String answer = "";
+    private final String answer = "";
+
+    private final ArrayList<Message> messages = new ArrayList<>();
 
     public Host() throws IOException {
 
@@ -161,10 +163,33 @@ public class Host {
 
                         System.out.println("message received from client: " + message.getMessageUser());
                         darabol(message.getMessageUser());
-                        message.setMessageUser(answer);
-                        System.out.println("message sent to client: " + message.getMessageUser());
-                        outS.writeObject(message);
-                        outS.flush();
+//                        message.setMessageUser(answer);
+//
+//                        while (messages.size() > 0) {
+//                            message = messages.get(0);
+//                            System.out.println("message sent to client: " + message.getMessageUser());
+//                            outS.writeObject(message);
+//                            outS.flush();
+//                            messages.remove(0);
+//                        }
+
+                        if (!messages.isEmpty()) {
+                            for (Message m : messages) {
+
+                                System.out.println("message sent to client: " + m.getMessageUser());
+                                outS.writeObject(m);
+                                outS.flush();
+                            }
+                            for (int i = 0; i < messages.size(); i++) {
+                                messages.remove(i);
+                            }
+                        }
+
+
+//
+//                        System.out.println("message sent to client: " + message.getMessageUser());
+//                        outS.writeObject(message);
+//                        outS.flush();
 
                         Thread.sleep(100);
                         Write_lastCurrentDatabase();
@@ -191,6 +216,10 @@ public class Host {
             handleClient(portNumber);
         }
 
+    }
+
+    public void addAnswerToClient(Message mgs) {
+        messages.add(mgs);
     }
 
     String reformatParserInput(String fullInput) {
@@ -228,14 +257,18 @@ public class Host {
                 } else {
                     fullInput = fullInput.trim();
                     System.out.println("|=> parsed command: " + fullInput + "|");
-                    new Parser(fullInput, this);
-                    if (error.length() > 0) {
-                        answer = "ERROR: " + error;
-                        error = "";
-                        return;
-                    } else {
-                        answer = "ok";
-                    }
+                    Parser parser = new Parser(fullInput, this);
+//                    if (error.length() > 0) {
+//                        answer = "ERROR: " + error;
+//                        error = "";
+//                        return;
+//                    } else {
+//                        answer = "ok";
+//                    }S
+                    Message message = parser.getAnswer();
+
+                    this.addAnswerToClient(message);
+
                     fullInput = words[i] + " ";
                 }
             } else {
@@ -244,13 +277,18 @@ public class Host {
         }
         fullInput = fullInput.trim();
         System.out.println("|=> parsed command: " + fullInput + "| ");
-        new Parser(fullInput, this);
-        if (error.length() > 0) {
-            answer = "ERROR: " + error;
-            error = "";
-        } else {
-            answer = "ok";
-        }
+//        new Parser(fullInput, this);
+//        if (error.length() > 0) {
+//            answer = "ERROR: " + error;
+//            error = "";
+//        } else {
+//            answer = "ok";
+//        }
+        Parser parser = new Parser(fullInput, this);
+        Message message = parser.getAnswer();
+
+        this.addAnswerToClient(message);
+
     }
 
     public void setError(String error) {
