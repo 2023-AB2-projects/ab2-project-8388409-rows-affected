@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 public class Select {
 
+    private DataTable resultTable;
     private String[] selectedColums;
     private String[] fromTables;
     private String[] joinClause;
@@ -140,5 +141,7 @@ public class Select {
 
     }
 
-
+    public DataTable getResultTable() {
+        return resultTable;
+    }
 }

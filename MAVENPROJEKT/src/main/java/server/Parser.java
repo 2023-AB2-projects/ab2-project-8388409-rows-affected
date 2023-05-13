@@ -4,6 +4,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import server.commands.*;
+import server.mongobongo.DataTable;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,8 +14,12 @@ public class Parser {
     private final Host host;
     private boolean parserError = false;
     private String otherError = "";
+
+    private final Message message;
+
     public Parser(String input, Host host) {
         this.host = host;
+        message = new Message();
         System.out.println("Parser : " + input);
 
         // USE
@@ -238,9 +243,49 @@ public class Parser {
     }
 
     public void setParserError(boolean parserError) {
+
+        message.setParserError(parserError);
         this.parserError = parserError;
     }
+
     public void setOtherError(String otherError) {
+
+        message.setErrors(otherError);
         this.otherError = otherError;
+    }
+
+    public String getErrorMessage() {
+        if (parserError) {
+            return "Invalid syntax";
+        }
+        return otherError;
+    }
+
+    public void addDataTale(DataTable dataTable) {
+        message.addDataTable(dataTable);
+
+    }
+
+    public Message getAnswer() {
+
+
+        if (parserError) {
+            System.out.println("Parser error: ");
+            message.setErrors("Invalid syntax");
+            System.out.println("Invalid syntax");
+            return message;
+        }
+        if (!otherError.equals("")) {
+            System.out.println("Other error: ");
+            message.setErrors(otherError);
+            System.out.println(otherError);
+            return message;
+        }
+
+        message.setErrors("");
+//        System.out.println("Query executed successfully");
+        message.setMessageUser("Query executed successfully");
+
+        return message;
     }
 }
