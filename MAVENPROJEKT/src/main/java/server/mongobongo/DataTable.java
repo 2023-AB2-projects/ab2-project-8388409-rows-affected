@@ -26,7 +26,7 @@ public class DataTable extends JPanel implements Serializable {
     public DataTable(String databaseName, String tableName, Parser parser) {
         this.parser = parser;
         setLayout(new FlowLayout());
-        setBackground(Color.BLACK);
+//        setBackground(Color.BLACK);
         this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = databaseName;
         this.tableName = tableName;
@@ -51,7 +51,6 @@ public class DataTable extends JPanel implements Serializable {
 
     public DataTable(String databaseName, String tableName) {
         setLayout(new FlowLayout());
-        setBackground(Color.BLACK);
         this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = databaseName;
         this.tableName = tableName;
@@ -64,6 +63,50 @@ public class DataTable extends JPanel implements Serializable {
         ok = setMongoData(databaseName, tableName);
         if (!ok.equalsIgnoreCase("ok")) {
             parser.setOtherError(ok);
+            return;
+        }
+        for (DataColumn column : columns) {
+            add(column);
+        }
+
+        setVisible(true);
+    }
+
+    public DataTable(ArrayList<Document> documentList, ArrayList<String> columnNames, ArrayList<String> columnTypes, Parser parser) {
+        setLayout(new FlowLayout());
+        this.setPreferredSize(new Dimension(400, 300));
+        this.databaseName = "tempDB";
+        this.tableName = "tempTable";
+        columns = new ArrayList<>();
+
+        for (int i = 0; i < columnNames.size(); i++) {
+            DataColumn column = new DataColumn(columnNames.get(i), columnTypes.get(i));
+            columns.add(column);
+        }
+
+        String ok = setData(documentList);
+        if (!ok.equalsIgnoreCase("ok")) {
+            parser.setOtherError(ok);
+            return;
+        }
+        for (DataColumn column : columns) {
+            add(column);
+        }
+
+        setVisible(true);
+    }
+
+
+    public DataTable(String databaseName, String tableName, String skelton) {
+        setLayout(new FlowLayout());
+        setBackground(Color.BLACK);
+        this.setPreferredSize(new Dimension(400, 300));
+        this.databaseName = databaseName;
+        this.tableName = tableName;
+        columns = new ArrayList<>();
+        String ok = setCatalogData(databaseName, tableName);
+        if (!ok.equalsIgnoreCase("ok")) {
+            parser.setOtherError("Table does not exist");
             return;
         }
         for (DataColumn column : columns) {
@@ -120,7 +163,7 @@ public class DataTable extends JPanel implements Serializable {
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
             List<Database> databaseList = databases.getDatabases();
             for (Database db : databaseList) {
-                System.out.println(db.get_dataBaseName());
+//                System.out.println(db.get_dataBaseName());
 
                 if (db.get_dataBaseName().equals(databaseName)) {
                     List<Table> tables = db.getTables();
@@ -128,7 +171,7 @@ public class DataTable extends JPanel implements Serializable {
                         if (table.get_tableName().equals(tableName)) {
 
                             columns = new ArrayList<>();
-                            System.out.println(table.get_tableName());
+//                            System.out.println(table.get_tableName());
                             ArrayList<Attribute> attributes = table.zAttributumok();
                             List<PrimaryKey> pks = table.getPrimaryKeys();
                             List<ForeignKey> fks = table.getForeignKeys();
@@ -172,6 +215,37 @@ public class DataTable extends JPanel implements Serializable {
         return ret;
     }
 
+    public String setData(ArrayList<Document> documents) {
+
+
+        for (Document document : documents) {
+            int index = 0;
+
+            for (String key : document.keySet()) {
+//                System.out.println(key);
+//                System.out.println(document.get(key));
+
+                if (index == 0) {
+                    columns.get(index).addValue(document.get(key).toString());
+                } else {
+                    String[] values = document.get(key).toString().split("#");
+                    for (String value : values) {
+                        columns.get(index).addValue(value);
+//                        System.out.println("+>" + index + " " + value);
+//                        System.out.println("index: " + index);
+                        index++;
+                    }
+
+                }
+//                System.out.println("index: " + index);
+                index++;
+            }
+
+        }
+
+        return "OK";
+    }
+
     public String setMongoData(String db, String table) {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 
@@ -179,6 +253,8 @@ public class DataTable extends JPanel implements Serializable {
         if (database == null) {
             return "Database not found";
         }
+
+        ArrayList<Document> documents = new ArrayList<>();
 
         MongoCollection<Document> collection = database.getCollection(table);
         if (collection == null) {
@@ -212,7 +288,6 @@ public class DataTable extends JPanel implements Serializable {
         mongoClient.close();
         return "OK";
     }
-
 
     public ArrayList<DataColumn> getDataColums() {
         return columns;
@@ -250,19 +325,38 @@ public class DataTable extends JPanel implements Serializable {
         for (Integer i : rowIndex) {
             ArrayList<String> row = dt.getRow(i);
             for (String lab : row) {
-                System.out.print(lab + ", ");
+//                System.out.print(lab + ", ");
             }
-            System.out.println();
+//            System.out.println();
         }
         JFrame jf = new JFrame();
         jf.setSize(400, 300);
         jf.setLayout(new FlowLayout());
         jf.setBackground(new Color(203, 141, 141));
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JScrollPane sp = new JScrollPane(new DataTable(dt), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        jf.add(new DataTable(dt));
+//        System.out.println("width: " + dt.getPanelWidth() + " height: " + dt.getPanelHeight());
+//        System.out.println("width: " + sp.getWidth() + " height: " + sp.getHeight());
+
+//        sp.setPreferredSize(new Dimension());
+//      sp be resizable
+        sp.setAutoscrolls(true);
+
+        sp.getVerticalScrollBar().getMaximumSize();
+
+
+        jf.add(sp);
         jf.setVisible(true);
 
+    }
+
+    public int getPanelWidth() {
+        return getColumns().get(0).getValueLabels().size() * 10;
+    }
+
+    public int getPanelHeight() {
+        return getColumns().size() * 20;
     }
 
     public DataColumn getColumnByName(String key1) {
@@ -299,8 +393,8 @@ public class DataTable extends JPanel implements Serializable {
 
     public int addRow(ArrayList<String> row) {
         if (row.size() != columns.size()) {
-            System.out.println(row.size() + " " + columns.size());
-            System.out.println("Nem egyezik a sor hossza a tábla oszlopainak számával!");
+//            System.out.println(row.size() + " " + columns.size());
+//            System.out.println("Nem egyezik a sor hossza a tábla oszlopainak számával!");
             return -1;
         }
         for (int i = 0; i < row.size(); i++) {
