@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 public class Select {
 
-    private String[] selectedColums;
-    private String[] fromTables;
-    private String[] joinClause;
-    private String[] whereClause;
+    private final String[] selectedColums;
+    private final String fromTables;
+    private final String[] joinClause;
+    private final String[] whereClause;
     private String[] groupBy;
 
     private final String database;
@@ -136,6 +136,7 @@ public class Select {
     }
 
     public DataTable getResultTable() {
+        DataTable resultTable = null;
         return resultTable;
     }
 }
