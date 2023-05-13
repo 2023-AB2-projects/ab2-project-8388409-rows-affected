@@ -233,6 +233,16 @@ public class KliensNew extends JFrame implements Runnable {
                 currentQueryPanel.setOutText(mess.getMessageUser());
 //            QueryPanel
         }
+
+//        DataTable selectedDataTable = mess.getSelectedDataTable();
+//
+//        if (selectedDataTable != null) {
+//            System.out.println("selectedDataTable: " + selectedDataTable.getTableName());
+//            if (currentQueryPanel != null)
+//                currentQueryPanel.setDataTableToOut(selectedDataTable);
+//        }
+
+
         if (!mess.isMessageServerEmpy()) {
 
         }

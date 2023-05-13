@@ -201,9 +201,10 @@ public class Host {
 
 
             } catch (IOException e) {
+
                 System.out.println("Disconnected from client");
-//                System.out.println(e.getMessage());
-//                System.out.println(e.getStackTrace());
+                System.out.println(e.getMessage());
+                System.out.println(e.getStackTrace());
             }
 
     }

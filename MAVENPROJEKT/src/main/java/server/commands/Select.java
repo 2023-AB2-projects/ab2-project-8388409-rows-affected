@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 public class Select {
 
+    private DataTable resultTable;
     private final String[] selectedColums;
     private final String fromTables;
     private final String[] joinClause;
@@ -117,7 +118,7 @@ public class Select {
 
         System.out.println("\nDatabase: |" + database + "| Table: |" + fromTables + "|\n");
         tables.add(new DataTable(database, fromTables, parser));
-
+        resultTable = tables.get(0);
         JFrame jf = new JFrame();
         jf.setSize(400, 300);
         jf.setLayout(new FlowLayout());
@@ -126,17 +127,13 @@ public class Select {
 
 
         System.out.println("Tables: ");
-        for (DataTable table : tables) {
-//            System.out.println(table.getTableName());
-            jf.add(new DataTable(table));
-        }
+
         jf.setVisible(true);
         return tables;
 
     }
 
     public DataTable getResultTable() {
-        DataTable resultTable = null;
         return resultTable;
     }
 }

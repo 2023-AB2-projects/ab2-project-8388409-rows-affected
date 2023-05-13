@@ -1,5 +1,7 @@
 package client;
 
+import server.mongobongo.DataTable;
+
 import javax.accessibility.Accessible;
 import javax.swing.*;
 import java.awt.*;
@@ -103,6 +105,13 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
         resultPanel.add(new JLabel("Result:" + text));
         resultPanel.revalidate();
 
+    }
+
+    public void setDataTableToOut(DataTable dataTable) {
+        resultPanel.removeAll();
+        resultPanel.add(new JLabel("Result:"));
+        resultPanel.add(new DataTable(dataTable));
+        resultPanel.revalidate();
     }
 
 
