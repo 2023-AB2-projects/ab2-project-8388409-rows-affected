@@ -2,10 +2,7 @@ package server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
-import server.jacksonclasses.Database;
 import server.jacksonclasses.Databases;
-import server.jacksonclasses.Table;
-import server.mongobongo.DataTable;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -106,29 +103,29 @@ public class Host {
 
                 Message message = new Message();
                 message.setMessageUser("Welcome to the server!");
-                message.setDatabases(new DataBaseNames().getDatabaseNames());
-                DataBaseNames dbn = new DataBaseNames();
-
-                ArrayList<Database> databaseArrayList = new ArrayList<>();
-                ArrayList<Table> tableArrayList = new ArrayList<>();
-
-                for (String databaseName : dbn.getDatabaseNames()) {
-                    System.out.println(databaseName);
-                    databaseArrayList.add(dbn.getDatabase(databaseName));
-                }
-                ArrayList<DataTable> dataTables = new ArrayList<>();
-                for (Database db : databaseArrayList) {
-                    tableArrayList.addAll(db.getTables());
-                    for (Table table : db.getTables()) {
-                        System.out.println(table.get_tableName());
-                        System.out.println("db: " + db.get_dataBaseName() + " tabla: " + table.get_tableName());
-                        dataTables.add(new DataTable(db.get_dataBaseName(), table.get_tableName()));
-                    }
-                }
-                message.setDataTables(dataTables);
-                message.setTables(tableArrayList);
-                message.setDatabases(dbn.getDatabaseNames());
-                message.setDatabaseObjects(databaseArrayList);
+//                message.setDatabases(new DataBaseNames().getDatabaseNames());
+//                DataBaseNames dbn = new DataBaseNames();
+//
+//                ArrayList<Database> databaseArrayList = new ArrayList<>();
+//                ArrayList<Table> tableArrayList = new ArrayList<>();
+//
+//                for (String databaseName : dbn.getDatabaseNames()) {
+//                    System.out.println(databaseName);
+//                    databaseArrayList.add(dbn.getDatabase(databaseName));
+//                }
+//                ArrayList<DataTable> dataTables = new ArrayList<>();
+//                for (Database db : databaseArrayList) {
+//                    tableArrayList.addAll(db.getTables());
+//                    for (Table table : db.getTables()) {
+//                        System.out.println(table.get_tableName());
+//                        System.out.println("db: " + db.get_dataBaseName() + " tabla: " + table.get_tableName());
+//                        dataTables.add(new DataTable(db.get_dataBaseName(), table.get_tableName()));
+//                    }
+//                }
+//                message.setDataTables(dataTables);
+//                message.setTables(tableArrayList);
+//                message.setDatabases(dbn.getDatabaseNames());
+//                message.setDatabaseObjects(databaseArrayList);
 
 //                if outs is not connected to the client
 
