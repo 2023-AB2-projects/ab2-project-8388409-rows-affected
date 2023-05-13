@@ -36,7 +36,7 @@ public class Host {
         elvSzavak.add("INSERT");
         elvSzavak.add("insert");
         elvSzavak.add("DELETE");
-
+        elvSzavak.add("select");
         error = "";
         acc = "";
 
@@ -92,7 +92,6 @@ public class Host {
     }
 
     private void handleClient(int portNumber) throws IOException {
-        while (true) {
 
             try (
                     ServerSocket serverSocket = new ServerSocket(portNumber);
@@ -163,6 +162,7 @@ public class Host {
                         System.out.println("message received from client: " + message.getMessageUser());
                         darabol(message.getMessageUser());
                         message.setMessageUser(answer);
+                        System.out.println("message sent to client: " + message.getMessageUser());
                         outS.writeObject(message);
                         outS.flush();
 
@@ -170,12 +170,17 @@ public class Host {
                         Write_lastCurrentDatabase();
                     } catch (InterruptedException e3) {
                         e3.printStackTrace();
+                        return;
                     }
                 }
 
 
+            } catch (IOException e) {
+                System.out.println("Disconnected from client");
+//                System.out.println(e.getMessage());
+//                System.out.println(e.getStackTrace());
             }
-        }
+
     }
 
 

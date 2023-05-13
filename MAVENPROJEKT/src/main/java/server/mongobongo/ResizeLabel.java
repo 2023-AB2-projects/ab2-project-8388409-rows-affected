@@ -170,4 +170,6 @@ public class ResizeLabel extends JPanel implements MouseListener, MouseMotionLis
         resizeLabel.addButton("delete");
         frame.setVisible(true);
     }
+
+
 }

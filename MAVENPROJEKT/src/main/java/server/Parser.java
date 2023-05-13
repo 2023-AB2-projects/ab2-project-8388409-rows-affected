@@ -27,7 +27,7 @@ public class Parser {
             }
             String databaseName = split[1];
 
-            new UseDatabase(databaseName,this);
+            new UseDatabase(databaseName, this);
             if (parserError) {
                 parserError = false;
                 host.setError("Database does not exist");
@@ -35,6 +35,14 @@ public class Parser {
             } else {
                 host.setCurrentDatabase(databaseName);
             }
+        }
+        //SELECT * FROM table_name
+        //SELECT * FROM table_name WHERE column_name = value
+
+
+        if (input.toUpperCase().contains("SELECT")) {
+            System.out.println("SELECT");
+            new Select(host.getCurrentDatabase(), input, this);
         }
 
         // CREATE DATABASE
@@ -228,6 +236,7 @@ public class Parser {
             }
         }
     }
+
     public void setParserError(boolean parserError) {
         this.parserError = parserError;
     }

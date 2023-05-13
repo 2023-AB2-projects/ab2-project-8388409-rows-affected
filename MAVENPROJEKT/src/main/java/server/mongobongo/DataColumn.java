@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DataColumn extends JPanel implements java.io.Serializable {
+public class DataColumn extends JPanel {
     protected final String name;
     protected final String type;
     protected Boolean primaryKey;
@@ -33,7 +33,7 @@ public class DataColumn extends JPanel implements java.io.Serializable {
         for (ResizeLabel label : this.valueLabels) {
             add(label);
         }
-
+        setVisible(true);
     }
 
     public DataColumn(String name, String type) {
@@ -50,8 +50,9 @@ public class DataColumn extends JPanel implements java.io.Serializable {
         this.valueLabels.add(typeL);
         add(nameL);
         add(typeL);
-
+        setVisible(true);
     }
+
 
     private ResizeLabel[] valueLabels() {
         ResizeLabel[] ret = new ResizeLabel[this.valueLabels.size()];
@@ -159,11 +160,11 @@ public class DataColumn extends JPanel implements java.io.Serializable {
 
     }
 
-    private ArrayList getValues() {
+    public ArrayList getValues() {
         return values;
     }
 
-    private ArrayList<ResizeLabel> getLabels() {
+    public ArrayList<ResizeLabel> getLabels() {
         return valueLabels;
     }
 
@@ -279,5 +280,10 @@ public class DataColumn extends JPanel implements java.io.Serializable {
 
     public String getColumnName() {
         return this.name;
+    }
+
+
+    public String getDataType() {
+        return this.type;
     }
 }

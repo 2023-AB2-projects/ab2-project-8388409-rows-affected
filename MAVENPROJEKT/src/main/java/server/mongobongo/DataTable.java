@@ -6,7 +6,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.json.simple.JSONArray;
+import server.Parser;
 import server.jacksonclasses.*;
 
 import javax.swing.*;
@@ -15,26 +15,66 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataTable extends JPanel implements java.io.Serializable {
+public class DataTable extends JPanel {
     protected String databaseName;
     protected String tableName;
     protected ArrayList<DataColumn> columns;
 
-    public DataTable(String databaseName, String tableName) {
-        setBackground(Color.BLACK);
+    protected Parser parser;
+
+    public DataTable(String databaseName, String tableName, Parser parser) {
+        this.parser = parser;
         setLayout(new FlowLayout());
+        setBackground(Color.BLACK);
+        this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = databaseName;
         this.tableName = tableName;
         columns = new ArrayList<>();
-        setCatalogData(databaseName, tableName);
-        setMongoData(databaseName, tableName);
+        String ok = setCatalogData(databaseName, tableName);
+        System.out.println("ok: " + ok);
+        if (!ok.equalsIgnoreCase("ok")) {
+            parser.setOtherError("Table does not exist");
+            return;
+        }
+        ok = setMongoData(databaseName, tableName);
+        if (!ok.equalsIgnoreCase("ok")) {
+            parser.setOtherError(ok);
+            return;
+        }
         for (DataColumn column : columns) {
             add(column);
         }
+
+        setVisible(true);
+    }
+
+    public DataTable(String databaseName, String tableName) {
+        setLayout(new FlowLayout());
+        setBackground(Color.BLACK);
+        this.setPreferredSize(new Dimension(400, 300));
+        this.databaseName = databaseName;
+        this.tableName = tableName;
+        columns = new ArrayList<>();
+        String ok = setCatalogData(databaseName, tableName);
+        if (!ok.equalsIgnoreCase("ok")) {
+            parser.setOtherError("Table does not exist");
+            return;
+        }
+        ok = setMongoData(databaseName, tableName);
+        if (!ok.equalsIgnoreCase("ok")) {
+            parser.setOtherError(ok);
+            return;
+        }
+        for (DataColumn column : columns) {
+            add(column);
+        }
+
+        setVisible(true);
     }
 
     public DataTable(DataTable table) {
         setLayout(new FlowLayout());
+        this.setPreferredSize(new Dimension(400, 300));
         this.columns = new ArrayList<>();
         this.databaseName = table.getDatabaseName();
         this.tableName = table.getTableName();
@@ -45,6 +85,15 @@ public class DataTable extends JPanel implements java.io.Serializable {
         for (DataColumn column : columns) {
             add(column);
         }
+        setVisible(true);
+    }
+
+    public DataTable() {
+        setBackground(Color.BLACK);
+        setLayout(new FlowLayout());
+        this.setPreferredSize(new Dimension(400, 300));
+        columns = new ArrayList<>();
+        setVisible(true);
     }
 
     public ArrayList<DataColumn> getColumns() {
@@ -63,7 +112,7 @@ public class DataTable extends JPanel implements java.io.Serializable {
         return tableName;
     }
 
-    public void setCatalogData(String databaseName, String tableName) {
+    public String setCatalogData(String databaseName, String tableName) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
 
@@ -103,6 +152,7 @@ public class DataTable extends JPanel implements java.io.Serializable {
                                 }
                                 columns.add(dataColumn);
                             }
+                            return "ok";
                         }
                     }
                 }
@@ -110,7 +160,7 @@ public class DataTable extends JPanel implements java.io.Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Cszice:" + columns.size());
+        return "Table not found";
     }
 
     public ArrayList<String> getRow(int index) {
@@ -121,42 +171,145 @@ public class DataTable extends JPanel implements java.io.Serializable {
         return ret;
     }
 
-    public void setMongoData(String db, String table) {
+    public String setMongoData(String db, String table) {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 
         MongoDatabase database = mongoClient.getDatabase(db);
+        if (database == null) {
+            return "Database not found";
+        }
+
         MongoCollection<Document> collection = database.getCollection(table);
+        if (collection == null) {
+            return "Collection not found";
+        }
         for (Document document : collection.find()) {
             int index = 0;
-            JSONArray jsonArray = new JSONArray();
-            System.out.println(document.toJson());
+
+//            System.out.println(document.toJson());
             for (String key : document.keySet()) {
-                System.out.println(key);
-                System.out.println(document.get(key));
+//                System.out.println(key);
+//                System.out.println(document.get(key));
 
                 if (index == 0) {
                     columns.get(index).addValue(document.get(key).toString());
                 } else {
                     String[] values = document.get(key).toString().split("#");
-                    for (int i = 0; i < values.length; i++) {
-                        columns.get(index).addValue(values[i]);
-                        System.out.println("+>" + index + " " + values[i]);
-                        System.out.println("index: " + index);
+                    for (String value : values) {
+                        columns.get(index).addValue(value);
+//                        System.out.println("+>" + index + " " + value);
+//                        System.out.println("index: " + index);
                         index++;
                     }
 
                 }
-                System.out.println("index: " + index);
+//                System.out.println("index: " + index);
                 index++;
             }
 
         }
         mongoClient.close();
-
+        return "OK";
     }
+
 
     public ArrayList<DataColumn> getDataColums() {
         return columns;
+    }
+
+    public void addColomn(DataColumn column) {
+        columns.add(column);
+    }
+
+    public void setColumns(ArrayList<DataColumn> columns) {
+        this.columns = columns;
+    }
+
+    public ArrayList<Integer> findRowIndexByColumNameAndValue(String columnName, String value) {
+        int index = 0;
+        ArrayList<Integer> fineIndexes = new ArrayList();
+        for (DataColumn dc : getColumns()) {
+            if (dc.getColumnName().equals(columnName)) {
+                for (ResizeLabel rl : dc.getValueLabels()) {
+                    if (index > 1) {
+                        if (rl.getText().equals(value))
+                            fineIndexes.add(index - 2);
+                    }
+                    index++;
+                }
+            }
+        }
+
+        return fineIndexes;
+    }
+
+    public static void main(String[] args) {
+        DataTable dt = new DataTable("ab", "GPU");
+        ArrayList<Integer> rowIndex = dt.findRowIndexByColumNameAndValue("price", "220");
+        for (Integer i : rowIndex) {
+            ArrayList<String> row = dt.getRow(i);
+            for (String lab : row) {
+                System.out.print(lab + ", ");
+            }
+            System.out.println();
+        }
+        JFrame jf = new JFrame();
+        jf.setSize(400, 300);
+        jf.setLayout(new FlowLayout());
+        jf.setBackground(new Color(203, 141, 141));
+        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        jf.add(new DataTable(dt));
+        jf.setVisible(true);
+
+    }
+
+    public DataColumn getColumnByName(String key1) {
+//        System.out.println();
+        for (DataColumn dc : columns) {
+//            System.out.println(dc.getColumnName()+" "+key1);
+            if (dc.getColumnName().equals(key1)) {
+                return dc;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<String> getRowByIndex(Integer integer) {
+        ArrayList<String> ret = new ArrayList<>();
+        for (DataColumn column : columns) {
+            ret.add(column.getRow(integer));
+        }
+        return ret;
+    }
+
+    public ArrayList<String>[] getRows() {
+        ArrayList[] ret = new ArrayList[columns.get(0).getValueLabels().size()];
+        for (int i = 0; i < columns.get(0).getValueLabels().size(); i++) {
+            ret[i] = new ArrayList<>();
+        }
+        for (DataColumn column : columns) {
+            for (int i = 0; i < column.getValueLabels().size(); i++) {
+                ret[i].add(column.getRow(i));
+            }
+        }
+        return ret;
+    }
+
+    public int addRow(ArrayList<String> row) {
+        if (row.size() != columns.size()) {
+            System.out.println(row.size() + " " + columns.size());
+            System.out.println("Nem egyezik a sor hossza a tábla oszlopainak számával!");
+            return -1;
+        }
+        for (int i = 0; i < row.size(); i++) {
+            columns.get(i).addValue(row.get(i));
+        }
+        return 0;
+    }
+
+    public void addColumn(DataColumn column) {
+        columns.add(column);
     }
 
 }

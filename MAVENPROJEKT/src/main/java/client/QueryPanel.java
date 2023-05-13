@@ -10,7 +10,7 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
 
     private final JTextArea textArea = new JTextArea();
     private JTextArea outText = new JTextArea();
-
+    private final JPanel resultPanel = new JPanel();
     private final JTabbedPane tabbedPane;
     private final KliensNew kliensNew;
     public QueryPanel(KliensNew kliensNew, JTabbedPane tabbedPane){
@@ -31,16 +31,30 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
         outText.setText("welcome friend!");
         outText.setBorder(BorderFactory.createLineBorder(Color.black));
 
+//        JPanel resultMainPanel = new JPanel();
+
+
         JScrollPane scrollTextResp = new JScrollPane(outText);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // set fix size for the text area
         scrollText.setPreferredSize(new Dimension(1000, 300));
-        scrollTextResp.setPreferredSize(new Dimension(1000, 300));
+//        scrollTextResp.setPreferredSize(new Dimension(1000, 300));
 
+
+//        JPanel resultPanel = new JPanel();
+//        resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
+//        resultPanel.add(scrollTextResp);
+        resultPanel.setLayout(new GridLayout(100, 0));
+        resultPanel.add(new JLabel("Hello user!"));
+        resultPanel.setPreferredSize(new Dimension(1000, 300));
+
+
+        JScrollPane resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         add(scrollText);
-        add(scrollTextResp);
+        add(resultPanelSCR);
+//        add(scrollTextResp);
     }
 
     @Override
@@ -84,7 +98,10 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
     }
 
     public void setOutText(String text) {
-        outText.setText(text);
+
+        resultPanel.add(new JLabel("Result:" + text));
+//        outText.setText(text);
+
     }
 
 
