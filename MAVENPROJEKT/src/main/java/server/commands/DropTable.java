@@ -38,10 +38,8 @@ public class DropTable {
                             Table myTable = databases.getDatabases().get(i).getTables().get(j);
                             IndexFiles indexFiles = myTable.getIndexFiles();
                             if (indexFiles != null) {
-                                if (indexFiles.getIndexFiles() != null) {
-                                    for (IndexFile indexFile : indexFiles.getIndexFiles()) {
-                                        indexNames.add(indexFile.get_indexName());
-                                    }
+                                for (IndexFile indexFile : indexFiles.getIndexFiles()) {
+                                    indexNames.add(indexFile.get_indexName());
                                 }
                             }
                             databases.getDatabases().get(i).getTables().remove(j);

@@ -7,31 +7,22 @@
           "_tableName": "tbl",
           "_rowLength": "0",
           "_fileName": "tbl.json",
+          "foreignKeys": [],
           "primaryKeys": [
             {
               "pkAttribute": "id"
             }
           ],
           "indexFiles": {
-            "indexFiles": null
-          },
-          "foreignKeys": [],
-          "structure": {
-            "attributes": [
+            "indexFiles": [
               {
-                "_attributeName": "id",
-                "_isnull": "0",
-                "_type": "INT"
-              },
-              {
-                "_attributeName": "u",
-                "_isnull": "0",
-                "_type": "INT"
-              },
-              {
-                "_attributeName": "str",
-                "_isnull": "0",
-                "_type": "VARCHAR"
+                "_indexName": "nonindex",
+                "_indexType": "non",
+                "indexAttributes": [
+                  {
+                    "iattribute": "str"
+                  }
+                ]
               }
             ]
           },
@@ -39,7 +30,26 @@
             {
               "uniqueAttribute": "u"
             }
-          ]
+          ],
+          "structure": {
+            "attributes": [
+              {
+                "_attributeName": "id",
+                "_isnull": "0",
+                "_type": "int"
+              },
+              {
+                "_attributeName": "u",
+                "_isnull": "0",
+                "_type": "int"
+              },
+              {
+                "_attributeName": "str",
+                "_isnull": "0",
+                "_type": "varchar"
+              }
+            ]
+          }
         }
       ]
     }

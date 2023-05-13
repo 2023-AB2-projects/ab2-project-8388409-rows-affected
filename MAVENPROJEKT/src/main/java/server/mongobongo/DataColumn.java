@@ -2,10 +2,11 @@ package server.mongobongo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DataColumn extends JPanel {
+public class DataColumn extends JPanel implements Serializable {
     protected final String name;
     protected final String type;
     protected Boolean primaryKey;

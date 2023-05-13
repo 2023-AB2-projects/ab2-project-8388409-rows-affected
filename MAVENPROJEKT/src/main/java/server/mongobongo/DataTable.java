@@ -12,10 +12,11 @@ import server.jacksonclasses.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataTable extends JPanel {
+public class DataTable extends JPanel implements Serializable {
     protected String databaseName;
     protected String tableName;
     protected ArrayList<DataColumn> columns;
@@ -173,6 +174,7 @@ public class DataTable extends JPanel {
 
     public String setMongoData(String db, String table) {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+
         MongoDatabase database = mongoClient.getDatabase(db);
         if (database == null) {
             return "Database not found";
@@ -310,4 +312,5 @@ public class DataTable extends JPanel {
     public void addColumn(DataColumn column) {
         columns.add(column);
     }
+
 }
