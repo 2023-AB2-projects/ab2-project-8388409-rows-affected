@@ -9,31 +9,19 @@ import java.util.ArrayList;
 
 public class Select {
 
-    private String[] selectedColums;
-    private String[] fromTables;
-    private String[] joinClause;
-    private String[] whereClause;
+    private final String[] selectedColums;
+    private final String fromTables;
+    private final String[] joinClause;
+    private final String[] whereClause;
     private String[] groupBy;
 
-    private String database;
-    private Parser parser;
-
-    public Select(String[] tables, String[] columns, String[] where, Parser parser) {
-        System.out.println("Tables: ");
-        for (String table : tables)
-            System.out.println(table);
-        System.out.println("Columns: ");
-        for (String column : columns)
-            System.out.println(column);
-        System.out.println("Where: ");
-        for (String whereClause : where)
-            System.out.println(whereClause);
-        getBaseTables();
-    }
+    private final String database;
+    private final Parser parser;
 
     public Select(String currentDatabase, String text, Parser parser) {
         this.parser = parser;
         database = currentDatabase;
+
         selectedColums = selectedColums(text);
         System.out.println("Selected columns: ");
         for (String an : selectedColums) {
@@ -41,10 +29,8 @@ public class Select {
         }
         System.out.println();
         fromTables = fromTables(text);
-        System.out.println("From tables: ");
-        for (String an : fromTables) {
-            System.out.print(an + " ");
-        }
+        System.out.println("Table: " + fromTables);
+
         System.out.println();
         joinClause = joinClause(text);
         System.out.println("Join clause: ");
@@ -52,12 +38,24 @@ public class Select {
             System.out.print(an + " ");
         }
         System.out.println();
+
         whereClause = whereClause(text);
         System.out.println("Where clause: ");
         for (String an : whereClause) {
             System.out.print(an + " ");
         }
-        getBaseTables();
+        System.out.println();
+
+
+        if (selectedColums[0].equals("*")) {
+            if (selectedColums.length == 1) {
+                getBaseTables();
+            } else {
+                parser.setParserError(true);
+            }
+        } else {
+            getBaseTables();
+        }
     }
 
     public String betweenString(String text, String start, String end) {
@@ -92,11 +90,10 @@ public class Select {
         return ans;
     }
 
-    public String[] fromTables(String text) {
+    public String fromTables(String text) {
 //        FROM ans JOIN vagy FROM WHERE
         String data = betweenString(text, "FROM", "INNER JOIN");
-        String[] ans = data.split(",");
-        return ans;
+        return data.trim();
     }
 
     public String[] joinClause(String text) {
@@ -118,11 +115,9 @@ public class Select {
         ArrayList<DataTable> tables = new ArrayList<>();
         JFrame frame = new JFrame("Select");
 
-        for (String table : fromTables) {
-            System.out.println("\nDatabase: |" + database + "| Table: |" + table + "|\n");
-            table = table.trim();
-            tables.add(new DataTable(database, table, parser));
-        }
+        System.out.println("\nDatabase: |" + database + "| Table: |" + fromTables + "|\n");
+        tables.add(new DataTable(database, fromTables, parser));
+
         JFrame jf = new JFrame();
         jf.setSize(400, 300);
         jf.setLayout(new FlowLayout());

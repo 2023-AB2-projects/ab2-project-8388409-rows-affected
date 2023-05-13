@@ -173,7 +173,6 @@ public class DataTable extends JPanel {
 
     public String setMongoData(String db, String table) {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-
         MongoDatabase database = mongoClient.getDatabase(db);
         if (database == null) {
             return "Database not found";
@@ -311,5 +310,4 @@ public class DataTable extends JPanel {
     public void addColumn(DataColumn column) {
         columns.add(column);
     }
-
 }
