@@ -13,6 +13,8 @@ public class Message implements Serializable {
     private String messageUser;
     private String messageKlient;
     private String messageServer;
+
+    private DataTable selectedTable;
     private int klientID;
     private ArrayList<String> databases;
     private final ArrayList<Table> tables;
@@ -41,6 +43,14 @@ public class Message implements Serializable {
         tables = new ArrayList<>();
         databaseObjects = new ArrayList<>();
 
+    }
+
+    public void setSelectedTable(DataTable selectedTable) {
+        this.selectedTable = selectedTable;
+    }
+
+    public DataTable getSelectedTable() {
+        return selectedTable;
     }
 
     public void setParserError(Boolean parserError) {
@@ -137,6 +147,10 @@ public class Message implements Serializable {
 
     public void addDataTable(DataTable dataTable) {
         dataTables.add(dataTable);
+    }
+
+    public DataTable getSelectedDataTable() {
+        return selectedTable;
     }
 }
 
