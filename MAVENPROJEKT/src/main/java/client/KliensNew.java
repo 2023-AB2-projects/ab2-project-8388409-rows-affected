@@ -44,7 +44,7 @@ public class KliensNew extends JFrame implements Runnable {
 
     private ArrayList<DataTable> dataTables;
 
-    KliensNew() {
+    public KliensNew() {
 //        InitQueryPanel();
 //        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setTitle("AB: Client");
@@ -229,6 +229,9 @@ public class KliensNew extends JFrame implements Runnable {
         if (!mess.isMessageUserEmpy()) {
             System.out.println("mess.getMessageUser(): " + mess.getMessageUser());
             outText.setText(outText.getText() + "\n" + mess.getMessageUser());
+            if (currentQueryPanel != null)
+                currentQueryPanel.setOutText(mess.getMessageUser());
+//            QueryPanel
         }
         if (!mess.isMessageServerEmpy()) {
 
@@ -454,6 +457,7 @@ public class KliensNew extends JFrame implements Runnable {
     private void connectSendReceive() throws IOException {
         String hostName = "localhost";
         int portNumber = 1234;
+        System.out.println(hostName + " " + portNumber);
         try (
                 Socket clientSocket = new Socket(hostName, portNumber);
                 InputStream inputStream = clientSocket.getInputStream();
@@ -475,7 +479,7 @@ public class KliensNew extends JFrame implements Runnable {
                     message = new Message();
                     message.setMessageUser(textArea.getText());
                     message.setKlientID(tabbedPane.getSelectedIndex());
-                    oot.writeObject(message); // TODO: MEGHALT ITT java.net.SocketException: Connection reset by peer / java.net.SocketException: An established connection was aborted by the software in your host machine
+                    oot.writeObject(message);
                     oot.flush();
                     send = false;
                 }
