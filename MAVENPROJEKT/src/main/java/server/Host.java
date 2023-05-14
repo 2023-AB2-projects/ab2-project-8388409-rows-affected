@@ -2,7 +2,10 @@ package server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
+import server.jacksonclasses.Database;
 import server.jacksonclasses.Databases;
+import server.jacksonclasses.Table;
+import server.mongobongo.DataTable;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -14,7 +17,6 @@ import java.util.List;
 public class Host {
     private final JSONObject catalog = new JSONObject();
     private String currentDatabase = "";
-
     private String error;
     private final List<String> elvSzavak;
     private final String acc;
@@ -103,29 +105,29 @@ public class Host {
 
                 Message message = new Message();
                 message.setMessageUser("Welcome to the server!");
-//                message.setDatabases(new DataBaseNames().getDatabaseNames());
-//                DataBaseNames dbn = new DataBaseNames();
-//
-//                ArrayList<Database> databaseArrayList = new ArrayList<>();
-//                ArrayList<Table> tableArrayList = new ArrayList<>();
-//
-//                for (String databaseName : dbn.getDatabaseNames()) {
-//                    System.out.println(databaseName);
-//                    databaseArrayList.add(dbn.getDatabase(databaseName));
-//                }
-//                ArrayList<DataTable> dataTables = new ArrayList<>();
-//                for (Database db : databaseArrayList) {
-//                    tableArrayList.addAll(db.getTables());
+                message.setDatabases(new DataBaseNames().getDatabaseNames());
+                DataBaseNames dbn = new DataBaseNames();
+
+                ArrayList<Database> databaseArrayList = new ArrayList<>();
+                ArrayList<Table> tableArrayList = new ArrayList<>();
+
+                for (String databaseName : dbn.getDatabaseNames()) {
+                    System.out.println(databaseName);
+                    databaseArrayList.add(dbn.getDatabase(databaseName));
+                }
+                ArrayList<DataTable> dataTables = new ArrayList<>();
+                for (Database db : databaseArrayList) {
+                    tableArrayList.addAll(db.getTables());
 //                    for (Table table : db.getTables()) {
 //                        System.out.println(table.get_tableName());
 //                        System.out.println("db: " + db.get_dataBaseName() + " tabla: " + table.get_tableName());
 //                        dataTables.add(new DataTable(db.get_dataBaseName(), table.get_tableName()));
-//                    }
+                }
 //                }
 //                message.setDataTables(dataTables);
-//                message.setTables(tableArrayList);
-//                message.setDatabases(dbn.getDatabaseNames());
-//                message.setDatabaseObjects(databaseArrayList);
+                message.setTables(tableArrayList);
+                message.setDatabases(dbn.getDatabaseNames());
+                message.setDatabaseObjects(databaseArrayList);
 
 //                if outs is not connected to the client
 
@@ -160,15 +162,6 @@ public class Host {
 
                         System.out.println("message received from client: " + message.getMessageUser());
                         darabol(message.getMessageUser());
-//                        message.setMessageUser(answer);
-//
-//                        while (messages.size() > 0) {
-//                            message = messages.get(0);
-//                            System.out.println("message sent to client: " + message.getMessageUser());
-//                            outS.writeObject(message);
-//                            outS.flush();
-//                            messages.remove(0);
-//                        }
 
                         if (!messages.isEmpty()) {
                             for (Message m : messages) {
@@ -182,11 +175,6 @@ public class Host {
                             }
                         }
 
-
-//
-//                        System.out.println("message sent to client: " + message.getMessageUser());
-//                        outS.writeObject(message);
-//                        outS.flush();
 
                         Thread.sleep(100);
                         Write_lastCurrentDatabase();
@@ -205,7 +193,6 @@ public class Host {
             }
 
     }
-
 
     private void Create_socket_communication() throws IOException {
         int portNumber = 1234; // replace with your port number

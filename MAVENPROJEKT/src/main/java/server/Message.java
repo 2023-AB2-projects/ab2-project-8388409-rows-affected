@@ -14,7 +14,11 @@ public class Message implements Serializable {
     private String messageKlient;
     private String messageServer;
 
+    private String visualQueryDesignerMessage;
+
     private DataTable selectedTable;
+
+    private DataTable vqdTableSkeleton;
     private int klientID;
     private ArrayList<String> databases;
     private final ArrayList<Table> tables;
@@ -152,5 +156,22 @@ public class Message implements Serializable {
     public DataTable getSelectedDataTable() {
         return selectedTable;
     }
+
+    public void setVisualQueryDesignerMessage(String selectTable) {
+        visualQueryDesignerMessage = selectTable;
+    }
+
+    public String getVisualQueryDesignerMessage() {
+        return visualQueryDesignerMessage;
+    }
+
+    public DataTable getVqdTableSkeleton() {
+        return vqdTableSkeleton;
+    }
+
+    public void setVqdTableSkeleton(DataTable vqdTableSkeleton) {
+        this.vqdTableSkeleton = vqdTableSkeleton;
+    }
+
 }
 

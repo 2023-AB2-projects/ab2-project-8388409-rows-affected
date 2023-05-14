@@ -7,6 +7,8 @@ import server.mongobongo.DataTable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.*;
@@ -28,6 +30,8 @@ public class KliensNew extends JFrame implements Runnable {
     private JComponent VisualQueryDesigner;
     private final JScrollPane scrollTextResp = new JScrollPane();
     private JTextArea textArea;
+
+    private Message clientMessage;
     private final JTextArea textAreas = new JTextArea();
     private JTextArea outText = new JTextArea();
     private boolean connected = false;
@@ -54,6 +58,7 @@ public class KliensNew extends JFrame implements Runnable {
         this.setLayout(null);
         this.setIconImage(new ImageIcon("src/main/resources/icons/ablogo512.jpg").getImage());
 
+        clientMessage = new Message();
         dataTables = new ArrayList<>();
         tableObjects = new ArrayList<>();
         databaseObjects = new ArrayList<>();
@@ -145,52 +150,102 @@ public class KliensNew extends JFrame implements Runnable {
         JPanel panel = new JPanel();
         panel.setBounds(50, 50, width - 50, height - 50);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        JButton button = new JButton("Create");
+        JButton createTable = new JButton("Insert / Delete");
+        JButton selectTable = new JButton("Select");
         JButton closeTab = new JButton("Close Tab");
 
+        createTable.setEnabled(false);
+        selectTable.setEnabled(false);
 
-        JComboBox<String> comboBox = new JComboBox<>();
-        JComboBox<String> comboBox2 = new JComboBox<>();
+        final int[] Selected = {0};
 
-        panel.add(button, BorderLayout.NORTH);
-        panel.add(closeTab, BorderLayout.SOUTH);
+        JComboBox<String> comboBoxDatabase = new JComboBox<>();
+        JComboBox<String> comboBoxTables = new JComboBox<>();
 
+//        if comboBoxDatabase is selected the selected parameter increase by 1
+        comboBoxDatabase.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                Selected[0]++;
+                System.out.println("SELECTED: " + Selected[0]);
 
-        panel.add(comboBox, BorderLayout.WEST);
-        panel.add(comboBox2, BorderLayout.EAST);
-
-        for (Database database : databaseObjects) {
-            System.out.println(database.get_dataBaseName());
-            comboBox.addItem(database.get_dataBaseName());
-        }
-
-        if (comboBox.getItemCount() > 0) {
-            comboBox.setSelectedIndex(0);
-        }
-
-        comboBox.addActionListener(e -> {
-            comboBox2.removeAllItems();
-            Database database = databaseObjects.get(comboBox.getSelectedIndex());
-            for (Table table : database.getTables()) {
-                comboBox2.addItem(table.get_tableName());
+                if (Selected[0] == 2) {
+                    createTable.setEnabled(true);
+                    selectTable.setEnabled(true);
+                }
             }
-            comboBox2.setVisible(comboBox2.getItemCount() > 0);
+        });
+
+        comboBoxTables.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (comboBoxTables.getSelectedIndex() != -1) {
+                    Selected[0]++;
+                }
+                System.out.println("SELECTED: " + Selected[0]);
+
+                if (Selected[0] == 2) {
+                    createTable.setEnabled(true);
+                    selectTable.setEnabled(true);
+                }
+            }
         });
 
 
-        if (comboBox2.getItemCount() > 0) {
-            comboBox2.setSelectedIndex(0);
+        panel.add(createTable, BorderLayout.NORTH);
+        panel.add(selectTable, BorderLayout.NORTH);
+        panel.add(closeTab, BorderLayout.SOUTH);
+
+        panel.add(comboBoxDatabase, BorderLayout.WEST);
+        panel.add(comboBoxTables, BorderLayout.EAST);
+
+        for (Database database : databaseObjects) {
+            System.out.println(database.get_dataBaseName());
+            comboBoxDatabase.addItem(database.get_dataBaseName());
         }
 
-        button.addActionListener(e -> {
+        if (comboBoxDatabase.getItemCount() > 0) {
+            comboBoxDatabase.setSelectedIndex(0);
+        }
+
+        comboBoxDatabase.addActionListener(e -> {
+            comboBoxTables.removeAllItems();
+            Database database = databaseObjects.get(comboBoxDatabase.getSelectedIndex());
+            for (Table table : database.getTables()) {
+                comboBoxTables.addItem(table.get_tableName());
+            }
+            comboBoxTables.setVisible(comboBoxTables.getItemCount() > 0);
+        });
+
+
+        if (comboBoxTables.getItemCount() > 0) {
+            comboBoxTables.setSelectedIndex(0);
+        }
+
+
+        selectTable.addActionListener(e -> {
+
+//            VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
+
+            if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner) {
+                String databaseName = (String) comboBoxDatabase.getSelectedItem();
+                String tableName = (String) comboBoxTables.getSelectedItem();
+                clientMessage.setVisualQueryDesignerMessage("getSceleton\r\n" + databaseName + "\r\n" + tableName + "\r\n");
+                send();
+            }
+
+        });
+
+        createTable.addActionListener(e -> {
 
             VisualQueryDesigner visualQueryDesigner = tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner ? (VisualQueryDesigner) tabbedPane.getSelectedComponent() : null;
-            for (DataTable dataTable : this.dataTables) {
-                if (dataTable.getTableName().equals(comboBox2.getSelectedItem()) && dataTable.getDatabaseName().equals(comboBox.getSelectedItem())) {
-                    visualQueryDesigner.createTable(dataTable);
-                    break;
-                }
-            }
+
+
+            String query = "use " + comboBoxDatabase.getSelectedItem() + "\n";
+            query += "select * from " + comboBoxTables.getSelectedItem() + "\n";
+            textArea.setText(query);
+            send();
+
         });
 
         closeTab.addActionListener(e -> {
@@ -200,8 +255,8 @@ public class KliensNew extends JFrame implements Runnable {
         });
 
 
-//        visualQueryDesignerOptions.add(comboBox);
-//        visualQueryDesignerOptions.add(comboBox2);
+//        visualQueryDesignerOptions.add(comboBoxDatabase);
+//        visualQueryDesignerOptions.add(comboBoxTables);
 //        visualQueryDesignerOptions.add(button);
         visualQueryDesignerOptions.add(panel);
         visualQueryDesignerOptions.setVisible(true);
@@ -234,18 +289,39 @@ public class KliensNew extends JFrame implements Runnable {
 //            QueryPanel
         }
 
-//        DataTable selectedDataTable = mess.getSelectedDataTable();
-//
-//        if (selectedDataTable != null) {
-//            System.out.println("selectedDataTable: " + selectedDataTable.getTableName());
+        DataTable vqdDataTable = mess.getVqdTableSkeleton();
+
+        if (vqdDataTable != null) {
+            System.out.println("vqdDataTable: " + vqdDataTable.getTableName());
+            if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner visualQueryDesigner) {
+                System.out.println("VisualQueryDesigner SELECTED SKELTON");
+                visualQueryDesigner.selectTable(vqdDataTable);
+            }
+        }
+
+        DataTable selectedDataTable = mess.getSelectedDataTable();
+
+        if (selectedDataTable != null) {
+            System.out.println("selectedDataTable: " + selectedDataTable.getTableName());
 //            if (currentQueryPanel != null)
 //                currentQueryPanel.setDataTableToOut(selectedDataTable);
-//        }
+//            tabbedPane.getSelectedComponent()
+            if (tabbedPane.getSelectedComponent() instanceof QueryPanel queryPanel) {
+                queryPanel.setDataTableToOut(selectedDataTable);
+            }
+
+            if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner visualQueryDesigner) {
+
+                visualQueryDesigner.createTable(selectedDataTable);
+            }
+
+        }
 
 
         if (!mess.isMessageServerEmpy()) {
 
         }
+
 
         if (!mess.isDatabasesEmpty()) {
             System.out.println("mess.getDatabases(): " + mess.getDatabases());
@@ -486,12 +562,15 @@ public class KliensNew extends JFrame implements Runnable {
                 }
 
                 if (send) {
-                    message = new Message();
+                    message = clientMessage;
                     message.setMessageUser(textArea.getText());
                     message.setKlientID(tabbedPane.getSelectedIndex());
                     oot.writeObject(message);
                     oot.flush();
+                    clientMessage = new Message();
+                    textArea.setText("");
                     send = false;
+
                 }
                 if (inputStream.available() > 0) {
                     System.out.println("Waiting for message");
@@ -549,4 +628,9 @@ public class KliensNew extends JFrame implements Runnable {
     public ArrayList<Table> getTables() {
         return this.tableObjects;
     }
+
+    public Message getCilentMessage() {
+        return this.clientMessage;
+    }
+
 }
