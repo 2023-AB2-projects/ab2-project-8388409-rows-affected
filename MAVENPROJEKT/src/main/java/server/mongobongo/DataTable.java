@@ -74,6 +74,7 @@ public class DataTable extends JPanel implements Serializable {
 
     public DataTable(ArrayList<Document> documentList, ArrayList<String> columnNames, ArrayList<String> columnTypes, Parser parser) {
         setLayout(new FlowLayout());
+
         this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = "tempDB";
         this.tableName = "tempTable";
