@@ -94,8 +94,8 @@ public class DataColumn extends JPanel implements Serializable {
     }
 
     public void addValue(String value) {
-        System.out.println("value: " + value);
-        System.out.println("type: " + this.type);
+//        System.out.println("value: " + value);
+//        System.out.println("type: " + this.type);
         ResizeLabel resLabel = getLabel(value);
         this.valueLabels.add(resLabel);
         add(resLabel);
@@ -113,7 +113,7 @@ public class DataColumn extends JPanel implements Serializable {
                 return;
             }
 
-            System.out.println(value);
+//            System.out.println(value);
             this.values.add(Integer.parseInt(value));
             return;
         }

@@ -22,6 +22,11 @@ public class Parser {
         message = new Message();
         System.out.println("Parser : " + input);
 
+        // Szazezer
+        if (input.toUpperCase().contains("SZAZEZER")) {
+            System.out.println("SZAZEZER");
+            new Szazezer(this);
+        }
         // USE
         if (input.toUpperCase().contains("USE")) {
             System.out.println("USE");
@@ -43,8 +48,6 @@ public class Parser {
         }
         //SELECT * FROM table_name
         //SELECT * FROM table_name WHERE column_name = value
-
-
         if (input.toUpperCase().contains("SELECT")) {
             System.out.println("SELECT");
             Select select = new Select(host.getCurrentDatabase(), input, this);
