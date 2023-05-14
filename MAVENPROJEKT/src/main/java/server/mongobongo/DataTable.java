@@ -72,7 +72,7 @@ public class DataTable extends JPanel implements Serializable {
         setVisible(true);
     }
 
-    public DataTable(ArrayList<Document> documentList, ArrayList<String> columnNames, ArrayList<String> columnTypes, Parser parser) {
+    public DataTable(ArrayList<Document> documentList, ArrayList<String> columnNames, Parser parser) {
         setLayout(new FlowLayout());
 
         this.setPreferredSize(new Dimension(400, 300));
@@ -80,10 +80,10 @@ public class DataTable extends JPanel implements Serializable {
         this.tableName = "tempTable";
         columns = new ArrayList<>();
 
-        for (int i = 0; i < columnNames.size(); i++) {
-            DataColumn column = new DataColumn(columnNames.get(i), columnTypes.get(i));
-            columns.add(column);
-        }
+//        for (int i = 0; i < columnNames.size(); i++) {
+//            DataColumn column = new DataColumn(columnNames.get(i), columnTypes.get(i));
+//            columns.add(column);
+//        }
 
         String ok = setData(documentList);
         if (!ok.equalsIgnoreCase("ok")) {

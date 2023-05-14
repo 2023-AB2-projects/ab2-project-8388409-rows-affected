@@ -1,0 +1,13 @@
+drop database db
+create database db
+CREATE TABLE tbl (id INT PRIMARY KEY, u INT UNIQUE, str VARCHAR)
+INSERT INTO tbl VALUES (1, 1, 'a')
+INSERT INTO tbl VALUES (2, 2, 'b')
+INSERT INTO tbl VALUES (3, 3, 'c')
+INSERT INTO tbl VALUES (4, 4, 'd')
+INSERT INTO tbl VALUES (5, 5, 'e')
+INSERT INTO tbl VALUES (6, 6, 'f')
+INSERT INTO tbl VALUES (7, 7, 'g')
+INSERT INTO tbl VALUES (8, 8, 'h')
+INSERT INTO tbl VALUES (9, 9, 'i')
+INSERT INTO tbl VALUES (10, 10, 'j')
