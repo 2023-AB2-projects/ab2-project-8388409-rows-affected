@@ -169,7 +169,7 @@ public class Message implements Serializable {
         return vqdTableSkeleton;
     }
 
-    public void setVqdTableSkeleton(DataTable vqdTableSkeleton) {
+    public void voidfromsetVqdTableSkeleton(DataTable vqdTableSkeleton) {
         this.vqdTableSkeleton = vqdTableSkeleton;
     }
 

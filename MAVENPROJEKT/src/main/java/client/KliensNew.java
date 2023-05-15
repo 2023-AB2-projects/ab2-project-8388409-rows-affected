@@ -568,7 +568,7 @@ public class KliensNew extends JFrame implements Runnable {
                     oot.writeObject(message);
                     oot.flush();
                     clientMessage = new Message();
-                    textArea.setText("");
+//                    textArea.setText("");
                     send = false;
 
                 }

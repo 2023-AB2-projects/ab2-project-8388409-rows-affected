@@ -23,6 +23,8 @@ public class DataTable extends JPanel implements Serializable {
 
     protected Parser parser;
 
+    protected ArrayList<Integer> selectedColumnIndexes = new ArrayList<>();
+
     public DataTable(String databaseName, String tableName, Parser parser) {
         this.parser = parser;
         setLayout(new FlowLayout());
@@ -72,31 +74,82 @@ public class DataTable extends JPanel implements Serializable {
         setVisible(true);
     }
 
-    public DataTable(ArrayList<Document> documentList, ArrayList<String> columnNames, Parser parser) {
+    public DataTable(ArrayList<Document> documentList, Table tableStructure, ArrayList<String> columnNames, Parser parser) {
         setLayout(new FlowLayout());
 
         this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = "tempDB";
         this.tableName = "tempTable";
         columns = new ArrayList<>();
+        buildColumns(columnNames, tableStructure);
 
-//        for (int i = 0; i < columnNames.size(); i++) {
-//            DataColumn column = new DataColumn(columnNames.get(i), columnTypes.get(i));
-//            columns.add(column);
-//        }
-
-        String ok = setData(documentList);
-        if (!ok.equalsIgnoreCase("ok")) {
-            parser.setOtherError(ok);
-            return;
-        }
         for (DataColumn column : columns) {
+            System.out.println("column: " + column.getName());
             add(column);
         }
+        revalidate();
 
+        setData(documentList);
         setVisible(true);
     }
 
+
+    public void buildColumns(ArrayList<String> columnNames, Table table) {
+        columns = new ArrayList<>();
+
+        ArrayList<Attribute> attributes = table.zAttributumok();
+        System.out.println("Projecting columns");
+        for (String cn : columnNames) {
+            System.out.println(cn);
+        }
+        System.out.println("end");
+        int index = 0;
+        for (Attribute attribute : attributes) {
+            System.out.println(attribute.get_attributeName());
+
+            if (columnNames.get(0).equals("*") && columnNames.size() == 1) {
+                DataColumn dataColumn = new DataColumn(attribute.get_attributeName(), attribute.get_type());
+                columns.add(dataColumn);
+                selectedColumnIndexes.add(index);
+            } else {
+                if (columnNames.contains(attribute.get_attributeName())) {
+                    DataColumn dataColumn = new DataColumn(attribute.get_attributeName(), attribute.get_type());
+                    columns.add(dataColumn);
+                    selectedColumnIndexes.add(index);
+                }
+            }
+
+            index++;
+        }
+
+
+    }
+
+    public String setData(ArrayList<Document> documents) {
+
+
+        for (Document document : documents) {
+            int index = 0;
+            for (String key : document.keySet()) {
+                if (selectedColumnIndexes.contains(index)) {
+                    if (index == 0) {
+                        columns.get(index).addValue(document.get(key).toString());
+                    } else {
+                        String[] values = document.get(key).toString().split("#");
+                        for (String value : values) {
+                            columns.get(index).addValue(value);
+                            index++;
+                        }
+                    }
+                }
+                index++;
+            }
+
+
+        }
+
+        return "OK";
+    }
 
     public DataTable(String databaseName, String tableName, String skelton) {
         setLayout(new FlowLayout());
@@ -214,37 +267,6 @@ public class DataTable extends JPanel implements Serializable {
             ret.add(column.getRow(index));
         }
         return ret;
-    }
-
-    public String setData(ArrayList<Document> documents) {
-
-
-        for (Document document : documents) {
-            int index = 0;
-
-            for (String key : document.keySet()) {
-//                System.out.println(key);
-//                System.out.println(document.get(key));
-
-                if (index == 0) {
-                    columns.get(index).addValue(document.get(key).toString());
-                } else {
-                    String[] values = document.get(key).toString().split("#");
-                    for (String value : values) {
-                        columns.get(index).addValue(value);
-//                        System.out.println("+>" + index + " " + value);
-//                        System.out.println("index: " + index);
-                        index++;
-                    }
-
-                }
-//                System.out.println("index: " + index);
-                index++;
-            }
-
-        }
-
-        return "OK";
     }
 
     public String setMongoData(String db, String table) {
