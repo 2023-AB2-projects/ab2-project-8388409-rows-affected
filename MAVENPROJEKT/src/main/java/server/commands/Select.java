@@ -147,6 +147,8 @@ public class Select {
                 MongoCollection<Document> collection = db.getCollection(fromTable);
                 ArrayList<Document> documents = collection.find().into(new ArrayList<>());
                 resultTable = new DataTable(documents, tableStructure, selectedColums, parser);
+                resultTable.setTableName(fromTable);
+                resultTable.setDatabaseName(currentDatabase);
             }
         }
         // SELECT * FROM table WHERE condition(s)
@@ -507,7 +509,8 @@ public class Select {
             }
             Table tableStructure = findTableInCatalog();
             resultTable = new DataTable(result, tableStructure, selectedColums, parser);
-
+            resultTable.setTableName(fromTable);
+            resultTable.setDatabaseName(currentDatabase);
         }
 
         // van projetion

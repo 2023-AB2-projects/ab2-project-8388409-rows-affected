@@ -19,7 +19,8 @@ import java.util.List;
 public class DataTable extends JPanel implements Serializable {
     protected String databaseName;
     protected String tableName;
-    protected ArrayList<DataColumn> columns;
+//    protected ArrayList<DataColumn> columns;
+    protected ArrayList<DataColumnModel> columns;
 
     protected Parser parser;
 
@@ -27,9 +28,9 @@ public class DataTable extends JPanel implements Serializable {
 
     public DataTable(String databaseName, String tableName, Parser parser) {
         this.parser = parser;
-        setLayout(new FlowLayout());
+
 //        setBackground(Color.BLACK);
-        this.setPreferredSize(new Dimension(400, 300));
+//        this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = databaseName;
         this.tableName = tableName;
         columns = new ArrayList<>();
@@ -44,9 +45,9 @@ public class DataTable extends JPanel implements Serializable {
             parser.setOtherError(ok);
             return;
         }
-        for (DataColumn column : columns) {
-            add(column);
-        }
+//        for (DataColumn column : columns) {
+//            add(column);
+//        }
 
         setVisible(true);
     }
@@ -67,9 +68,9 @@ public class DataTable extends JPanel implements Serializable {
             parser.setOtherError(ok);
             return;
         }
-        for (DataColumn column : columns) {
-            add(column);
-        }
+//        for (DataColumn column : columns) {
+//            add(column);
+//        }
 
         setVisible(true);
     }
@@ -83,10 +84,10 @@ public class DataTable extends JPanel implements Serializable {
         columns = new ArrayList<>();
         buildColumns(columnNames, tableStructure);
 
-        for (DataColumn column : columns) {
-            System.out.println("column: " + column.getName());
-            add(column);
-        }
+//        for (DataColumn column : columns) {
+//            System.out.println("column: " + column.getName());
+//            add(column);
+//        }
         revalidate();
 
         setData(documentList);
@@ -108,12 +109,12 @@ public class DataTable extends JPanel implements Serializable {
             System.out.println(attribute.get_attributeName());
 
             if (columnNames.get(0).equals("*") && columnNames.size() == 1) {
-                DataColumn dataColumn = new DataColumn(attribute.get_attributeName(), attribute.get_type());
+                DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
                 columns.add(dataColumn);
                 selectedColumnIndexes.add(index);
             } else {
                 if (columnNames.contains(attribute.get_attributeName())) {
-                    DataColumn dataColumn = new DataColumn(attribute.get_attributeName(), attribute.get_type());
+                    DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
                     columns.add(dataColumn);
                     selectedColumnIndexes.add(index);
                 }
@@ -133,6 +134,7 @@ public class DataTable extends JPanel implements Serializable {
             for (String key : document.keySet()) {
                 if (selectedColumnIndexes.contains(index)) {
                     if (index == 0) {
+                        columns.get(index).isPrimaryKey();
                         columns.get(index).addValue(document.get(key).toString());
                     } else {
                         String[] values = document.get(key).toString().split("#");
@@ -163,9 +165,9 @@ public class DataTable extends JPanel implements Serializable {
             parser.setOtherError("Table does not exist");
             return;
         }
-        for (DataColumn column : columns) {
-            add(column);
-        }
+//        for (DataColumn column : columns) {
+//            add(column);
+//        }
 
         setVisible(true);
     }
@@ -176,13 +178,13 @@ public class DataTable extends JPanel implements Serializable {
         this.columns = new ArrayList<>();
         this.databaseName = table.getDatabaseName();
         this.tableName = table.getTableName();
-        for (DataColumn column : table.getColumns()) {
+        for (DataColumnModel column : table.getColumns()) {
             if (column != null)
-                columns.add(new DataColumn(column));
+                columns.add(new DataColumnModel(column));
         }
-        for (DataColumn column : columns) {
-            add(column);
-        }
+//        for (DataColumn column : columns) {
+//            add(column);
+//        }
         setVisible(true);
     }
 
@@ -194,10 +196,10 @@ public class DataTable extends JPanel implements Serializable {
         setVisible(true);
     }
 
-    public ArrayList<DataColumn> getColumns() {
-        ArrayList<DataColumn> ret = new ArrayList<>();
-        for (DataColumn column : columns) {
-            ret.add(new DataColumn(column));
+    public ArrayList<DataColumnModel> getColumns() {
+        ArrayList<DataColumnModel> ret = new ArrayList<>();
+        for (DataColumnModel column : columns) {
+            ret.add(new DataColumnModel(column));
         }
         return columns;
     }
@@ -233,7 +235,7 @@ public class DataTable extends JPanel implements Serializable {
 
                             for (Attribute attribute : attributes) {
 
-                                DataColumn dataColumn = new DataColumn(attribute.get_attributeName(), attribute.get_type());
+                                DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
                                 if (pks != null) {
                                     for (PrimaryKey pk : pks) {
                                         if (pk.getPkAttribute().equals(attribute.get_attributeName())) {
@@ -263,7 +265,7 @@ public class DataTable extends JPanel implements Serializable {
 
     public ArrayList<String> getRow(int index) {
         ArrayList<String> ret = new ArrayList<>();
-        for (DataColumn column : columns) {
+        for (DataColumnModel column : columns) {
             ret.add(column.getRow(index));
         }
         return ret;
@@ -286,10 +288,7 @@ public class DataTable extends JPanel implements Serializable {
         for (Document document : collection.find()) {
             int index = 0;
 
-//            System.out.println(document.toJson());
             for (String key : document.keySet()) {
-//                System.out.println(key);
-//                System.out.println(document.get(key));
 
                 if (index == 0) {
                     columns.get(index).addValue(document.get(key).toString());
@@ -297,13 +296,10 @@ public class DataTable extends JPanel implements Serializable {
                     String[] values = document.get(key).toString().split("#");
                     for (String value : values) {
                         columns.get(index).addValue(value);
-//                        System.out.println("+>" + index + " " + value);
-//                        System.out.println("index: " + index);
                         index++;
                     }
 
                 }
-//                System.out.println("index: " + index);
                 index++;
             }
 
@@ -312,26 +308,27 @@ public class DataTable extends JPanel implements Serializable {
         return "OK";
     }
 
-    public ArrayList<DataColumn> getDataColums() {
+    public ArrayList<DataColumnModel> getDataColums() {
         return columns;
     }
 
-    public void addColomn(DataColumn column) {
+    public void addColomn(DataColumnModel column) {
         columns.add(column);
     }
 
-    public void setColumns(ArrayList<DataColumn> columns) {
+    public void setColumns(ArrayList<DataColumnModel> columns) {
         this.columns = columns;
     }
 
     public ArrayList<Integer> findRowIndexByColumNameAndValue(String columnName, String value) {
         int index = 0;
         ArrayList<Integer> fineIndexes = new ArrayList();
-        for (DataColumn dc : getColumns()) {
+        for (DataColumnModel dc : getColumns()) {
             if (dc.getColumnName().equals(columnName)) {
-                for (ResizeLabel rl : dc.getValueLabels()) {
+//                TODO: lehet az object nem jo
+                for (Object rl : dc.getValues()) {
                     if (index > 1) {
-                        if (rl.getText().equals(value))
+                        if (rl.equals(value))
                             fineIndexes.add(index - 2);
                     }
                     index++;
@@ -342,16 +339,18 @@ public class DataTable extends JPanel implements Serializable {
         return fineIndexes;
     }
 
+//    public ArrayList<String> getRow(int index) {
+//        index += 2;
+//        ArrayList<String> ret = new ArrayList<>();
+//        for (String value : this.columns.get(0).getValues()) {
+//            ret.add(value);
+//        }
+//        return ret;
+//    }
+
     public static void main(String[] args) {
         DataTable dt = new DataTable("ab", "GPU");
-        ArrayList<Integer> rowIndex = dt.findRowIndexByColumNameAndValue("price", "220");
-        for (Integer i : rowIndex) {
-            ArrayList<String> row = dt.getRow(i);
-            for (String lab : row) {
-//                System.out.print(lab + ", ");
-            }
-//            System.out.println();
-        }
+
         JFrame jf = new JFrame();
         jf.setSize(400, 300);
         jf.setLayout(new FlowLayout());
@@ -374,60 +373,12 @@ public class DataTable extends JPanel implements Serializable {
 
     }
 
-    public int getPanelWidth() {
-        return getColumns().get(0).getValueLabels().size() * 10;
+
+    public void setTableName(String fromTable) {
+        this.tableName = fromTable;
     }
 
-    public int getPanelHeight() {
-        return getColumns().size() * 20;
+    public void setDatabaseName(String fromDatabase) {
+        this.databaseName = fromDatabase;
     }
-
-    public DataColumn getColumnByName(String key1) {
-//        System.out.println();
-        for (DataColumn dc : columns) {
-//            System.out.println(dc.getColumnName()+" "+key1);
-            if (dc.getColumnName().equals(key1)) {
-                return dc;
-            }
-        }
-        return null;
-    }
-
-    public ArrayList<String> getRowByIndex(Integer integer) {
-        ArrayList<String> ret = new ArrayList<>();
-        for (DataColumn column : columns) {
-            ret.add(column.getRow(integer));
-        }
-        return ret;
-    }
-
-    public ArrayList<String>[] getRows() {
-        ArrayList[] ret = new ArrayList[columns.get(0).getValueLabels().size()];
-        for (int i = 0; i < columns.get(0).getValueLabels().size(); i++) {
-            ret[i] = new ArrayList<>();
-        }
-        for (DataColumn column : columns) {
-            for (int i = 0; i < column.getValueLabels().size(); i++) {
-                ret[i].add(column.getRow(i));
-            }
-        }
-        return ret;
-    }
-
-    public int addRow(ArrayList<String> row) {
-        if (row.size() != columns.size()) {
-//            System.out.println(row.size() + " " + columns.size());
-//            System.out.println("Nem egyezik a sor hossza a tábla oszlopainak számával!");
-            return -1;
-        }
-        for (int i = 0; i < row.size(); i++) {
-            columns.get(i).addValue(row.get(i));
-        }
-        return 0;
-    }
-
-    public void addColumn(DataColumn column) {
-        columns.add(column);
-    }
-
 }

@@ -1,7 +1,6 @@
 package client;
 
-import server.mongobongo.DataColumn;
-import server.mongobongo.DataTable;
+import server.mongobongo.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +8,7 @@ import java.util.ArrayList;
 
 import static java.lang.Math.max;
 
-public class VisualQueryDesignerTableEdit extends DataTable {
+public class VisualQueryDesignerTableEdit extends DataTableGUI {
 
     private ArrayList<JButton> buttons;
     private final KliensNew kliens;
@@ -20,15 +19,18 @@ public class VisualQueryDesignerTableEdit extends DataTable {
         this.kliens = kliens;
         int size = 0;
         setLayout(new FlowLayout());
-        for (DataColumn column : getDataColums()) {
-            size = max(column.getLength(), size);
-        }
+//        for (DataColumnGUI column : getDataColums()) {
+//            size = max(column.getLength(), size);
+//        }
 
-        DataColumn delete = new DataColumn("", "");
-        delete.addButtons("delete", size);
+        DataColumnModel deleteModel = new DataColumnModel("", "");
+        DataColumnGUI delete = new DataColumnGUI(deleteModel);
+
+
+        delete.addButtons("delete", getColumn());
+        delete.addButtons("insert", 1);
         this.removeAll();
 //        delete.setPreferredSize(new Dimension(100, 100));
-        delete.addButtons("insert", 1);
         add(delete);
 
         for (JButton button : delete.getButtons()) {
@@ -43,6 +45,7 @@ public class VisualQueryDesignerTableEdit extends DataTable {
                     System.out.println("delete");
                     System.out.println(index);
 
+                    System.out.println(" ========================== \n args:");
                     System.out.println(getRow(index));
                     ArrayList<String> args = getRow(index);
                     String[] args2 = new String[args.size()];
@@ -66,10 +69,9 @@ public class VisualQueryDesignerTableEdit extends DataTable {
             });
         }
 
-        for (DataColumn column : getDataColums()) {
+        for (DataColumnGUI column : getDataColums()) {
             add(column);
             column.addInputField(1);
-
         }
 
         setVisible(true);
@@ -80,12 +82,15 @@ public class VisualQueryDesignerTableEdit extends DataTable {
         String sql = "USE " + getDatabaseName() + " \n ";
         sql += "DELETE FROM " + getTableName() + " WHERE ";
 
-        ArrayList<DataColumn> columns = getDataColums();
+        ArrayList<DataColumnModel> columns = getColumnsModel();
         for (int i = 0; i < columns.size(); i++) {
             if (columns.get(i).getIsPrimaryKey()) {
                 sql += getColumnName(i) + " = " + args[i];
                 break;
+//            if (i != columns.size() - 1) {
+//                sql += " AND ";
             }
+//            }
         }
         System.out.println(sql);
         kliens.setTextArea(sql);

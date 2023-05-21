@@ -31,7 +31,7 @@ public class VisualQueryDesigner extends JPanel {
     public void createTable(DataTable table) {
 
         this.removeAll();
-//        add horizontal and vertical scroll bar
+
         VisualQueryDesignerTableEdit vqdt = new VisualQueryDesignerTableEdit(table, kliens);
         vqdt.setPreferredSize(new Dimension(this.getWidth() * 2, this.getHeight() * 2));
         JScrollPane jps = new JScrollPane(vqdt, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);

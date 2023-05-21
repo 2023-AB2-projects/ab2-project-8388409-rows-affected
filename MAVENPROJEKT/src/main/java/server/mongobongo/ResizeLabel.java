@@ -66,7 +66,6 @@ public class ResizeLabel extends JPanel implements MouseListener, MouseMotionLis
                 BorderFactory.createEmptyBorder(padding, padding, padding, padding)));
         setVisible(true);
         this.resizeLabels = resizeLabels;
-
     }
 
 
@@ -123,8 +122,13 @@ public class ResizeLabel extends JPanel implements MouseListener, MouseMotionLis
 
         setLabelWidth(newWidth);
         if (resizeLabels != null) {
+
             for (ResizeLabel resizeLabel : resizeLabels) {
-                resizeLabel.setLabelWidth(newWidth);
+                System.out.println("resizeLabel: " + resizeLabel.getText());
+//                resizeLabel.setPreferredSize(new Dimension(newWidth, label.getHeight()));
+                resizeLabel.setSize(newWidth, label.getHeight());
+                revalidate();
+                repaint();
             }
         }
     }

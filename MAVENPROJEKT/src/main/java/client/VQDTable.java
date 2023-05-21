@@ -2,7 +2,8 @@ package client;
 
 import server.jacksonclasses.Attribute;
 import server.jacksonclasses.Table;
-import server.mongobongo.DataColumn;
+import server.mongobongo.DataColumnModel;
+
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -161,11 +162,7 @@ public class VQDTable extends JPanel {
 
 class tableView extends JPanel {
 
-    private final DataColumn[] columns;
 
-    public tableView(DataColumn[] columns) {
-        this.columns = columns;
-    }
 
     //    paint component override
     @Override

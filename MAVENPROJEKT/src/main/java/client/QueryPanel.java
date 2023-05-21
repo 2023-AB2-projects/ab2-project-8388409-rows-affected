@@ -1,6 +1,7 @@
 package client;
 
 import server.mongobongo.DataTable;
+import server.mongobongo.DataTableGUI;
 
 import javax.accessibility.Accessible;
 import javax.swing.*;
@@ -50,12 +51,13 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
 //        resultPanel.setLayout(new GridLayout(100, 0));
         resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
         resultPanel.add(new JLabel("Hello user!"));
-        resultPanel.setPreferredSize(new Dimension(1000, 300));
+//        resultPanel.setPreferredSize(new Dimension(400, 300));
 
 
         JScrollPane resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         add(scrollText);
+//        add(resultPanel);
         add(resultPanelSCR);
 //        add(scrollTextResp);
     }
@@ -109,8 +111,9 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
 
     public void setDataTableToOut(DataTable dataTable) {
         resultPanel.removeAll();
+        DataTableGUI dataTableGUI = new DataTableGUI(dataTable);
         resultPanel.add(new JLabel("Result:"));
-        resultPanel.add(new DataTable(dataTable));
+        resultPanel.add(dataTableGUI);
         resultPanel.revalidate();
     }
 
