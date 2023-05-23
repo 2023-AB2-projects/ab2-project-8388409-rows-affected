@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DataColumnModel extends JPanel implements Serializable {
+public class DataColumnModel implements Serializable {
     protected final String name;
     protected final String type;
     protected Boolean primaryKey;
@@ -20,7 +20,6 @@ public class DataColumnModel extends JPanel implements Serializable {
 
 
     public DataColumnModel(DataColumnModel column) {
-        setLayout(new GridLayout(100, 1));
         this.name = column.getName();
         this.type = column.getType();
         this.primaryKey = column.getPrimaryKey();
@@ -28,13 +27,10 @@ public class DataColumnModel extends JPanel implements Serializable {
         this.isForeignKey = column.getForeignKey();
         this.isNull = column.getIsNull();
         this.values = new ArrayList();
-//        values.addAll(column.getValues());
 
-        setVisible(true);
     }
 
     public DataColumnModel(String name, String type) {
-        setLayout(new GridLayout(100, 1));
         this.name = name;
         this.type = type;
         this.primaryKey = false;
@@ -57,24 +53,6 @@ public class DataColumnModel extends JPanel implements Serializable {
 
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        frame.setSize(500, 500);
-        frame.setLayout(new FlowLayout());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        DataColumnModel dbcl = new DataColumnModel("id", "int");
-        dbcl.addValue("1");
-        dbcl.addValue("2");
-        dbcl.addValue("3");
-        frame.add(dbcl);
-        frame.add(new DataColumnModel("kor", "int"));
-        frame.add(new DataColumnModel("magassag", "float"));
-        frame.add(new DataColumnModel("suly", "double"));
-
-
-        frame.setVisible(true);
-
-    }
 
     public ArrayList<String> getValues() {
         return values;
@@ -88,7 +66,6 @@ public class DataColumnModel extends JPanel implements Serializable {
     String getType() {
         return type;
     }
-
 
     public void setSpecial(String special) {
         this.special = special;
@@ -128,7 +105,6 @@ public class DataColumnModel extends JPanel implements Serializable {
     }
 
 
-    @Override
     public String getName() {
         return name;
     }
