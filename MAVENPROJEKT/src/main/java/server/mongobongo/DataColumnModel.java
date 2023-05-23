@@ -27,6 +27,7 @@ public class DataColumnModel implements Serializable {
         this.isForeignKey = column.getForeignKey();
         this.isNull = column.getIsNull();
         this.values = new ArrayList();
+        this.values.addAll(column.getValues());
 
     }
 

@@ -146,6 +146,7 @@ public class DataTable implements Serializable {
         this.databaseName = table.getDatabaseName();
         this.tableName = table.getTableName();
         for (DataColumnModel column : table.getColumns()) {
+
             if (column != null)
                 columns.add(new DataColumnModel(column));
         }
