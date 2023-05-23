@@ -50,11 +50,7 @@ public class Message implements Serializable {
     }
 
     public void setSelectedTable(DataTable selectedTable) {
-        this.selectedTable = selectedTable;
-    }
-
-    public DataTable getSelectedTable() {
-        return selectedTable;
+        this.selectedTable = new DataTable(selectedTable);
     }
 
     public void setParserError(Boolean parserError) {

@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class DataTableGUI extends JPanel{
+public class DataTableGUI extends JPanel {
 
     private DataTable tableModel;
     private ArrayList<DataColumnGUI> dataColumnGUI;
@@ -12,7 +12,6 @@ public class DataTableGUI extends JPanel{
     public DataTableGUI(DataTable tableModel) {
         this.tableModel = tableModel;
         this.dataColumnGUI = new ArrayList<>();
-//        setLayout(new GridLayout(1, getRowSize()));
         setLayout(new FlowLayout());
         for (DataColumnModel column : tableModel.getColumns()) {
             DataColumnGUI columnGUI = new DataColumnGUI(column);
@@ -20,7 +19,6 @@ public class DataTableGUI extends JPanel{
             add(columnGUI);
         }
 
-//        setLayout(new FlowLayout());
         System.out.println("Width: " + getRowSize() + " Height: " + getColumn());
         setVisible(true);
     }

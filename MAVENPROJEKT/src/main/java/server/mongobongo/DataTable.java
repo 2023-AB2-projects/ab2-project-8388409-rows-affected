@@ -16,10 +16,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataTable extends JPanel implements Serializable {
+public class DataTable implements Serializable {
     protected String databaseName;
     protected String tableName;
-//    protected ArrayList<DataColumn> columns;
     protected ArrayList<DataColumnModel> columns;
 
     protected Parser parser;
@@ -29,8 +28,6 @@ public class DataTable extends JPanel implements Serializable {
     public DataTable(String databaseName, String tableName, Parser parser) {
         this.parser = parser;
 
-//        setBackground(Color.BLACK);
-//        this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = databaseName;
         this.tableName = tableName;
         columns = new ArrayList<>();
@@ -45,16 +42,9 @@ public class DataTable extends JPanel implements Serializable {
             parser.setOtherError(ok);
             return;
         }
-//        for (DataColumn column : columns) {
-//            add(column);
-//        }
-
-        setVisible(true);
     }
 
     public DataTable(String databaseName, String tableName) {
-        setLayout(new FlowLayout());
-        this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = databaseName;
         this.tableName = tableName;
         columns = new ArrayList<>();
@@ -66,32 +56,18 @@ public class DataTable extends JPanel implements Serializable {
         ok = setMongoData(databaseName, tableName);
         if (!ok.equalsIgnoreCase("ok")) {
             parser.setOtherError(ok);
-            return;
-        }
-//        for (DataColumn column : columns) {
-//            add(column);
-//        }
+                }
 
-        setVisible(true);
     }
 
     public DataTable(ArrayList<Document> documentList, Table tableStructure, ArrayList<String> columnNames, Parser parser) {
-        setLayout(new FlowLayout());
 
-        this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = "tempDB";
         this.tableName = "tempTable";
         columns = new ArrayList<>();
         buildColumns(columnNames, tableStructure);
 
-//        for (DataColumn column : columns) {
-//            System.out.println("column: " + column.getName());
-//            add(column);
-//        }
-        revalidate();
-
         setData(documentList);
-        setVisible(true);
     }
 
 
@@ -154,9 +130,6 @@ public class DataTable extends JPanel implements Serializable {
     }
 
     public DataTable(String databaseName, String tableName, String skelton) {
-        setLayout(new FlowLayout());
-        setBackground(Color.BLACK);
-        this.setPreferredSize(new Dimension(400, 300));
         this.databaseName = databaseName;
         this.tableName = tableName;
         columns = new ArrayList<>();
@@ -165,16 +138,10 @@ public class DataTable extends JPanel implements Serializable {
             parser.setOtherError("Table does not exist");
             return;
         }
-//        for (DataColumn column : columns) {
-//            add(column);
-//        }
 
-        setVisible(true);
     }
 
     public DataTable(DataTable table) {
-        setLayout(new FlowLayout());
-        this.setPreferredSize(new Dimension(400, 300));
         this.columns = new ArrayList<>();
         this.databaseName = table.getDatabaseName();
         this.tableName = table.getTableName();
@@ -182,18 +149,10 @@ public class DataTable extends JPanel implements Serializable {
             if (column != null)
                 columns.add(new DataColumnModel(column));
         }
-//        for (DataColumn column : columns) {
-//            add(column);
-//        }
-        setVisible(true);
     }
 
     public DataTable() {
-        setBackground(Color.BLACK);
-        setLayout(new FlowLayout());
-        this.setPreferredSize(new Dimension(400, 300));
         columns = new ArrayList<>();
-        setVisible(true);
     }
 
     public ArrayList<DataColumnModel> getColumns() {
@@ -348,30 +307,30 @@ public class DataTable extends JPanel implements Serializable {
 //        return ret;
 //    }
 
-    public static void main(String[] args) {
-        DataTable dt = new DataTable("ab", "GPU");
-
-        JFrame jf = new JFrame();
-        jf.setSize(400, 300);
-        jf.setLayout(new FlowLayout());
-        jf.setBackground(new Color(203, 141, 141));
-        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JScrollPane sp = new JScrollPane(new DataTable(dt), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-//        System.out.println("width: " + dt.getPanelWidth() + " height: " + dt.getPanelHeight());
-//        System.out.println("width: " + sp.getWidth() + " height: " + sp.getHeight());
-
-//        sp.setPreferredSize(new Dimension());
-//      sp be resizable
-        sp.setAutoscrolls(true);
-
-        sp.getVerticalScrollBar().getMaximumSize();
-
-
-        jf.add(sp);
-        jf.setVisible(true);
-
-    }
+//    public static void main(String[] args) {
+//        DataTable dt = new DataTable("ab", "GPU");
+//
+//        JFrame jf = new JFrame();
+//        jf.setSize(400, 300);
+//        jf.setLayout(new FlowLayout());
+//        jf.setBackground(new Color(203, 141, 141));
+//        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        JScrollPane sp = new JScrollPane(new DataTable(dt), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//
+////        System.out.println("width: " + dt.getPanelWidth() + " height: " + dt.getPanelHeight());
+////        System.out.println("width: " + sp.getWidth() + " height: " + sp.getHeight());
+//
+////        sp.setPreferredSize(new Dimension());
+////      sp be resizable
+//        sp.setAutoscrolls(true);
+//
+//        sp.getVerticalScrollBar().getMaximumSize();
+//
+//
+//        jf.add(sp);
+//        jf.setVisible(true);
+//
+//    }
 
 
     public void setTableName(String fromTable) {
