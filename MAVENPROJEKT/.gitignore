@@ -1,1 +1,6 @@
-Catalog.json
+# Default ignored files
+/.idea/shelf/
+/workspace.xml
+../target/
+/target/
+/.idea/

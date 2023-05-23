@@ -50,6 +50,10 @@ public class Message implements Serializable {
     }
 
     public void setSelectedTable(DataTable selectedTable) {
+        if (selectedTable == null) {
+            System.out.println("Selected table is null");
+            return;
+        }
         this.selectedTable = new DataTable(selectedTable);
     }
 

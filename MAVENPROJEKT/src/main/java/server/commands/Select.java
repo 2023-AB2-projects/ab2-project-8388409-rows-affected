@@ -360,6 +360,10 @@ public class Select {
                                     case "int" -> {
                                         int attributeValueInt = Integer.parseInt(attributeValue);
                                         int valueInt = Integer.parseInt(value);
+
+                                        System.out.println("attributeValueInt: " + attributeValueInt*10);
+                                        System.out.println("valueInt: " + valueInt*10);
+
                                         switch (operator) {
                                             case "=" -> {
                                                 if (attributeValueInt == valueInt) {
@@ -522,8 +526,8 @@ public class Select {
     public String betweenString(String text, String start, String end) {
         String ans = "";
         String textUpper = text.toUpperCase();
-        int startindex = textUpper.indexOf(start);
-        int endindex = textUpper.indexOf(end);
+        int startindex = textUpper.indexOf(start.toUpperCase());
+        int endindex = textUpper.indexOf(end.toUpperCase());
 
         if (startindex == -1 && endindex == -1) {
             return ans;
@@ -535,9 +539,11 @@ public class Select {
         if (endindex == -1) {
             endindex = text.length();
         }
-
+        System.out.println("- start: "+start+" startindex: "+startindex);
+        System.out.println("- end: "+end+" endindex: "+endindex);
 
         ans = text.substring(startindex + start.length(), endindex);
+        System.out.println("- ans:"+ans);
         return ans;
     }
 
@@ -608,8 +614,12 @@ public class Select {
                 ans[i] = ans[i].trim();
             }
             return ans;
+        } else {
+            ans = new String[1];
+            ans[0] = data.trim();
+            return ans;
         }
-        return ans;
+
     }
 
     public ArrayList<DataTable> getBaseTables() {

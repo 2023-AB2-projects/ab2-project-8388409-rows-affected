@@ -56,7 +56,7 @@ public class DataTable implements Serializable {
         ok = setMongoData(databaseName, tableName);
         if (!ok.equalsIgnoreCase("ok")) {
             parser.setOtherError(ok);
-                }
+        }
 
     }
 
@@ -83,18 +83,12 @@ public class DataTable implements Serializable {
         int index = 0;
         for (Attribute attribute : attributes) {
             System.out.println(attribute.get_attributeName());
-
-            if (columnNames.get(0).equals("*") && columnNames.size() == 1) {
-                DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
-                columns.add(dataColumn);
-                selectedColumnIndexes.add(index);
-            } else {
                 if (columnNames.contains(attribute.get_attributeName())) {
                     DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
                     columns.add(dataColumn);
                     selectedColumnIndexes.add(index);
+                    System.out.println("!Adding column: " + attribute.get_attributeName());
                 }
-            }
 
             index++;
         }
@@ -107,20 +101,25 @@ public class DataTable implements Serializable {
 
         for (Document document : documents) {
             int index = 0;
-            for (String key : document.keySet()) {
-                if (selectedColumnIndexes.contains(index)) {
-                    if (index == 0) {
-                        columns.get(index).isPrimaryKey();
-                        columns.get(index).addValue(document.get(key).toString());
-                    } else {
-                        String[] values = document.get(key).toString().split("#");
-                        for (String value : values) {
-                            columns.get(index).addValue(value);
-                            index++;
-                        }
-                    }
+//            System.out.println("Selected columns:");
+
+            ArrayList<String> keys = new ArrayList<>(document.keySet());
+//            System.out.println("keys: " + keys.size());
+            for (Integer i : selectedColumnIndexes) {
+                System.out.println(i);
+
+                if (i==0){
+                    columns.get(index).addValue(document.get("_id").toString());
+                    columns.get(index).setPrimaryKey(true);
+                } else {
+                    String value = (String) document.get(keys.get(1));
+                    String[] values = value.split("#");
+//                    System.out.println("key: " + i + " value: " + values[i-1]);
+                    columns.get(index).addValue(values[i-1]);
                 }
                 index++;
+
+
             }
 
 
