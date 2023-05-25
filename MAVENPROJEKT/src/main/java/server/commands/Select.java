@@ -210,7 +210,7 @@ public class Select {
                     for (Attribute attribute : attributes) {
                         if (attribute.get_attributeName().equals(attributeName)) {
                             attributeExists = true;
-                            attributeType = attribute.get_type();
+                            attributeType = attribute.get_type().toLowerCase();
                             break;
                         }
                     }
@@ -296,54 +296,70 @@ public class Select {
                             MongoCollection<Document> tableCollection = db.getCollection(fromTable);
 
                             Bson filter = null;
-                            switch (attributeType) {
-                                case "int" -> {
-                                    int intValue = Integer.parseInt(value);
-                                    switch (operator) {
-                                        case "=" -> filter = eq(attributeName, intValue);
-                                        case "<" -> filter = lt(attributeName, intValue);
-                                        case ">" -> filter = gt(attributeName, intValue);
-                                        case "<=" -> filter = lte(attributeName, intValue);
-                                        case ">=" -> filter = gte(attributeName, intValue);
-                                        case "!=" -> filter = ne(attributeName, intValue);
-                                        default -> {
-                                            parser.setOtherError("Operator " + operator + " is not supported");
-                                            return;
-                                        }
-                                    }
-                                }
-                                case "float" -> {
-                                    float floatValue = Float.parseFloat(value);
-                                    switch (operator) {
-                                        case "=" -> filter = eq(attributeName, floatValue);
-                                        case "<" -> filter = lt(attributeName, floatValue);
-                                        case ">" -> filter = gt(attributeName, floatValue);
-                                        case "<=" -> filter = lte(attributeName, floatValue);
-                                        case ">=" -> filter = gte(attributeName, floatValue);
-                                        case "!=" -> filter = ne(attributeName, floatValue);
-                                        default -> {
-                                            parser.setOtherError("Operator " + operator + " is not supported");
-                                            return;
-                                        }
-                                    }
-                                }
-                                case "varchar", "date" -> {
-                                    switch (operator) {
-                                        case "=" -> filter = eq("_id", value);
-                                        case "<" -> filter = lt("_id", value);
-                                        case ">" -> filter = gt("_id", value);
-                                        case "<=" -> filter = lte("_id", value);
-                                        case ">=" -> filter = gte("_id", value);
-                                        case "!=" -> filter = ne("_id", value);
-                                        default -> {
-                                            parser.setOtherError("Operator " + operator + " is not supported");
-                                            return;
-                                        }
-                                    }
+//                            switch (attributeType) {
+//                                case "int" -> {
+//                                    int intValue = Integer.parseInt(value);
+//                                    System.out.println("int value: " + intValue);
+//                                    switch (operator) {
+//                                        case "=" -> filter = eq("_id", intValue);
+//                                        case "<" -> filter = lt("_id", intValue);
+//                                        case ">" -> filter = gt("_id", intValue);
+//                                        case "<=" -> filter = lte("_id", intValue);
+//                                        case ">=" -> filter = gte("_id", intValue);
+//                                        case "!=" -> filter = ne("_id", intValue);
+//                                        default -> {
+//                                            parser.setOtherError("Operator " + operator + " is not supported");
+//                                            return;
+//                                        }
+//                                    }
+//                                }
+//                                case "float" -> {
+//                                    float floatValue = Float.parseFloat(value);
+//                                    System.out.println("float value: " + floatValue);
+//                                    switch (operator) {
+//                                        case "=" -> filter = eq("_id", floatValue);
+//                                        case "<" -> filter = lt("_id", floatValue);
+//                                        case ">" -> filter = gt("_id", floatValue);
+//                                        case "<=" -> filter = lte("_id", floatValue);
+//                                        case ">=" -> filter = gte("_id", floatValue);
+//                                        case "!=" -> filter = ne("_id", floatValue);
+//                                        default -> {
+//                                            parser.setOtherError("Operator " + operator + " is not supported");
+//                                            return;
+//                                        }
+//                                    }
+//                                }
+//                                case "varchar", "date" -> {
+//                                    switch (operator) {
+//                                        case "=" -> filter = eq("_id", value);
+//                                        case "<" -> filter = lt("_id", value);
+//                                        case ">" -> filter = gt("_id", value);
+//                                        case "<=" -> filter = lte("_id", value);
+//                                        case ">=" -> filter = gte("_id", value);
+//                                        case "!=" -> filter = ne("_id", value);
+//                                        default -> {
+//                                            parser.setOtherError("Operator " + operator + " is not supported");
+//                                            return;
+//                                        }
+//                                    }
+//                                }
+//                            }
+
+                            switch (operator) {
+                                case "=" -> filter = eq("_id", value);
+                                case "<" -> filter = lt("_id", value);
+                                case ">" -> filter = gt("_id", value);
+                                case "<=" -> filter = lte("_id", value);
+                                case ">=" -> filter = gte("_id", value);
+                                case "!=" -> filter = ne("_id", value);
+                                default -> {
+                                    parser.setOtherError("Operator " + operator + " is not supported");
+                                    return;
                                 }
                             }
-
-
+                            if (filter == null) {
+                                System.out.println("FILTER NULL");
+                            }
                             ArrayList<Document> filteredDocuments = tableCollection.find(filter).into(new ArrayList<>());
                             arrayLists.add(filteredDocuments);
                             // unique index esetén
@@ -351,54 +367,74 @@ public class Select {
                             System.out.println("Van index a " + attributeName + " attribútumra");
                             MongoCollection<Document> indexCollection = db.getCollection(indexName);
 
+                            System.out.println("Attribute type: " + attributeType);
                             Bson filter = null;
-                            switch (attributeType) {
-                                case "int" -> {
-                                    int intValue = Integer.parseInt(value);
-                                    switch (operator) {
-                                        case "=" -> filter = eq(attributeName, intValue);
-                                        case "<" -> filter = lt(attributeName, intValue);
-                                        case ">" -> filter = gt(attributeName, intValue);
-                                        case "<=" -> filter = lte(attributeName, intValue);
-                                        case ">=" -> filter = gte(attributeName, intValue);
-                                        case "!=" -> filter = ne(attributeName, intValue);
-                                        default -> {
-                                            parser.setOtherError("Operator " + operator + " is not supported");
-                                            return;
-                                        }
-                                    }
-                                }
-                                case "float" -> {
-                                    float floatValue = Float.parseFloat(value);
-                                    switch (operator) {
-                                        case "=" -> filter = eq(attributeName, floatValue);
-                                        case "<" -> filter = lt(attributeName, floatValue);
-                                        case ">" -> filter = gt(attributeName, floatValue);
-                                        case "<=" -> filter = lte(attributeName, floatValue);
-                                        case ">=" -> filter = gte(attributeName, floatValue);
-                                        case "!=" -> filter = ne(attributeName, floatValue);
-                                        default -> {
-                                            parser.setOtherError("Operator " + operator + " is not supported");
-                                            return;
-                                        }
-                                    }
-                                }
-                                case "varchar", "date" -> {
-                                    switch (operator) {
-                                        case "=" -> filter = eq("_id", value);
-                                        case "<" -> filter = lt("_id", value);
-                                        case ">" -> filter = gt("_id", value);
-                                        case "<=" -> filter = lte("_id", value);
-                                        case ">=" -> filter = gte("_id", value);
-                                        case "!=" -> filter = ne("_id", value);
-                                        default -> {
-                                            parser.setOtherError("Operator " + operator + " is not supported");
-                                            return;
-                                        }
-                                    }
+//                            switch (attributeType) {
+//                                case "int" -> {
+//                                    int intValue = Integer.parseInt(value);
+//                                    System.out.println("int value: " + intValue);
+//                                    switch (operator) {
+//                                        case "=" -> filter = eq("_id", intValue);
+//                                        case "<" -> filter = lt("_id", intValue);
+//                                        case ">" -> filter = gt("_id", intValue);
+//                                        case "<=" -> filter = lte("_id", intValue);
+//                                        case ">=" -> filter = gte("_id", intValue);
+//                                        case "!=" -> filter = ne("_id", intValue);
+//                                        default -> {
+//                                            parser.setOtherError("Operator " + operator + " is not supported");
+//                                            return;
+//                                        }
+//                                    }
+//                                }
+//                                case "float" -> {
+//                                    float floatValue = Float.parseFloat(value);
+//                                    System.out.println("float value: " + floatValue);
+//                                    switch (operator) {
+//                                        case "=" -> filter = eq("_id", floatValue);
+//                                        case "<" -> filter = lt("_id", floatValue);
+//                                        case ">" -> filter = gt("_id", floatValue);
+//                                        case "<=" -> filter = lte("_id", floatValue);
+//                                        case ">=" -> filter = gte("_id", floatValue);
+//                                        case "!=" -> filter = ne("_id", floatValue);
+//                                        default -> {
+//                                            parser.setOtherError("Operator " + operator + " is not supported");
+//                                            return;
+//                                        }
+//                                    }
+//                                }
+//                                case "varchar", "date" -> {
+//                                    switch (operator) {
+//                                        case "=" -> filter = eq("_id", value);
+//                                        case "<" -> filter = lt("_id", value);
+//                                        case ">" -> filter = gt("_id", value);
+//                                        case "<=" -> filter = lte("_id", value);
+//                                        case ">=" -> filter = gte("_id", value);
+//                                        case "!=" -> filter = ne("_id", value);
+//                                        default -> {
+//                                            parser.setOtherError("Operator " + operator + " is not supported");
+//                                            return;
+//                                        }
+//                                    }
+//                                }
+//                            }
+                            switch (operator) {
+                                case "=" -> filter = eq("_id", value);
+                                case "<" -> filter = lt("_id", value);
+                                case ">" -> filter = gt("_id", value);
+                                case "<=" -> filter = lte("_id", value);
+                                case ">=" -> filter = gte("_id", value);
+                                case "!=" -> filter = ne("_id", value);
+                                default -> {
+                                    parser.setOtherError("Operator " + operator + " is not supported");
+                                    return;
                                 }
                             }
 
+                            if (filter == null) {
+                                System.out.println("FILTER NULL");
+                            }
+
+                            System.out.println(indexCollection.find(filter).into(new ArrayList<>()));
 
                             ArrayList<Document> filteredDocuments = indexCollection.find(filter).into(new ArrayList<>());
 
@@ -414,6 +450,7 @@ public class Select {
                             arrayLists.add(result);
                             // nem indexelt esetén
                         } else {
+                            System.out.println("Nincs index");
                             MongoCollection<Document> collection = db.getCollection(fromTable);
                             ArrayList<Document> filteredDocuments = new ArrayList<>();
                             for (Document document : collection.find()) {
@@ -424,7 +461,7 @@ public class Select {
                                 String[] split = row.split("#");
                                 System.out.println("split: " + Arrays.toString(split));
                                 System.out.println("attributeIndexDB: " + attributeIndexDB);
-                                String attributeValue = split[attributeIndexDB];
+                                String attributeValue = split[attributeIndexDB - 1];
                                 System.out.println("attributeValue: " + attributeValue);
                                 switch (attributeType.toLowerCase()) {
                                     case "int" -> {
@@ -566,6 +603,7 @@ public class Select {
                 }
             }
             ArrayList<Document> result = arrayLists.get(0);
+            System.out.println("arrayLists.size() : " + arrayLists.size());
             for (int i = 1; i < arrayLists.size(); i++) {
                 result = ArrayListIntersection(result, arrayLists.get(i));
             }
