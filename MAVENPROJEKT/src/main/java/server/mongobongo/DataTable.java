@@ -14,6 +14,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DataTable implements Serializable {
@@ -65,6 +66,8 @@ public class DataTable implements Serializable {
         this.databaseName = "tempDB";
         this.tableName = "tempTable";
         columns = new ArrayList<>();
+//        System.out.println("Projecting columns"+columnNames.toString());
+
         buildColumns(columnNames, tableStructure);
 
         setData(documentList);
@@ -75,19 +78,18 @@ public class DataTable implements Serializable {
         columns = new ArrayList<>();
 
         ArrayList<Attribute> attributes = table.zAttributumok();
-        System.out.println("Projecting columns");
-        for (String cn : columnNames) {
-            System.out.println(cn);
-        }
-        System.out.println("end");
+//        for (String cn : columnNames) {
+//            System.out.println(cn);
+//        }
+//        System.out.println("end");
         int index = 0;
         for (Attribute attribute : attributes) {
-            System.out.println(attribute.get_attributeName());
+//            System.out.println(attribute.get_attributeName());
                 if (columnNames.contains(attribute.get_attributeName())) {
                     DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
                     columns.add(dataColumn);
                     selectedColumnIndexes.add(index);
-                    System.out.println("!Adding column: " + attribute.get_attributeName());
+//                    System.out.println("!Adding column: " + attribute.get_attributeName());
                 }
 
             index++;
@@ -101,19 +103,24 @@ public class DataTable implements Serializable {
 
         for (Document document : documents) {
             int index = 0;
-//            System.out.println("Selected columns:");
 
             ArrayList<String> keys = new ArrayList<>(document.keySet());
+//            System.out.println("Projecting colum indexes:"+selectedColumnIndexes.toString());
+
 //            System.out.println("keys: " + keys.size());
+//            System.out.println("keys: " + keys.toString());
+
             for (Integer i : selectedColumnIndexes) {
-                System.out.println(i);
+//                System.out.println(i);
 
                 if (i==0){
                     columns.get(index).addValue(document.get("_id").toString());
                     columns.get(index).setPrimaryKey(true);
                 } else {
                     String value = (String) document.get(keys.get(1));
+//                    System.out.println("-key: " + i + " : " + keys.get(1));
                     String[] values = value.split("#");
+//                    System.out.println(Arrays.toString(values));
 //                    System.out.println("key: " + i + " value: " + values[i-1]);
                     columns.get(index).addValue(values[i-1]);
                 }
@@ -169,6 +176,48 @@ public class DataTable implements Serializable {
 
     public String getTableName() {
         return tableName;
+    }
+
+
+    public int[] quicSort(int[] arr){
+        if(arr.length <= 1) {
+            return arr;
+        }
+        int pivot = arr[0];
+        int[] left = new int[arr.length];
+        int[] right = new int[arr.length];
+        int leftCount = 0;
+        int rightCount = 0;
+        for(int i = 1; i < arr.length; i++) {
+            if(arr[i] < pivot) {
+                left[leftCount++] = arr[i];
+            } else {
+                right[rightCount++] = arr[i];
+            }
+        }
+        int[] leftSorted = quicSort(Arrays.copyOfRange(left, 0, leftCount));
+        int[] rightSorted = quicSort(Arrays.copyOfRange(right, 0, rightCount));
+        int[] sorted = new int[arr.length];
+        System.arraycopy(leftSorted, 0, sorted, 0, leftCount);
+        sorted[leftCount] = pivot;
+        System.arraycopy(rightSorted, 0, sorted, leftCount + 1, rightCount);
+        return sorted;
+    }
+    public void sort(int index) {
+        int[] indexLocal = new int[columns.size()];
+        for (int i = 0; i < indexLocal.length; i++) {
+            indexLocal[i] = i;
+        }
+        int temp = indexLocal[columns.size()];
+        ArrayList<String> tmp = getColumns().get(index).getValues();
+        int[] tmp2 = new int[tmp.size()];
+        for (int i = 0; i < tmp.size(); i++) {
+           tmp2[i] = Integer.parseInt(tmp.get(i));
+        }
+        int [] tmp3 = quicSort(tmp2);
+
+
+
     }
 
     public String setCatalogData(String databaseName, String tableName) {

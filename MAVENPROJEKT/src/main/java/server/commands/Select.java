@@ -5,6 +5,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import server.Parser;
@@ -24,13 +25,17 @@ import static com.mongodb.client.model.Filters.*;
 public class Select {
 
     private DataTable resultTable;
+
+    private ArrayList<DataTable> resultTables;
     private final ArrayList<String> selectedColums;
     private final String fromTable;
-    private final String[] joinClause;
+    private final String joinClause;
+
+    private final String[] joinTables;
     private final String[] whereClause;
     private String[] groupBy;
 
-    private final String database;
+    private final String currentDatabase;
     private final Parser parser;
 
     private ArrayList<Document> ArrayListIntersection(ArrayList<Document> list1, ArrayList<Document> list2) {
@@ -47,37 +52,9 @@ public class Select {
         return result;
     }
 
-    public Select(String currentDatabase, String text, Parser parser) {
+    public void where(String currentTable,ArrayList<String> selectedColums, String[] whereClause) {
         String connectionString = "mongodb://localhost:27017";
-        this.parser = parser;
-        database = currentDatabase;
-
-        selectedColums = selectedColums(text);
-        System.out.println("Selected columns: ");
-        for (String an : selectedColums) {
-            System.out.print(an + " ");
-        }
-        System.out.println();
-        fromTable = fromTables(text);
-        System.out.println("Table: " + fromTable);
-
-        System.out.println();
-        joinClause = joinClause(text);
-        System.out.println("Join clause: ");
-        for (String an : joinClause) {
-            System.out.print(an + " ");
-        }
-        System.out.println();
-
-        whereClause = whereClause(text);
-        System.out.println("Where clause: ");
-        for (String an : whereClause) {
-            System.out.print("|" + an + "| ");
-        }
-        System.out.println();
-
         // SELECT * FROM table
-//        if (selectedColums.get(0).equals("*") && selectedColums.size() == 1) {
         System.out.println("SELECT * FROM table eset");
 //        ArrayList<String> columnNames = new ArrayList<>();
 //        columnNames.add("*");
@@ -111,7 +88,7 @@ public class Select {
                         return;
                     }
                     for (Table table : tableList) {
-                        if (table.get_tableName().equals(fromTable)) {
+                        if (table.get_tableName().equals(currentTable)) {
                             tableExists = true;
                             myTable = table;
                             break;
@@ -120,7 +97,7 @@ public class Select {
                 }
             }
             if (!tableExists) {
-                parser.setOtherError("Table " + fromTable + " does not exist");
+                parser.setOtherError("Table " + currentTable + " does not exist");
                 return;
             }
             if (selectedColums.get(0).equals("*") && selectedColums.size() == 1) {
@@ -131,25 +108,29 @@ public class Select {
                     columnTypes.add(attribute.get_type());
                 }
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         System.out.println("Where clause length: " + whereClause.length);
         System.out.println("Where clause: " + Arrays.toString(whereClause));
-
+        System.out.println("Where clause 0: " + whereClause[0]);
         // SELECT * FROM table
-        if (whereClause.length == 0 || whereClause[0].equals("")) {
+        if (whereClause.length == 1 && whereClause[0].equals("")) {
 
             System.out.println("Nincs where");
             try (MongoClient mongoClient = create(connectionString)) {
                 Table tableStructure = findTableInCatalog();
                 MongoDatabase db = mongoClient.getDatabase(currentDatabase);
-                MongoCollection<Document> collection = db.getCollection(fromTable);
+                MongoCollection<Document> collection = db.getCollection(currentTable);
                 ArrayList<Document> documents = collection.find().into(new ArrayList<>());
                 resultTable = new DataTable(documents, tableStructure, selectedColums, parser);
-                resultTable.setTableName(fromTable);
+                resultTable.setTableName(currentTable);
                 resultTable.setDatabaseName(currentDatabase);
+                resultTables.add(resultTable);
+                System.out.println("Result table created");
+                return;
             }
         }
         // SELECT * FROM table WHERE condition(s)
@@ -192,7 +173,7 @@ public class Select {
                                 return;
                             }
                             for (Table table : tableList) {
-                                if (table.get_tableName().equals(fromTable)) {
+                                if (table.get_tableName().equals(currentTable)) {
                                     tableExists = true;
                                     myTable = table;
                                     break;
@@ -201,7 +182,7 @@ public class Select {
                         }
                     }
                     if (!tableExists) {
-                        parser.setOtherError("Table " + fromTable + " does not exist");
+                        parser.setOtherError("Table " + currentTable + " does not exist");
                         return;
                     }
 
@@ -293,58 +274,9 @@ public class Select {
                         // primary key esetén
                         if (isPk || indexType.equals("primary")) {
                             System.out.println("primary key eset " + attributeName);
-                            MongoCollection<Document> tableCollection = db.getCollection(fromTable);
+                            MongoCollection<Document> tableCollection = db.getCollection(currentTable);
 
-                            Bson filter = null;
-//                            switch (attributeType) {
-//                                case "int" -> {
-//                                    int intValue = Integer.parseInt(value);
-//                                    System.out.println("int value: " + intValue);
-//                                    switch (operator) {
-//                                        case "=" -> filter = eq("_id", intValue);
-//                                        case "<" -> filter = lt("_id", intValue);
-//                                        case ">" -> filter = gt("_id", intValue);
-//                                        case "<=" -> filter = lte("_id", intValue);
-//                                        case ">=" -> filter = gte("_id", intValue);
-//                                        case "!=" -> filter = ne("_id", intValue);
-//                                        default -> {
-//                                            parser.setOtherError("Operator " + operator + " is not supported");
-//                                            return;
-//                                        }
-//                                    }
-//                                }
-//                                case "float" -> {
-//                                    float floatValue = Float.parseFloat(value);
-//                                    System.out.println("float value: " + floatValue);
-//                                    switch (operator) {
-//                                        case "=" -> filter = eq("_id", floatValue);
-//                                        case "<" -> filter = lt("_id", floatValue);
-//                                        case ">" -> filter = gt("_id", floatValue);
-//                                        case "<=" -> filter = lte("_id", floatValue);
-//                                        case ">=" -> filter = gte("_id", floatValue);
-//                                        case "!=" -> filter = ne("_id", floatValue);
-//                                        default -> {
-//                                            parser.setOtherError("Operator " + operator + " is not supported");
-//                                            return;
-//                                        }
-//                                    }
-//                                }
-//                                case "varchar", "date" -> {
-//                                    switch (operator) {
-//                                        case "=" -> filter = eq("_id", value);
-//                                        case "<" -> filter = lt("_id", value);
-//                                        case ">" -> filter = gt("_id", value);
-//                                        case "<=" -> filter = lte("_id", value);
-//                                        case ">=" -> filter = gte("_id", value);
-//                                        case "!=" -> filter = ne("_id", value);
-//                                        default -> {
-//                                            parser.setOtherError("Operator " + operator + " is not supported");
-//                                            return;
-//                                        }
-//                                    }
-//                                }
-//                            }
-
+                            Bson filter = empty();
                             switch (operator) {
                                 case "=" -> filter = eq("_id", value);
                                 case "<" -> filter = lt("_id", value);
@@ -357,12 +289,16 @@ public class Select {
                                     return;
                                 }
                             }
+                            System.out.println("Filter: " + filter);
                             if (filter == null) {
                                 System.out.println("FILTER NULL");
                             }
+//                            use mongo cursor and sort
+
+
                             ArrayList<Document> filteredDocuments = tableCollection.find(filter).into(new ArrayList<>());
+                            System.out.println("Filtered documents: " + filteredDocuments.toString());
                             arrayLists.add(filteredDocuments);
-                            // unique index esetén
                         } else if (indexExists && indexType.equals("unique")) {
                             System.out.println("Van index a " + attributeName + " attribútumra");
                             MongoCollection<Document> indexCollection = db.getCollection(indexName);
@@ -442,16 +378,17 @@ public class Select {
                             // using the index to get the documents from the table
                             for (Document document : filteredDocuments) {
                                 String indexvalue = document.getString("indexvalue");
-                                MongoCollection<Document> tableCollection = db.getCollection(fromTable);
+                                MongoCollection<Document> tableCollection = db.getCollection(currentTable);
                                 Bson pkFilter = eq("_id", indexvalue);
                                 Document resultDocument = tableCollection.find(pkFilter).first();
                                 result.add(resultDocument);
                             }
                             arrayLists.add(result);
+
                             // nem indexelt esetén
                         } else {
                             System.out.println("Nincs index");
-                            MongoCollection<Document> collection = db.getCollection(fromTable);
+                            MongoCollection<Document> collection = db.getCollection(currentTable);
                             ArrayList<Document> filteredDocuments = new ArrayList<>();
                             for (Document document : collection.find()) {
                                 String pk = document.getString("_id");
@@ -621,9 +558,79 @@ public class Select {
             }
             Table tableStructure = findTableInCatalog();
             resultTable = new DataTable(result, tableStructure, selectedColums, parser);
-            resultTable.setTableName(fromTable);
+            resultTable.setTableName(currentTable);
             resultTable.setDatabaseName(currentDatabase);
+            resultTables.add(resultTable);
         }
+    }
+
+    public Select(String currentDatabase, String text, Parser parser) {
+        String connectionString = "mongodb://localhost:27017";
+        this.parser = parser;
+        this.currentDatabase = currentDatabase;
+        resultTables = new ArrayList<>();
+        selectedColums = selectedColums(text);
+        System.out.println("Selected columns: ");
+        for (String an : selectedColums) {
+            System.out.print(an + " ");
+        }
+        System.out.println();
+        fromTable = fromTables(text);
+        System.out.println("Table: " + fromTable);
+
+        System.out.println();
+        joinClause = joinClause(text);
+        System.out.println("Join clause: ");
+        System.out.println(joinClause);
+        System.out.println();
+
+        joinTables = joinTables(joinClause);
+        System.out.println("Join tables: ");
+        for (String an : joinTables) {
+            System.out.print(an + " ");
+        }
+
+        whereClause = whereClause(text);
+        System.out.println("Where clause: ");
+        for (String an : whereClause) {
+            System.out.print("|" + an + "| ");
+        }
+        System.out.println();
+        where(fromTable,selectedColums, whereClause);
+
+
+        if (joinTables.length == 1 && joinTables[0].equals("")) {
+            System.out.println("Join tables is empty");
+            return;
+        }
+//        for (int i=0;i< joinTables.length;i++) {
+//            String[] empty = new String[1];
+//            empty[0] = "";
+//            System.out.println("Join table: "+joinTables[i]);
+//            ArrayList<String> joinTableColumns = new ArrayList<>();
+//            joinTableColumns.add("*");
+//            where(joinTables[i],joinTableColumns,empty);
+//        }
+
+
+//            System.out.println("Join clause is not empty");
+//            Join joinRes = new Join(resultTables, joinClause, parser);
+//            resultTable = joinRes.getResultTable();
+    }
+    private String[] joinTables(String joinClause) {
+        ArrayList<String> ans = new ArrayList<>();
+        String[] joinClauseSplit = joinClause.split(" ");
+        ans.add(joinClauseSplit[0]);
+        for (int i = 1; i < joinClauseSplit.length; i++) {
+            if (joinClauseSplit[i].equals("JOIN")) {
+                ans.add(joinClauseSplit[i + 1]);
+            }
+        }
+        String[] ansArray = new String[ans.size()];
+        for (int i = 0; i < ans.size(); i++) {
+            ansArray[i] = ans.get(i);
+        }
+        return ansArray;
     }
 
     public String betweenString(String text, String start, String end) {
@@ -668,7 +675,7 @@ public class Select {
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
             List<Database> databaseList = databases.getDatabases();
             for (Database db : databaseList) {
-                if (db.get_dataBaseName().equals(this.database)) {
+                if (db.get_dataBaseName().equals(this.currentDatabase)) {
                     List<Table> tableList = db.getTables();
                     for (Table table : tableList) {
                         if (table.get_tableName().equals(this.fromTable)) {
@@ -697,14 +704,11 @@ public class Select {
         }
     }
 
-    public String[] joinClause(String text) {
+    public String joinClause(String text) {
 //        INNER JOIN ans WHERE
         String data = betweenString(text, "INNER JOIN", "WHERE");
-        String[] ans = data.split(",");
-        for (int i = 0; i < ans.length; i++) {
-            ans[i] = ans[i].trim();
-        }
-        return new String[]{data.trim()};
+//
+        return new String(data.trim());
     }
 
     public String[] whereClause(String text) {
@@ -725,29 +729,8 @@ public class Select {
 
     }
 
-    public ArrayList<DataTable> getBaseTables() {
-
-        ArrayList<DataTable> tables = new ArrayList<>();
-        JFrame frame = new JFrame("Select");
-
-        System.out.println("\nDatabase: |" + database + "| Table: |" + fromTable + "|\n");
-        tables.add(new DataTable(database, fromTable, parser));
-        resultTable = tables.get(0);
-        JFrame jf = new JFrame();
-        jf.setSize(400, 300);
-        jf.setLayout(new FlowLayout());
-        jf.setBackground(new Color(203, 141, 141));
-        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
-        System.out.println("Tables: ");
-
-        jf.setVisible(true);
-        return tables;
-
-    }
-
     public DataTable getResultTable() {
-        return resultTable;
+        System.out.println("Result table: " + resultTable);
+        return resultTables.get(0);
     }
 }
