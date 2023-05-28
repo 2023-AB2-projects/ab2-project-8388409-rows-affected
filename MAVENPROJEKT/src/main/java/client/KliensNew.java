@@ -487,9 +487,19 @@ public class KliensNew extends JFrame implements Runnable {
             }
             send = true;
         });
-        tabbedPane.addChangeListener(e -> {
-            if (tabbedPane.getSelectedComponent() == this) {
+
+        JButton popOut = new JButton("PopOut");
+        popOut.addActionListener(e -> {
+            QueryPanel queryPanel = tabbedPane.getSelectedComponent() instanceof QueryPanel ? (QueryPanel) tabbedPane.getSelectedComponent() : null;
+            if (queryPanel != null) {
+               queryPanel.pop();
             }
+        });
+        queryPanelOptions.add(popOut);
+
+
+        tabbedPane.addChangeListener(e -> {
+            tabbedPane.getSelectedComponent();
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel) {
                 currentQueryPanel = (QueryPanel) tabbedPane.getSelectedComponent();
                 textArea = currentQueryPanel.getTextArea();

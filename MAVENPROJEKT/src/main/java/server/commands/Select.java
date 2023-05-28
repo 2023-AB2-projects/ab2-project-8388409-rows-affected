@@ -600,6 +600,8 @@ public class Select {
 
     public void addKeysToProjection(String keysArr){
 
+            if (keysArr.equals(""))
+                return;
 
             String tmp = keysArr.split("ON")[1];
             String[] arr = tmp.split("=");

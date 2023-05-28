@@ -16,6 +16,12 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
     private final JPanel resultPanel = new JPanel();
     private final JTabbedPane tabbedPane;
     private final KliensNew kliensNew;
+
+    private JScrollPane resultPanelSCR;
+
+    private JFrame frame;
+    private int pop = 0;
+
     public QueryPanel(KliensNew kliensNew, JTabbedPane tabbedPane){
         super();
 
@@ -54,7 +60,7 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
 //        resultPanel.setPreferredSize(new Dimension(400, 300));
 
 
-        JScrollPane resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         add(scrollText);
 //        add(resultPanel);
@@ -119,7 +125,44 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
         dataTable.getColumnsName().forEach(System.out::println);
 
     }
+    private void popBackPanel() {
+        frame.dispose();
+        resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        add(resultPanelSCR);
+        revalidate();
+    }
 
+    private void popOutPanel() {
+        remove(resultPanelSCR);
+        frame = new JFrame("Result");
+        frame.setSize(400, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+        frame.add(resultPanel);
+        frame.revalidate();
+        frame.setVisible(true);
+
+//        frame add close listener
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                popBackPanel();
+                pop = 0;
+            }
+        });
+
+        revalidate();
+    }
+
+    public void pop(){
+        if (pop == 0){
+            popOutPanel();
+            pop = 1;
+        } else {
+            popBackPanel();
+            pop = 0;
+        }
+    }
 
     public JTextArea getOutText() {
         return outText;
