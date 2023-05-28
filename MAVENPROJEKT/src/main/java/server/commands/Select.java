@@ -55,7 +55,7 @@ public class Select {
         return result;
     }
 
-    public void where(String currentTable,ArrayList<String> selectedColums, String[] whereClause) {
+    public void where(String currentTable, ArrayList<String> selectedColums, String[] whereClause) {
         String connectionString = "mongodb://localhost:27017";
         // SELECT * FROM table
         System.out.println("SELECT * FROM table eset");
@@ -439,8 +439,8 @@ public class Select {
                                         int attributeValueInt = Integer.parseInt(attributeValue);
                                         int valueInt = Integer.parseInt(value);
 
-                                        System.out.println("attributeValueInt: " + attributeValueInt*10);
-                                        System.out.println("valueInt: " + valueInt*10);
+                                        System.out.println("attributeValueInt: " + attributeValueInt * 10);
+                                        System.out.println("valueInt: " + valueInt * 10);
 
                                         switch (operator) {
                                             case "=" -> {
@@ -598,10 +598,11 @@ public class Select {
         }
     }
 
-    public void addKeysToProjection(String keysArr){
+    public int addKeysToProjection(String keysArr) {
 
+//        try {
             if (keysArr.equals(""))
-                return;
+                return 0;
 
             String tmp = keysArr.split("ON")[1];
             String[] arr = tmp.split("=");
@@ -616,14 +617,19 @@ public class Select {
 
                 if (!columns.contains(columnName))
                     columns.add(columnName);
-                    joinKeys.add(columnName);
+                joinKeys.add(columnName);
             }
-
-
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println(e.getMessage());
+//            parser.setOtherError("Invalid join keys");
+//            return -1;
+//        }
+        return 0;
 
     }
 
-    public void processProjection(ArrayList<String> selectedColums){
+    public void processProjection(ArrayList<String> selectedColums) {
 
         if (selectedColums.contains("*")) {
             ArrayList<String> columns = tableProjectionMap.get(fromTable);
@@ -634,7 +640,7 @@ public class Select {
                 columns.add(attribute.get_attributeName());
             }
 
-            if (!(joinTables.length == 1 && joinTables[0].equals(""))){
+            if (!(joinTables.length == 1 && joinTables[0].equals(""))) {
                 for (String joinTable : joinTables) {
                     ArrayList<String> joinColumns = tableProjectionMap.get(joinTable);
                     Table table = findTableInCatalog(joinTable);
@@ -665,7 +671,7 @@ public class Select {
 
 
             } catch (Exception e) {
-
+                e.printStackTrace();
                 parser.setOtherError("Column " + column + " is not found");
                 return;
             }
@@ -714,7 +720,9 @@ public class Select {
         System.out.println();
         processProjection(selectedColums);
 
-        addKeysToProjection(joinClause);
+        if (addKeysToProjection(joinClause) != 0)
+            return;
+//        addKeysToProjection(joinClause);
         System.out.println("Table projection map: ");
         for (ArrayList<String> columns1 : tableProjectionMap.values()) {
             for (String column : columns1) {
@@ -723,27 +731,28 @@ public class Select {
             System.out.println();
         }
 
-        where(fromTable,tableProjectionMap.get(fromTable), whereClause);
+        where(fromTable, tableProjectionMap.get(fromTable), whereClause);
 
 
         if (joinTables.length == 1 && joinTables[0].equals("")) {
             System.out.println("Join tables is empty");
             return;
         }
-        for (int i=0;i< joinTables.length;i++) {
+        for (int i = 0; i < joinTables.length; i++) {
             String[] empty = new String[1];
             empty[0] = "";
-            System.out.println("Join table: "+joinTables[i]);
+            System.out.println("Join table: " + joinTables[i]);
             ArrayList<String> joinTableColumns = new ArrayList<>();
             joinTableColumns.add("*");
-            where(joinTables[i],tableProjectionMap.get(joinTables[i]),empty);
+            where(joinTables[i], tableProjectionMap.get(joinTables[i]), empty);
         }
 
 
-            System.out.println("Join clause is not empty");
-            Join joinRes = new Join(resultTables, joinClause, joinKeys,parser);
-            resultTables.set(0,joinRes.getResultTable());
+        System.out.println("Join clause is not empty");
+        Join joinRes = new Join(resultTables, joinClause, joinKeys, parser);
+        resultTables.set(0, joinRes.getResultTable());
     }
+
     private String[] joinTables(String joinClause) {
         ArrayList<String> ans = new ArrayList<>();
         String[] joinClauseSplit = joinClause.split(" ");
@@ -776,11 +785,11 @@ public class Select {
         if (endindex == -1) {
             endindex = text.length();
         }
-        System.out.println("- start: "+start+" startindex: "+startindex);
-        System.out.println("- end: "+end+" endindex: "+endindex);
+        System.out.println("- start: " + start + " startindex: " + startindex);
+        System.out.println("- end: " + end + " endindex: " + endindex);
 
         ans = text.substring(startindex + start.length(), endindex);
-        System.out.println("- ans:"+ans);
+        System.out.println("- ans:" + ans);
         return ans;
     }
 
@@ -857,8 +866,16 @@ public class Select {
     }
 
     public DataTable getResultTable() {
-        System.out.println("Result table: " + resultTables.get(0).getTableName());
+        try {
+            System.out.println("Result table: " + resultTables.get(0).getTableName());
+            return new DataTable(resultTables.get(0));
+        } catch (Exception e) {
+            e.printStackTrace();
+            parser.setOtherError("Error in where clause");
+            parser.setParserError(true);
+            System.out.println(e.getMessage());
+            return new DataTable();
+        }
 
-        return new DataTable(resultTables.get(0));
     }
 }
