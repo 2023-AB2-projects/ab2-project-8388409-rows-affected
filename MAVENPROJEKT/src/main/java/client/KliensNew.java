@@ -76,6 +76,7 @@ public class KliensNew extends JFrame implements Runnable {
         visualQueryDesignerOptions = new JPanel();
 
         rightPanelTabs.setPreferredSize(new Dimension(300, 700));
+        rightPanel.setLayout(new GridLayout(1, 10));
         rightPanelTabs.setEnabled(false);
         rightPanel.add(rightPanelTabs);
         rightPanelTabs.setVisible(false);
@@ -355,8 +356,8 @@ public class KliensNew extends JFrame implements Runnable {
         leftPanel.resizePanel(0, getHeight() / 8, getWidth() / 4, getHeight());
         rightPanel.resizePanel(getWidth() - getWidth() / 4, getHeight() / 8, getWidth() / 4, getHeight());
         topPanel.resizePanel(0, 0, getWidth(), getHeight() / 8);
-        tabbedPane.setBounds(getWidth() / 4, getHeight() / 8, getWidth() - getWidth() / 2, getHeight() - getHeight() / 4);
-        QueryPanel.setBounds(getWidth() / 4, getHeight() / 8, getWidth() - getWidth() / 2, getHeight() - getHeight() / 4);
+        tabbedPane.setBounds(getWidth() / 4, getHeight() / 8, getWidth() - getWidth() / 2, getHeight() - getHeight() / 6);
+        QueryPanel.setBounds(getWidth() / 4, getHeight() / 8, getWidth() - getWidth() / 2, getHeight() - getHeight() / 6);
         VisualQueryDesigner.setBounds(getWidth() / 4, getHeight() / 8, getWidth() - getWidth() / 2, getHeight());
         scrollTextResp.setBounds(getWidth() / 4, getHeight() / 8, getWidth() - getWidth() / 2, getHeight() - getHeight() / 4);
     }
@@ -476,7 +477,7 @@ public class KliensNew extends JFrame implements Runnable {
                                     }
                                 }
         );
-
+        execButton.setSize(100, 50);
         execButton.addActionListener(e -> {
 
             int id = tabbedPane.getSelectedIndex();
@@ -489,6 +490,7 @@ public class KliensNew extends JFrame implements Runnable {
         });
 
         JButton popOut = new JButton("PopOut");
+        popOut.setSize(100, 50);
         popOut.addActionListener(e -> {
             QueryPanel queryPanel = tabbedPane.getSelectedComponent() instanceof QueryPanel ? (QueryPanel) tabbedPane.getSelectedComponent() : null;
             if (queryPanel != null) {

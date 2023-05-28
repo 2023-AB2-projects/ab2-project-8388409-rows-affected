@@ -57,7 +57,7 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
 //        resultPanel.setLayout(new GridLayout(100, 0));
         resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
         resultPanel.add(new JLabel("Hello user!"));
-//        resultPanel.setPreferredSize(new Dimension(400, 300));
+        resultPanel.setPreferredSize(new Dimension(400, 300));
 
 
         resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
