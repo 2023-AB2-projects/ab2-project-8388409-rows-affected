@@ -1,10 +1,7 @@
 package server.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -273,6 +270,32 @@ public class Select {
 
                         // primary key esetén
                         if (isPk || indexType.equals("primary")) {
+//                            System.out.println("primary key eset " + attributeName);
+//                            MongoCollection<Document> tableCollection = db.getCollection(currentTable);
+//
+//                            Bson filter = empty();
+//                            switch (operator) {
+//                                case "=" -> filter = eq("_id", value);
+//                                case "<" -> filter = lt("_id", value);
+//                                case ">" -> filter = gt("_id", value);
+//                                case "<=" -> filter = lte("_id", value);
+//                                case ">=" -> filter = gte("_id", value);
+//                                case "!=" -> filter = ne("_id", value);
+//                                default -> {
+//                                    parser.setOtherError("Operator " + operator + " is not supported");
+//                                    return;
+//                                }
+//                            }
+//                            System.out.println("Filter: " + filter);
+//                            if (filter == null) {
+//                                System.out.println("FILTER NULL");
+//                            }
+////                            use mongo cursor and sort
+//
+//
+//                            ArrayList<Document> filteredDocuments = tableCollection.find(filter).into(new ArrayList<>());
+//                            System.out.println("Filtered documents: " + filteredDocuments.toString());
+//                            arrayLists.add(filteredDocuments);
                             System.out.println("primary key eset " + attributeName);
                             MongoCollection<Document> tableCollection = db.getCollection(currentTable);
 
@@ -290,15 +313,18 @@ public class Select {
                                 }
                             }
                             System.out.println("Filter: " + filter);
-                            if (filter == null) {
-                                System.out.println("FILTER NULL");
+
+                            MongoCursor<Document> cursor = tableCollection.find(filter).iterator();
+                            try {
+                                ArrayList<Document> filteredDocuments = new ArrayList<>();
+                                while (cursor.hasNext()) {
+                                    filteredDocuments.add(cursor.next());
+                                }
+                                System.out.println("Filtered documents: " + filteredDocuments.toString());
+                                arrayLists.add(filteredDocuments);
+                            } finally {
+                                cursor.close();
                             }
-//                            use mongo cursor and sort
-
-
-                            ArrayList<Document> filteredDocuments = tableCollection.find(filter).into(new ArrayList<>());
-                            System.out.println("Filtered documents: " + filteredDocuments.toString());
-                            arrayLists.add(filteredDocuments);
                         } else if (indexExists && indexType.equals("unique")) {
                             System.out.println("Van index a " + attributeName + " attribútumra");
                             MongoCollection<Document> indexCollection = db.getCollection(indexName);

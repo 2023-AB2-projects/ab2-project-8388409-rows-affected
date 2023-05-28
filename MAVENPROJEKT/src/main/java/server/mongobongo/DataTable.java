@@ -13,8 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 
 public class DataTable implements Serializable {
@@ -71,6 +70,14 @@ public class DataTable implements Serializable {
         buildColumns(columnNames, tableStructure);
 
         setData(documentList);
+    }
+
+    public DataTable(ArrayList<String> columnNames) {
+        columns = new ArrayList<>();
+        for (String columnName : columnNames) {
+            DataColumnModel dataColumn = new DataColumnModel(columnName, "String");
+            columns.add(dataColumn);
+        }
     }
 
 
@@ -203,22 +210,7 @@ public class DataTable implements Serializable {
         System.arraycopy(rightSorted, 0, sorted, leftCount + 1, rightCount);
         return sorted;
     }
-    public void sort(int index) {
-        int[] indexLocal = new int[columns.size()];
-        for (int i = 0; i < indexLocal.length; i++) {
-            indexLocal[i] = i;
-        }
-        int temp = indexLocal[columns.size()];
-        ArrayList<String> tmp = getColumns().get(index).getValues();
-        int[] tmp2 = new int[tmp.size()];
-        for (int i = 0; i < tmp.size(); i++) {
-           tmp2[i] = Integer.parseInt(tmp.get(i));
-        }
-        int [] tmp3 = quicSort(tmp2);
 
-
-
-    }
 
     public String setCatalogData(String databaseName, String tableName) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -388,5 +380,31 @@ public class DataTable implements Serializable {
 
     public void setDatabaseName(String fromDatabase) {
         this.databaseName = fromDatabase;
+    }
+
+    public ArrayList<Map<String, Object>> getRows() {
+        ArrayList<Map<String, Object>> rows = new ArrayList<>();
+        for (int i = 0; i < columns.get(0).getValues().size(); i++) {
+            Map<String, Object> row = new HashMap<>();
+            for (DataColumnModel column : columns) {
+                row.put(column.getColumnName(), column.getValues().get(i));
+            }
+            rows.add(row);
+        }
+        return rows;
+    }
+
+    public Collection<String> getColumnNames() {
+        Collection<String> columnNames = new ArrayList<>();
+        for (DataColumnModel column : columns) {
+            columnNames.add(column.getColumnName());
+        }
+        return columnNames;
+    }
+
+    public void addRow(Map<String, Object> row) {
+        for (DataColumnModel column : columns) {
+            column.addValue((String) row.get(column.getColumnName()));
+        }
     }
 }
