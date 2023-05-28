@@ -2,19 +2,14 @@ package server.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.*;
-import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import server.Parser;
 import server.jacksonclasses.*;
 import server.mongobongo.DataTable;
-import server.mongobongo.DataTableGUI;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.*;
 
 import static com.mongodb.client.MongoClients.create;
@@ -24,15 +19,15 @@ public class Select {
 
     private DataTable resultTable;
 
-    private HashMap<String, ArrayList<String>> tableProjectionMap;
+    private final HashMap<String, ArrayList<String>> tableProjectionMap;
 
-    private HashMap<String, ArrayList<String>> selectedColumsMap;
-    private ArrayList<DataTable> resultTables;
+    private final HashMap<String, ArrayList<String>> selectedColumsMap;
+    private final ArrayList<DataTable> resultTables;
     private final ArrayList<String> selectedColums;
     private final String fromTable;
     private final String joinClause;
 
-    private ArrayList<String> joinKeys;
+    private final ArrayList<String> joinKeys;
 
     private final String[] joinTables;
     private final String[] whereClause;
@@ -135,7 +130,6 @@ public class Select {
                 resultTable.setDatabaseName(currentDatabase);
                 resultTables.add(resultTable);
                 System.out.println("Result table created");
-                return;
             }
         }
         // SELECT * FROM table WHERE condition(s)
@@ -277,7 +271,7 @@ public class Select {
                         MongoDatabase db = mongoClient.getDatabase(currentDatabase);
 
                         // primary key esetén
-                        if (isPk || indexType.equals("primary")) {
+                        if (isPk && indexType.equals("primary")) {
 //                            System.out.println("primary key eset " + attributeName);
 //                            MongoCollection<Document> tableCollection = db.getCollection(currentTable);
 //
@@ -328,7 +322,7 @@ public class Select {
                                 while (cursor.hasNext()) {
                                     filteredDocuments.add(cursor.next());
                                 }
-                                System.out.println("Filtered documents: " + filteredDocuments.toString());
+                                System.out.println("Filtered documents: " + filteredDocuments);
                                 arrayLists.add(filteredDocuments);
                             } finally {
                                 cursor.close();
@@ -844,7 +838,7 @@ public class Select {
 //        INNER JOIN ans WHERE
         String data = betweenString(text, "INNER JOIN", "WHERE");
 //
-        return new String(data.trim());
+        return data.trim();
     }
 
     public String[] whereClause(String text) {
