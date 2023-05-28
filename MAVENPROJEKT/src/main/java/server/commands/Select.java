@@ -6,6 +6,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import server.Parser;
 import server.jacksonclasses.*;
+import server.mongobongo.DataColumnModel;
 import server.mongobongo.DataTable;
 
 import java.io.File;
@@ -50,9 +51,11 @@ public class Select {
         return result;
     }
 
-    public void where(String currentTable, ArrayList<String> selectedColums, String[] whereClause) {
+    public void where(String currentTable, String[] whereClause) {
         String connectionString = "mongodb://localhost:27017";
         // SELECT * FROM table
+        ArrayList<String>  selectedColums = new ArrayList<>();
+        selectedColums.add("*");
         System.out.println("SELECT * FROM table eset");
 //        ArrayList<String> columnNames = new ArrayList<>();
 //        columnNames.add("*");
@@ -98,15 +101,15 @@ public class Select {
                 parser.setOtherError("Table " + currentTable + " does not exist");
                 return;
             }
-//            if (selectedColums.get(0).equals("*") && selectedColums.size() == 1) {
-//                selectedColums.clear();
-//                List<Attribute> attributes = myTable.getStructure().getAttributes();
-//                for (Attribute attribute : attributes) {
-//                    System.out.println("Attribute: " + attribute.get_attributeName());
-//                    selectedColums.add(attribute.get_attributeName());
-//                    columnTypes.add(attribute.get_type());
-//                }
-//            }
+            if (selectedColums.get(0).equals("*") && selectedColums.size() == 1) {
+                selectedColums.clear();
+                List<Attribute> attributes = myTable.getStructure().getAttributes();
+                for (Attribute attribute : attributes) {
+                    System.out.println("Attribute: " + attribute.get_attributeName());
+                    selectedColums.add(attribute.get_attributeName());
+                    columnTypes.add(attribute.get_type());
+                }
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -592,36 +595,6 @@ public class Select {
         }
     }
 
-    public int addKeysToProjection(String keysArr) {
-
-//        try {
-            if (keysArr.equals(""))
-                return 0;
-
-            String tmp = keysArr.split("ON")[1];
-            String[] arr = tmp.split("=");
-            for (String s : arr) {
-                System.out.println("- join key: " + keysArr);
-                String[] split = s.split("\\.");
-                String tableName = split[0].trim();
-                String columnName = split[1].trim();
-                System.out.println("- join tableName: " + tableName);
-                System.out.println("- join columnName: " + columnName);
-                ArrayList<String> columns = tableProjectionMap.get(tableName);
-
-                if (!columns.contains(columnName))
-                    columns.add(columnName);
-                joinKeys.add(columnName);
-            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            System.out.println(e.getMessage());
-//            parser.setOtherError("Invalid join keys");
-//            return -1;
-//        }
-        return 0;
-
-    }
 
     public void processProjection(ArrayList<String> selectedColums) {
 
@@ -673,6 +646,31 @@ public class Select {
         }
     }
 
+    public void fiterSelectedTables(){
+        ArrayList<String> tmpS = new ArrayList<>();
+
+        for(String c : selectedColums){
+            if(c.contains(".")){
+                String[] split = c.split("\\.");
+                c = split[1];
+                System.out.println("S table: " + c);
+            }
+
+            tmpS.add(c);
+        }
+
+        DataTable tmp = resultTables.get(0);
+        for (String dcm: tmp.getColumnsName()) {
+//            if dcm contains . then split and check if table is in selected tables
+
+            if (!tmpS.contains(dcm)) {
+                System.out.println("Removing column: " + dcm);
+                tmp.removeColumn(dcm);
+            }
+
+        }
+    }
+
     public Select(String currentDatabase, String text, Parser parser) {
         String connectionString = "mongodb://localhost:27017";
         this.parser = parser;
@@ -682,7 +680,7 @@ public class Select {
         this.currentDatabase = currentDatabase;
         resultTables = new ArrayList<>();
         selectedColums = selectedColums(text);
-        System.out.println("Selected columns: ");
+        System.out.println(" --- --  Selected columns: ");
         for (String an : selectedColums) {
             System.out.print(an + " ");
         }
@@ -712,10 +710,8 @@ public class Select {
             System.out.print("|" + an + "| ");
         }
         System.out.println();
-        processProjection(selectedColums);
 
-        if (addKeysToProjection(joinClause) != 0)
-            return;
+
 //        addKeysToProjection(joinClause);
         System.out.println("Table projection map: ");
         for (ArrayList<String> columns1 : tableProjectionMap.values()) {
@@ -725,7 +721,9 @@ public class Select {
             System.out.println();
         }
 
-        where(fromTable, tableProjectionMap.get(fromTable), whereClause);
+
+//              tableProjectionMap.get(fromTable)
+        where(fromTable, whereClause);
 
 
         if (joinTables.length == 1 && joinTables[0].equals("")) {
@@ -735,10 +733,8 @@ public class Select {
         for (int i = 0; i < joinTables.length; i++) {
             String[] empty = new String[1];
             empty[0] = "";
-            System.out.println("Join table: " + joinTables[i]);
-            ArrayList<String> joinTableColumns = new ArrayList<>();
-            joinTableColumns.add("*");
-            where(joinTables[i], tableProjectionMap.get(joinTables[i]), empty);
+            System.out.println("WHERE JOIN TABLE: " + joinTables[i]);
+            where(joinTables[i], empty);
         }
 
 
@@ -861,6 +857,7 @@ public class Select {
 
     public DataTable getResultTable() {
         try {
+            fiterSelectedTables();
             System.out.println("Result table: " + resultTables.get(0).getTableName());
             return new DataTable(resultTables.get(0));
         } catch (Exception e) {

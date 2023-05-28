@@ -445,6 +445,15 @@ public class DataTable implements Serializable {
         return false;
     }
 
+    public void renameColumn(String oldName, String newName) {
+        for (DataColumnModel column : columns) {
+            if (column.getColumnName().equals(oldName)) {
+                column.renameColumn(newName);
+                return;
+            }
+        }
+    }
+
     public void removeColumn(String columnName) {
         for (DataColumnModel column : columns) {
             if (column.getColumnName().equals(columnName)) {

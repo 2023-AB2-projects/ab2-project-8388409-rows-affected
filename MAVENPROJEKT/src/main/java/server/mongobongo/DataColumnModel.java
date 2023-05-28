@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DataColumnModel implements Serializable {
-    protected final String name;
+    protected String name;
     protected final String type;
     protected Boolean primaryKey;
     protected Boolean isNull;
@@ -29,6 +29,10 @@ public class DataColumnModel implements Serializable {
         this.values = new ArrayList();
         this.values.addAll(column.getValues());
 
+    }
+
+    public void renameColumn(String newName) {
+        this.name = newName;
     }
 
     public DataColumnModel(String name, String type) {

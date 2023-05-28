@@ -31,6 +31,7 @@ public class Join implements Serializable {
 
         connectionMap = new HashMap<>();
         for (DataTable table : tables) {
+            System.out.println("*** JOIN table " + table.getTableName());
             connectionMap.put(table.getTableName(), table);
         }
 
@@ -154,13 +155,11 @@ public class Join implements Serializable {
         DataTable result = new DataTable();
 
         try {
-            ArrayList<String> columnNames1 = dataTable.getColumnsName();
-            ArrayList<String> columnTypes1 = dataTable.getColumnsType();
-            ArrayList<String> columnNames = dataTable1.getColumnsName();
-            ArrayList<String> columnTypes = dataTable1.getColumnsType();
+            ArrayList<String> columnNames = dataTable.getColumnsName();
+            ArrayList<String> columnTypes = dataTable.getColumnsType();
 
-            columnNames.addAll(columnNames1);
-            columnTypes.addAll(columnTypes1);
+            columnNames.addAll(dataTable1.getColumnsName());
+            columnTypes.addAll(dataTable1.getColumnsType());
             for (int i = 0; i < columnNames.size(); i++) {
                 result.addColumn(columnNames.get(i), columnTypes.get(i));
             }
@@ -190,9 +189,9 @@ public class Join implements Serializable {
             for (ArrayList<String> row1 : rows) {
                 result.addRow(row1);
             }
-            for (String key : joinKeys) {
-                result.removeColumn(key);
-            }
+//            for (String key : joinKeys) {
+//                result.removeColumn(key);
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             parser.setOtherError("Error in Join");
