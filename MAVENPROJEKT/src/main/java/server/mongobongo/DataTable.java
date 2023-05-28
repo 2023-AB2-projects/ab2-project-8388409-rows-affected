@@ -428,7 +428,6 @@ public class DataTable implements Serializable {
     public DataColumnModel getColumn(String firstColumn) {
 
         for (DataColumnModel column : columns) {
-            System.out.println(column.getColumnName());
             if (column.getColumnName().equals(firstColumn)) {
                 return column;
             }
