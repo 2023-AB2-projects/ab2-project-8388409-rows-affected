@@ -27,7 +27,11 @@ public class DataTableGUI extends JPanel {
     }
 
     public int getColumn() {
-        return tableModel.getColumns().get(0).getColumnSize();
+        try {
+            return tableModel.getColumns().get(0).getValues().size();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public JScrollPane getAsScrollPane() {

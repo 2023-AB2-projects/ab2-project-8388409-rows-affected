@@ -14,12 +14,13 @@ import java.util.Map;
 public class Join implements Serializable {
 
     private HashMap<String, ArrayList<String>> joinConditionMap;
-    private HashMap<String, DataTable> connectionMap;
+    private final HashMap<String, DataTable> connectionMap;
 
+    private ArrayList<String> joinKeys;
     private DataTable resultTable;
 
-    public Join(ArrayList<DataTable> tables, String joinCondition, Parser parser) {
-
+    public Join(ArrayList<DataTable> tables, String joinCondition,ArrayList<String> joinKeys,  Parser parser) {
+        this.joinKeys = joinKeys;
         for (DataTable table : tables) {
            System.out.println(table.getTableName());
             System.out.println("join to");
@@ -53,15 +54,15 @@ public class Join implements Serializable {
             e.printStackTrace();
         }
 
-        JFrame frame = new JFrame("Join");
-        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 400);
-        assert resultTable != null;
-        frame.add(new DataTableGUI(resultTable));
-        frame.add(new DataTableGUI(connectionMap.get(firstTable)));
-        frame.add(new DataTableGUI(connectionMap.get(secondTable)));
-        frame.setVisible(true);
+//        JFrame frame = new JFrame("Join");
+//        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.setSize(400, 400);
+//        assert resultTable != null;
+//        frame.add(new DataTableGUI(resultTable));
+//        frame.add(new DataTableGUI(connectionMap.get(firstTable)));
+//        frame.add(new DataTableGUI(connectionMap.get(secondTable)));
+//        frame.setVisible(true);
 
     }
 
@@ -83,20 +84,29 @@ public class Join implements Serializable {
 
         ArrayList<ArrayList<String>> rows = new ArrayList<>();
         ArrayList<String> row = new ArrayList<>();
-        for (int i = 0; i < dataTable.getColumnSize(); i++) {
-            for (int j = 0; j < dataTable1.getColumnSize(); j++) {
-                if (dataTable.getColumn(firstColumn).getValues().get(i).equals(dataTable1.getColumn(secondColumn).getValues().get(j))) {
-                    System.out.println("i: "+i+" j: "+j);
-                    row.addAll(dataTable.getRow(i));
-                    row.addAll(dataTable1.getRow(j));
-                    rows.add(row);
-                    row = new ArrayList<>();
+
+        if (dataTable.hasColumn(firstColumn) && dataTable1.hasColumn(secondColumn)) {
+        for (int j = 0; j < dataTable1.getColumnSize(); j++) {
+            for (int i = 0; i < dataTable.getColumnSize(); i++) {
+
+
+                    if (dataTable.getColumn(firstColumn).getValues().get(i).equals(dataTable1.getColumn(secondColumn).getValues().get(j))) {
+                        System.out.println("i: "+i+" j: "+j);
+                        row.addAll(dataTable.getRow(i));
+                        row.addAll(dataTable1.getRow(j));
+                        rows.add(row);
+                        row = new ArrayList<>();
+                    }
                 }
             }
         }
 
+
         for (ArrayList<String> row1 : rows) {
             result.addRow(row1);
+        }
+        for (String key: joinKeys){
+            result.removeColumn(key);
         }
 
         return result;

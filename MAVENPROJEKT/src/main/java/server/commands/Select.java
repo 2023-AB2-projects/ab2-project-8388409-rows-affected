@@ -8,6 +8,7 @@ import org.bson.conversions.Bson;
 import server.Parser;
 import server.jacksonclasses.*;
 import server.mongobongo.DataTable;
+import server.mongobongo.DataTableGUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,10 +24,15 @@ public class Select {
 
     private DataTable resultTable;
 
+    private HashMap<String, ArrayList<String>> tableProjectionMap;
+
+    private HashMap<String, ArrayList<String>> selectedColumsMap;
     private ArrayList<DataTable> resultTables;
     private final ArrayList<String> selectedColums;
     private final String fromTable;
     private final String joinClause;
+
+    private ArrayList<String> joinKeys;
 
     private final String[] joinTables;
     private final String[] whereClause;
@@ -97,15 +103,15 @@ public class Select {
                 parser.setOtherError("Table " + currentTable + " does not exist");
                 return;
             }
-            if (selectedColums.get(0).equals("*") && selectedColums.size() == 1) {
-                selectedColums.clear();
-                List<Attribute> attributes = myTable.getStructure().getAttributes();
-                for (Attribute attribute : attributes) {
-                    System.out.println("Attribute: " + attribute.get_attributeName());
-                    selectedColums.add(attribute.get_attributeName());
-                    columnTypes.add(attribute.get_type());
-                }
-            }
+//            if (selectedColums.get(0).equals("*") && selectedColums.size() == 1) {
+//                selectedColums.clear();
+//                List<Attribute> attributes = myTable.getStructure().getAttributes();
+//                for (Attribute attribute : attributes) {
+//                    System.out.println("Attribute: " + attribute.get_attributeName());
+//                    selectedColums.add(attribute.get_attributeName());
+//                    columnTypes.add(attribute.get_type());
+//                }
+//            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -592,9 +598,85 @@ public class Select {
         }
     }
 
+    public void addKeysToProjection(String keysArr){
+
+
+            String tmp = keysArr.split("ON")[1];
+            String[] arr = tmp.split("=");
+            for (String s : arr) {
+                System.out.println("- join key: " + keysArr);
+                String[] split = s.split("\\.");
+                String tableName = split[0].trim();
+                String columnName = split[1].trim();
+                System.out.println("- join tableName: " + tableName);
+                System.out.println("- join columnName: " + columnName);
+                ArrayList<String> columns = tableProjectionMap.get(tableName);
+
+                if (!columns.contains(columnName))
+                    columns.add(columnName);
+                    joinKeys.add(columnName);
+            }
+
+
+
+    }
+
+    public void processProjection(ArrayList<String> selectedColums){
+
+        if (selectedColums.contains("*")) {
+            ArrayList<String> columns = tableProjectionMap.get(fromTable);
+            Table myTable = findTableInCatalog(fromTable);
+            List<Attribute> attributes = myTable.getStructure().getAttributes();
+
+            for (Attribute attribute : attributes) {
+                columns.add(attribute.get_attributeName());
+            }
+
+            if (!(joinTables.length == 1 && joinTables[0].equals(""))){
+                for (String joinTable : joinTables) {
+                    ArrayList<String> joinColumns = tableProjectionMap.get(joinTable);
+                    Table table = findTableInCatalog(joinTable);
+                    List<Attribute> attributes1 = table.getStructure().getAttributes();
+                    for (Attribute attribute : attributes1) {
+                        joinColumns.add(attribute.get_attributeName());
+                    }
+                }
+            }
+
+            return;
+        }
+
+        for (String column : selectedColums) {
+
+            try {
+
+                if (column.contains(".")) {
+                    String[] split = column.split("\\.");
+                    String tableName = split[0];
+                    String columnName = split[1];
+                    ArrayList<String> columns = tableProjectionMap.get(tableName);
+                    columns.add(columnName);
+                } else {
+                    ArrayList<String> columns = tableProjectionMap.get(fromTable);
+                    columns.add(column);
+                }
+
+
+            } catch (Exception e) {
+
+                parser.setOtherError("Column " + column + " is not found");
+                return;
+            }
+
+        }
+    }
+
     public Select(String currentDatabase, String text, Parser parser) {
         String connectionString = "mongodb://localhost:27017";
         this.parser = parser;
+        tableProjectionMap = new HashMap<>();
+        selectedColumsMap = new HashMap<>();
+        joinKeys = new ArrayList<>();
         this.currentDatabase = currentDatabase;
         resultTables = new ArrayList<>();
         selectedColums = selectedColums(text);
@@ -605,6 +687,8 @@ public class Select {
         System.out.println();
         fromTable = fromTables(text);
         System.out.println("Table: " + fromTable);
+        ArrayList<String> columns = new ArrayList<>();
+        tableProjectionMap.put(fromTable.trim(), columns);
 
         System.out.println();
         joinClause = joinClause(text);
@@ -616,6 +700,8 @@ public class Select {
         System.out.println("Join tables: ");
         for (String an : joinTables) {
             System.out.print(an + " ");
+            ArrayList<String> columns2 = new ArrayList<>();
+            tableProjectionMap.put(an.trim(), columns);
         }
 
         whereClause = whereClause(text);
@@ -624,7 +710,18 @@ public class Select {
             System.out.print("|" + an + "| ");
         }
         System.out.println();
-        where(fromTable,selectedColums, whereClause);
+        processProjection(selectedColums);
+
+        addKeysToProjection(joinClause);
+        System.out.println("Table projection map: ");
+        for (ArrayList<String> columns1 : tableProjectionMap.values()) {
+            for (String column : columns1) {
+                System.out.print(column + " ");
+            }
+            System.out.println();
+        }
+
+        where(fromTable,tableProjectionMap.get(fromTable), whereClause);
 
 
         if (joinTables.length == 1 && joinTables[0].equals("")) {
@@ -637,12 +734,12 @@ public class Select {
             System.out.println("Join table: "+joinTables[i]);
             ArrayList<String> joinTableColumns = new ArrayList<>();
             joinTableColumns.add("*");
-            where(joinTables[i],joinTableColumns,empty);
+            where(joinTables[i],tableProjectionMap.get(joinTables[i]),empty);
         }
 
 
             System.out.println("Join clause is not empty");
-            Join joinRes = new Join(resultTables, joinClause, parser);
+            Join joinRes = new Join(resultTables, joinClause, joinKeys,parser);
             resultTables.set(0,joinRes.getResultTable());
     }
     private String[] joinTables(String joinClause) {
@@ -759,6 +856,7 @@ public class Select {
 
     public DataTable getResultTable() {
         System.out.println("Result table: " + resultTables.get(0).getTableName());
+
         return new DataTable(resultTables.get(0));
     }
 }

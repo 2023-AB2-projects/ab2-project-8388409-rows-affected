@@ -428,11 +428,31 @@ public class DataTable implements Serializable {
     public DataColumnModel getColumn(String firstColumn) {
 
         for (DataColumnModel column : columns) {
+            System.out.println(column.getColumnName());
             if (column.getColumnName().equals(firstColumn)) {
                 return column;
             }
         }
-        System.out.println("Nincs ilyen oszlop");
+        System.out.println( "A " + tableName+ " tablenek nincs ilyen oszlop hogy: |" + firstColumn+"|");
         return null;
     }
+    public boolean hasColumn(String firstColumn) {
+
+        for (DataColumnModel column : columns) {
+            if (column.getColumnName().equals(firstColumn)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void removeColumn(String columnName) {
+        for (DataColumnModel column : columns) {
+            if (column.getColumnName().equals(columnName)) {
+                columns.remove(column);
+                return;
+            }
+        }
+    }
+
 }
