@@ -115,6 +115,9 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
         resultPanel.add(new JLabel("Result:"));
         resultPanel.add(dataTableGUI);
         resultPanel.revalidate();
+        System.out.println("columns:");
+        dataTable.getColumnsName().forEach(System.out::println);
+
     }
 
 

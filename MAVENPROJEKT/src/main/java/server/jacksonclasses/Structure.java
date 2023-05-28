@@ -1,9 +1,10 @@
 package server.jacksonclasses;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Structure implements java.io.Serializable {
+public class Structure implements Serializable {
     private List<Attribute> Attributes;
 
     public Structure() {

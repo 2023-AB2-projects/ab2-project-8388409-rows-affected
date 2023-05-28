@@ -101,6 +101,7 @@ public class Select {
                 selectedColums.clear();
                 List<Attribute> attributes = myTable.getStructure().getAttributes();
                 for (Attribute attribute : attributes) {
+                    System.out.println("Attribute: " + attribute.get_attributeName());
                     selectedColums.add(attribute.get_attributeName());
                     columnTypes.add(attribute.get_type());
                 }
@@ -118,9 +119,10 @@ public class Select {
 
             System.out.println("Nincs where");
             try (MongoClient mongoClient = create(connectionString)) {
-                Table tableStructure = findTableInCatalog();
+                Table tableStructure = findTableInCatalog(currentTable);
                 MongoDatabase db = mongoClient.getDatabase(currentDatabase);
                 MongoCollection<Document> collection = db.getCollection(currentTable);
+                System.out.println("Current table: " + currentTable);
                 ArrayList<Document> documents = collection.find().into(new ArrayList<>());
                 resultTable = new DataTable(documents, tableStructure, selectedColums, parser);
                 resultTable.setTableName(currentTable);
@@ -582,7 +584,7 @@ public class Select {
                 String row = document.getString("row").replace("#", " ");
                 System.out.println(pk + " " + row);
             }
-            Table tableStructure = findTableInCatalog();
+            Table tableStructure = findTableInCatalog(currentTable);
             resultTable = new DataTable(result, tableStructure, selectedColums, parser);
             resultTable.setTableName(currentTable);
             resultTable.setDatabaseName(currentDatabase);
@@ -629,19 +631,19 @@ public class Select {
             System.out.println("Join tables is empty");
             return;
         }
-//        for (int i=0;i< joinTables.length;i++) {
-//            String[] empty = new String[1];
-//            empty[0] = "";
-//            System.out.println("Join table: "+joinTables[i]);
-//            ArrayList<String> joinTableColumns = new ArrayList<>();
-//            joinTableColumns.add("*");
-//            where(joinTables[i],joinTableColumns,empty);
-//        }
+        for (int i=0;i< joinTables.length;i++) {
+            String[] empty = new String[1];
+            empty[0] = "";
+            System.out.println("Join table: "+joinTables[i]);
+            ArrayList<String> joinTableColumns = new ArrayList<>();
+            joinTableColumns.add("*");
+            where(joinTables[i],joinTableColumns,empty);
+        }
 
 
-//            System.out.println("Join clause is not empty");
-//            Join joinRes = new Join(resultTables, joinClause, parser);
-//            resultTable = joinRes.getResultTable();
+            System.out.println("Join clause is not empty");
+            Join joinRes = new Join(resultTables, joinClause, parser);
+            resultTables.set(0,joinRes.getResultTable());
     }
     private String[] joinTables(String joinClause) {
         ArrayList<String> ans = new ArrayList<>();
@@ -695,7 +697,7 @@ public class Select {
         return ans;
     }
 
-    public Table findTableInCatalog() {
+    public Table findTableInCatalog(String tableName) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
@@ -704,7 +706,7 @@ public class Select {
                 if (db.get_dataBaseName().equals(this.currentDatabase)) {
                     List<Table> tableList = db.getTables();
                     for (Table table : tableList) {
-                        if (table.get_tableName().equals(this.fromTable)) {
+                        if (table.get_tableName().equals(tableName)) {
                             return table;
                         }
                     }
@@ -756,7 +758,7 @@ public class Select {
     }
 
     public DataTable getResultTable() {
-        System.out.println("Result table: " + resultTable);
-        return resultTables.get(0);
+        System.out.println("Result table: " + resultTables.get(0).getTableName());
+        return new DataTable(resultTables.get(0));
     }
 }

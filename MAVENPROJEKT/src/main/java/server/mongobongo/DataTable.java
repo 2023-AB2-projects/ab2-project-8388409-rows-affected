@@ -65,7 +65,7 @@ public class DataTable implements Serializable {
         this.databaseName = "tempDB";
         this.tableName = "tempTable";
         columns = new ArrayList<>();
-//        System.out.println("Projecting columns"+columnNames.toString());
+        System.out.println("Projecting columns"+columnNames.toString());
 
         buildColumns(columnNames, tableStructure);
 
@@ -85,18 +85,18 @@ public class DataTable implements Serializable {
         columns = new ArrayList<>();
 
         ArrayList<Attribute> attributes = table.zAttributumok();
-//        for (String cn : columnNames) {
-//            System.out.println(cn);
-//        }
-//        System.out.println("end");
+        for (String cn : columnNames) {
+            System.out.println(cn);
+        }
+        System.out.println("end");
         int index = 0;
         for (Attribute attribute : attributes) {
-//            System.out.println(attribute.get_attributeName());
-                if (columnNames.contains(attribute.get_attributeName())) {
+            System.out.println("|"+attribute.get_attributeName()+"|");
+                if (columnNames.contains(attribute.get_attributeName().trim())) {
                     DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
                     columns.add(dataColumn);
                     selectedColumnIndexes.add(index);
-//                    System.out.println("!Adding column: " + attribute.get_attributeName());
+                    System.out.println("!Adding column: " + attribute.get_attributeName());
                 }
 
             index++;
@@ -394,17 +394,45 @@ public class DataTable implements Serializable {
         return rows;
     }
 
-    public Collection<String> getColumnNames() {
-        Collection<String> columnNames = new ArrayList<>();
+    public ArrayList<String> getColumnsName() {
+        ArrayList<String> columnsName = new ArrayList<>();
         for (DataColumnModel column : columns) {
-            columnNames.add(column.getColumnName());
+            columnsName.add(column.getColumnName());
         }
-        return columnNames;
+        return columnsName;
     }
 
-    public void addRow(Map<String, Object> row) {
-        for (DataColumnModel column : columns) {
-            column.addValue((String) row.get(column.getColumnName()));
+    public void addRow(ArrayList<String> row) {
+        for (int i = 0; i < row.size(); i++) {
+            columns.get(i).addValue(row.get(i));
         }
+    }
+
+    public ArrayList<String> getColumnsType() {
+        ArrayList<String> columnsType = new ArrayList<>();
+        for (DataColumnModel column : columns) {
+            columnsType.add(column.getType());
+        }
+        return columnsType;
+    }
+
+    public void addColumn(String name, String type) {
+        DataColumnModel column = new DataColumnModel(name, type);
+        columns.add(column);
+    }
+
+    public int getColumnSize() {
+        return columns.get(0).getValues().size();
+    }
+
+    public DataColumnModel getColumn(String firstColumn) {
+
+        for (DataColumnModel column : columns) {
+            if (column.getColumnName().equals(firstColumn)) {
+                return column;
+            }
+        }
+        System.out.println("Nincs ilyen oszlop");
+        return null;
     }
 }

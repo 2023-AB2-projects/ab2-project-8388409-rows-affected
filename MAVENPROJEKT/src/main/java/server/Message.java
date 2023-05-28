@@ -54,6 +54,7 @@ public class Message implements Serializable {
             System.out.println("Selected table is null");
             return;
         }
+        System.out.println("Selected table is not null");
         this.selectedTable = new DataTable(selectedTable);
     }
 

@@ -137,7 +137,7 @@ public class Host {
                 } catch (IOException e) {
                     System.out.println("Disconnected from client");
                     System.out.println(e.getMessage());
-                    System.out.println(e.getStackTrace());
+                    System.out.println(Arrays.toString(e.getStackTrace()));
                     serverSocket.close();
                     return;
                 }
@@ -152,13 +152,20 @@ public class Host {
                         message = null;
                         try {
                             message = (Message) inS.readObject();
-                        } catch (IOException | ClassNotFoundException e1) {
+                        } catch (ClassNotFoundException e1) {
                             System.out.println("Disconnected from client");
-                            System.out.println(e1.getMessage());
-                            System.out.println(Arrays.toString(e1.getStackTrace()));
+                            e1.printStackTrace();
                             serverSocket.close();
                             return;
                         }
+//                        } catch (IOException | ClassNotFoundException e1) {
+//                            System.out.println("Disconnected from client");
+//                            System.out.println(e1.getMessage());
+//                            System.out.println(Arrays.toString(e1.getStackTrace()));
+//                            e1.printStackTrace();
+//                            serverSocket.close();
+//                            return;
+//                        }
 
                         System.out.println("message received from client: " + message.getMessageUser());
                         darabol(message.getMessageUser());
@@ -176,7 +183,7 @@ public class Host {
                         }
 
 
-                        Thread.sleep(100);
+                        Thread.sleep(1000);
                         Write_lastCurrentDatabase();
                     } catch (InterruptedException e3) {
                         e3.printStackTrace();
