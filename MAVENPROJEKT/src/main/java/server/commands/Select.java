@@ -647,6 +647,11 @@ public class Select {
     }
 
     public void fiterSelectedTables(){
+
+        if (selectedColums.contains("*")) {
+            return;
+        }
+
         ArrayList<String> tmpS = new ArrayList<>();
 
         for(String c : selectedColums){

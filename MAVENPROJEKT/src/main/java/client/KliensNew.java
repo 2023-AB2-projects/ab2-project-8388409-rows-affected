@@ -65,7 +65,7 @@ public class KliensNew extends JFrame implements Runnable {
         databases = new ArrayList<>();
         syntax = new Syntax(this);
         tabsCounter = 0;
-        leftPanel = new ObjectExplorer(this, databases);
+        leftPanel = new ObjectExplorer(this);
         rightPanel = new SidePanel(this);
         topPanel = new SidePanel(this);
         tabbedPane = new JTabbedPane();
@@ -111,6 +111,50 @@ public class KliensNew extends JFrame implements Runnable {
                 g.fillOval(getWidth() / 10, getHeight() / 2 - 1, 3, 3);
             }
         };
+
+        JButton saveDocument = new JButton("Save Document");
+        JButton loadDocument = new JButton("Load Document");
+        saveDocument.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Save Document");
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int result = fileChooser.showSaveDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                try {
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+                    writer.write(textArea.getText());
+                    writer.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            }
+        });
+        loadDocument.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Load Document");
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(file));
+                    String line;
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while ((line = reader.readLine()) != null) {
+                        stringBuilder.append(line);
+                        stringBuilder.append("\n");
+                    }
+                    textArea.setText(stringBuilder.toString());
+                    reader.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            }
+        });
+        leftPanel.addButtons(saveDocument);
+        leftPanel.add(loadDocument);
+
         JButton execButton = new JButton("Execute");
         JButton closeTab = new JButton("Close this Tab");
         JButton clear = new JButton("Clear");
@@ -122,6 +166,8 @@ public class KliensNew extends JFrame implements Runnable {
         topPanel.add(newQuery);
         topPanel.add(newVisualQueryDesigner);
         topPanel.add(exit);
+
+
 
         queryPanelOptions.add(execButton);
         queryPanelOptions.add(clear);
@@ -271,7 +317,6 @@ public class KliensNew extends JFrame implements Runnable {
         System.out.println("mess.isMessageUserEmpy(): " + mess.isMessageUserEmpy());
         System.out.println("mess.isMessageServerEmpy(): " + mess.isMessageServerEmpy());
         System.out.println("mess.isDatabasesEmpty(): " + mess.isDatabasesEmpty());
-
         System.out.println("mess Message: " + mess.getMessageUser() + " \n" + mess.getMessageServer() + " \n" + mess.getDatabases() + " ");
 
         this.dataTables = mess.getDataTables();
@@ -330,7 +375,7 @@ public class KliensNew extends JFrame implements Runnable {
             databases.addAll(mess.getDatabases());
             databaseObjects.clear();
             databaseObjects.addAll(mess.getDatabaseObjects());
-            leftPanel.updateDatabase(databases);
+
             leftPanel.repaint();
             resizeWindowLayout();
             visualQueryDesignerOptions.removeAll();
@@ -446,9 +491,7 @@ public class KliensNew extends JFrame implements Runnable {
                 databases.clear();
                 databaseObjects.clear();
                 tableObjects.clear();
-                leftPanel.updateDatabase(databases);
-                leftPanel.emptyDatabase();
-                leftPanel.repaint();
+
                 connected = false;
                 connectionButton.setText("Connect");
                 visualQueryDesignerOptions.removeAll();
