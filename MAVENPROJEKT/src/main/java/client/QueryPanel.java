@@ -51,10 +51,6 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
 //        scrollTextResp.setPreferredSize(new Dimension(1000, 300));
 
 
-//        JPanel resultPanel = new JPanel();
-//        resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
-//        resultPanel.add(scrollTextResp);
-//        resultPanel.setLayout(new GridLayout(100, 0));
         resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
         resultPanel.add(new JLabel("Hello user!"));
         resultPanel.setPreferredSize(new Dimension(400, 300));
@@ -118,6 +114,7 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
     public void setDataTableToOut(DataTable dataTable) {
         resultPanel.removeAll();
         DataTableGUI dataTableGUI = new DataTableGUI(dataTable);
+        resultPanel.setPreferredSize(dataTableGUI.getPreferredSize());
         resultPanel.add(new JLabel("Result:"));
         resultPanel.add(dataTableGUI);
         resultPanel.revalidate();
