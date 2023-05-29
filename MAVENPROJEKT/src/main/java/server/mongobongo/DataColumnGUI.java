@@ -26,7 +26,7 @@ public class DataColumnGUI extends JPanel {
         add(typeL);
         revalidate();
         column.getValues().forEach((value) -> {
-            ResizeLabel label = getLabel(value.toString());
+            ResizeLabel label = getLabel(value);
             this.valueLabels.add(label);
             add(label);
         });
@@ -37,14 +37,12 @@ public class DataColumnGUI extends JPanel {
 
     private ResizeLabel getLabel(String text) {
 
-        ResizeLabel label = new ResizeLabel(text, "", this.valueLabels);
-        return label;
+        return new ResizeLabel(text, "", this.valueLabels);
     }
 
     private ResizeLabel getLabelTop(String text) {
         System.out.println("Getting label for " + text);
-        ResizeLabel label = new ResizeLabel(text, "top", this.valueLabels);
-        return label;
+        return new ResizeLabel(text, "top", this.valueLabels);
     }
 
     public ArrayList<ResizeLabel> getLabels() {
@@ -116,7 +114,7 @@ public class DataColumnGUI extends JPanel {
     }
 
     public String get(int index) {
-        return this.column.getValues().get(index).toString();
+        return this.column.getValues().get(index);
     }
 
     public DataColumnModel getDataColumnModel() {

@@ -8,10 +8,14 @@ import server.Parser;
 import server.jacksonclasses.*;
 import server.mongobongo.DataColumnModel;
 import server.mongobongo.DataTable;
+import server.mongobongo.DataTableGUI;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static com.mongodb.client.MongoClients.create;
 import static com.mongodb.client.model.Filters.*;
@@ -132,6 +136,16 @@ public class Select {
                 resultTable.setTableName(currentTable);
                 resultTable.setDatabaseName(currentDatabase);
                 resultTables.add(resultTable);
+
+
+//                JFrame frame = new JFrame("Result table");
+//                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//                frame.setSize(800, 600);
+//                frame.setLayout(new FlowLayout());
+//                frame.add(new DataTableGUI(resultTable));
+//                frame.setVisible(true);
+
+
                 System.out.println("Result table created");
             }
         }
@@ -864,6 +878,9 @@ public class Select {
         try {
             fiterSelectedTables();
             System.out.println("Result table: " + resultTables.get(0).getTableName());
+
+
+
             return new DataTable(resultTables.get(0));
         } catch (Exception e) {
             e.printStackTrace();

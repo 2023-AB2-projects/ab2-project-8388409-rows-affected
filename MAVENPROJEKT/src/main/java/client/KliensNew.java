@@ -623,6 +623,7 @@ public class KliensNew extends JFrame implements Runnable {
                     oot.writeObject(message);
                     oot.flush();
                     clientMessage = new Message();
+
 //                    textArea.setText("");
                     send = false;
 
@@ -636,6 +637,8 @@ public class KliensNew extends JFrame implements Runnable {
                     message = null;
                     try {
                         message = (Message) in.readObject();
+                        System.out.println("Message received");
+                        System.out.println("Message size:"+ getObjectSize(message)+" bytes");
                     } catch (EOFException e) {
                         System.out.println("EOFException");
                         break;
@@ -687,5 +690,12 @@ public class KliensNew extends JFrame implements Runnable {
     public Message getCilentMessage() {
         return this.clientMessage;
     }
-
+    public int getObjectSize(Object obj) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        oos.flush();
+        oos.close();
+        return baos.size();
+    }
 }

@@ -124,9 +124,11 @@ public class ResizeLabel extends JPanel implements MouseListener, MouseMotionLis
         if (resizeLabels != null) {
 
             for (ResizeLabel resizeLabel : resizeLabels) {
-                System.out.println("resizeLabel: " + resizeLabel.getText());
+
 //                resizeLabel.setPreferredSize(new Dimension(newWidth, label.getHeight()));
-                resizeLabel.setSize(newWidth, label.getHeight());
+//                resizeLabel.setSize(newWidth, label.getHeight());
+//                resizeLabel.setPreferredSize(new Dimension(newWidth, label.getHeight()));
+                resizeLabel.setLabelWidth(newWidth);
                 revalidate();
                 repaint();
             }

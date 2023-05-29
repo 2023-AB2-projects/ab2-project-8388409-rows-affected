@@ -174,6 +174,7 @@ public class Host {
                             for (Message m : messages) {
 
                                 System.out.println("message sent to client: " + m.getMessageUser());
+                                System.out.println("message size: " + getObjectSize(m) + " bytes");
                                 outS.writeObject(m);
                                 outS.flush();
                             }
@@ -297,5 +298,14 @@ public class Host {
 
     public static void main(String[] args) throws IOException {
         Host host = new Host();
+    }
+
+    public int getObjectSize(Object obj) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        oos.flush();
+        oos.close();
+        return baos.size();
     }
 }

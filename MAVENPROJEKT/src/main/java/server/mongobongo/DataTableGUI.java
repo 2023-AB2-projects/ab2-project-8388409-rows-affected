@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class DataTableGUI extends JPanel {
 
-    private DataTable tableModel;
-    private ArrayList<DataColumnGUI> dataColumnGUI;
+    private final DataTable tableModel;
+    private final ArrayList<DataColumnGUI> dataColumnGUI;
 
     public DataTableGUI(DataTable tableModel) {
         this.tableModel = tableModel;
@@ -35,8 +35,7 @@ public class DataTableGUI extends JPanel {
     }
 
     public JScrollPane getAsScrollPane() {
-        JScrollPane scrollPane = new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        return scrollPane;
+        return new JScrollPane(this, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     }
 
     public String getDatabaseName() {

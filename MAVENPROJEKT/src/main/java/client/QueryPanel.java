@@ -113,10 +113,13 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
 
     public void setDataTableToOut(DataTable dataTable) {
         resultPanel.removeAll();
-        DataTableGUI dataTableGUI = new DataTableGUI(dataTable);
-        resultPanel.setPreferredSize(dataTableGUI.getPreferredSize());
+//        DataTableGUI dataTableGUI = new DataTableGUI(dataTable);
+//        resultPanel.setPreferredSize(dataTableGUI.getPreferredSize());
+        System.out.println("===========================================");
         resultPanel.add(new JLabel("Result:"));
-        resultPanel.add(dataTableGUI);
+//        resultPanel.add(dataTableGUI);
+        resultPanel.add(new DataTableGUI(dataTable));
+        System.out.println("====================== 1 =====================");
         resultPanel.revalidate();
         System.out.println("columns:");
         dataTable.getColumnsName().forEach(System.out::println);
