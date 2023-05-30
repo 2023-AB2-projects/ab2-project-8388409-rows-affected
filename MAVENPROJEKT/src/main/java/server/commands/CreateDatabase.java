@@ -3,6 +3,7 @@ package server.commands;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -45,6 +46,13 @@ public class CreateDatabase {
                     // create database in MongoDB
                     MongoDatabase mongoDatabase = mongoClient.getDatabase(databaseName);
                     mongoDatabase.createCollection(databaseName);
+
+                } catch (MongoCommandException e) {
+                    if (e.getErrorCode() == 48) {
+                        parser.setOtherError("Database already exists");
+                    } else {
+                        parser.setOtherError("Error creating database");
+                    }
                 }
 
             } else {

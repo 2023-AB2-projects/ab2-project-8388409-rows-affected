@@ -11,7 +11,6 @@ import server.mongobongo.DataTable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 import static com.mongodb.client.MongoClients.create;
 import static com.mongodb.client.model.Filters.*;
@@ -249,11 +248,8 @@ public class Select {
                     boolean isPk = false;
                     List<PrimaryKey> primaryKeys = myTable.getPrimaryKeys();
                     List<String> primaryKeyNames = primaryKeys.stream().map(PrimaryKey::getPkAttribute).toList();
-                    for (PrimaryKey primaryKey : primaryKeys) {
-                        if (primaryKey.getPkAttribute().equals(attributeName)) {
-                            isPk = true;
-                            break;
-                        }
+                    if (primaryKeyNames.contains(attributeName)) {
+                        isPk = true;
                     }
 
                     int attributeIndexDB = -1;
@@ -289,7 +285,7 @@ public class Select {
                         MongoDatabase db = mongoClient.getDatabase(currentDatabase);
 
                         // primary key esetén
-                        if (isPk || indexType.equals("primary")) {
+                        if (isPk && indexType.equals("primary")) {
 //                            System.out.println("primary key eset " + attributeName);
 //                            MongoCollection<Document> tableCollection = db.getCollection(currentTable);
 //
@@ -319,7 +315,7 @@ public class Select {
                             System.out.println("primary key eset " + attributeName);
                             MongoCollection<Document> tableCollection = db.getCollection(currentTable);
 
-                            Bson filter = empty();
+                            Bson filter;
                             switch (operator) {
                                 case "=" -> filter = eq("_id", value);
                                 case "<" -> filter = lt("_id", value);
@@ -456,7 +452,13 @@ public class Select {
                                 }
 
 
-                                String attributeValue = split[attributeIndexDB - 1];
+                                String attributeValue = "";
+                                if (isPk) {
+                                    System.out.println("PK");
+                                    attributeValue = pk;
+                                } else {
+                                    attributeValue = split[attributeIndexDB - 1];
+                                }
                                 System.out.println("attributeValue: " + attributeValue);
                                 switch (attributeType.toLowerCase()) {
                                     case "int" -> {
