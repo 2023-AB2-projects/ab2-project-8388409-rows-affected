@@ -851,6 +851,9 @@ public class Select {
 
     public String joinClause(String text) {
 //        INNER JOIN ans WHERE
+        if (!text.contains("INNER JOIN")) {
+            return "";
+        }
         String data = betweenString(text, "INNER JOIN", "WHERE");
 //
         return data.trim();

@@ -354,6 +354,8 @@ public class KliensNew extends JFrame implements Runnable {
 //            tabbedPane.getSelectedComponent()
             if (tabbedPane.getSelectedComponent() instanceof QueryPanel queryPanel) {
                 queryPanel.setDataTableToOut(selectedDataTable);
+                revalidate();
+
             }
 
             if (tabbedPane.getSelectedComponent() instanceof VisualQueryDesigner visualQueryDesigner) {

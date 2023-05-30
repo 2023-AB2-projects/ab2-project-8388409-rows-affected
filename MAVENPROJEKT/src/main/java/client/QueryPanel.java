@@ -2,6 +2,7 @@ package client;
 
 import server.mongobongo.DataTable;
 import server.mongobongo.DataTableGUI;
+import server.mongobongo.DataTableGUI2;
 
 import javax.accessibility.Accessible;
 import javax.swing.*;
@@ -9,7 +10,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-public class QueryPanel extends JComponent implements Accessible, MenuElement {
+public class QueryPanel extends JPanel implements Accessible, MenuElement {
 
     private final JTextArea textArea = new JTextArea();
     private JTextArea outText = new JTextArea();
@@ -27,7 +28,6 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
 
         this.kliensNew = kliensNew;
         this.tabbedPane = tabbedPane;
-
 
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 15));
         textArea.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -56,11 +56,11 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
         resultPanel.setPreferredSize(new Dimension(400, 300));
 
 
-        resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//        resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         add(scrollText);
-//        add(resultPanel);
-        add(resultPanelSCR);
+        add(resultPanel);
+//        add(resultPanelSCR);
 //        add(scrollTextResp);
     }
 
@@ -114,26 +114,45 @@ public class QueryPanel extends JComponent implements Accessible, MenuElement {
     public void setDataTableToOut(DataTable dataTable) {
         resultPanel.removeAll();
 //        DataTableGUI dataTableGUI = new DataTableGUI(dataTable);
+//        JPanel dataTableGUI = new DataTableGUI(dataTable);
+        DataTableGUI2 jp =  new DataTableGUI2(dataTable);
+
 //        resultPanel.setPreferredSize(dataTableGUI.getPreferredSize());
         System.out.println("===========================================");
-        resultPanel.add(new JLabel("Result:"));
+        JScrollPane rPanel = new JScrollPane(jp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//
+//        rPanel.getVerticalScrollBar().setPreferredSize(new Dimension(20, 0));
+//        rPanel.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 20));
+//        rPanel.getVerticalScrollBar().setMaximum(20);
+        rPanel.getHorizontalScrollBar().setMaximum(20);
+        rPanel.getVerticalScrollBar().setUnitIncrement(20);
+        rPanel.getHorizontalScrollBar().setUnitIncrement(20);
+//        rPanel.setPreferredSize(jp.getPreferredSize());
+        resultPanel.add(rPanel);
+        resultPanel.revalidate();
+        resultPanel.repaint();
+        revalidate();
+        repaint();
+//        resultPanel.add(new JScrollPane(dataTableGUI));
+
+//        resultPanel.add(rPanel);
 //        resultPanel.add(dataTableGUI);
-        resultPanel.add(new DataTableGUI(dataTable));
+//        resultPanel.add(new DataTableGUI(dataTable));
+//        new DataTableGUI2(dataTable, resultPanel, this);
         System.out.println("====================== 1 =====================");
         resultPanel.revalidate();
+        revalidate();
         System.out.println("columns:");
         dataTable.getColumnsName().forEach(System.out::println);
 
     }
     private void popBackPanel() {
         frame.dispose();
-        resultPanelSCR = new JScrollPane(resultPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        add(resultPanelSCR);
+        add(resultPanel);
         revalidate();
     }
 
     private void popOutPanel() {
-        remove(resultPanelSCR);
         frame = new JFrame("Result");
         frame.setSize(400, 400);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
