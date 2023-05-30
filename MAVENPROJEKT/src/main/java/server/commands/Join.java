@@ -134,19 +134,6 @@ public class Join implements Serializable {
             e.printStackTrace();
         }
 
-//        join remaning tables to resultTable
-
-
-//        JFrame frame = new JFrame("Join");
-//        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setSize(400, 400);
-//        assert resultTable != null;
-//        frame.add(new DataTableGUI(resultTable));
-//        frame.add(new DataTableGUI(connectionMap.get(firstTable)));
-//        frame.add(new DataTableGUI(connectionMap.get(secondTable)));
-//        frame.setVisible(true);
-
         return new DataTable();
     }
 

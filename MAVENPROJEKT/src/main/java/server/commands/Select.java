@@ -6,12 +6,8 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import server.Parser;
 import server.jacksonclasses.*;
-import server.mongobongo.DataColumnModel;
 import server.mongobongo.DataTable;
-import server.mongobongo.DataTableGUI;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -25,7 +21,7 @@ public class Select {
     private DataTable resultTable;
 
     private final HashMap<String, ArrayList<String>> tableProjectionMap;
-
+    private final HashMap<Object, ArrayList<String>> whereClauseMap;
     private final HashMap<String, ArrayList<String>> selectedColumsMap;
     private final ArrayList<DataTable> resultTables;
     private final ArrayList<String> selectedColums;
@@ -56,13 +52,18 @@ public class Select {
     }
 
     public void where(String currentTable, String[] whereClause) {
+
+
+        System.out.println("WHERE");
+        System.out.println(" ==== Table:" + currentTable + " Where clause: " + Arrays.toString(whereClause));
+
         String connectionString = "mongodb://localhost:27017";
         // SELECT * FROM table
-        ArrayList<String>  selectedColums = new ArrayList<>();
+        ArrayList<String> selectedColums = new ArrayList<>();
         selectedColums.add("*");
+
         System.out.println("SELECT * FROM table eset");
-//        ArrayList<String> columnNames = new ArrayList<>();
-//        columnNames.add("*");
+
         ArrayList<String> columnTypes = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -119,12 +120,12 @@ public class Select {
             e.printStackTrace();
         }
 
-        System.out.println("Where clause length: " + whereClause.length);
-        System.out.println("Where clause: " + Arrays.toString(whereClause));
-        System.out.println("Where clause 0: " + whereClause[0]);
-        // SELECT * FROM table
-        if (whereClause.length == 1 && whereClause[0].equals("")) {
 
+        // SELECT * FROM table
+        if ((whereClause.length == 1 && whereClause[0].equals("")) || whereClause.length == 0) {
+//            System.out.println("Where clause length: " + whereClause.length);
+//            System.out.println("Where clause: " + Arrays.toString(whereClause));
+//            System.out.println("Where clause 0: " + whereClause[0]);
             System.out.println("Nincs where");
             try (MongoClient mongoClient = create(connectionString)) {
                 Table tableStructure = findTableInCatalog(currentTable);
@@ -136,7 +137,7 @@ public class Select {
                 resultTable.setTableName(currentTable);
                 resultTable.setDatabaseName(currentDatabase);
                 resultTables.add(resultTable);
-
+                System.out.println("OKE WHERE MEGVOLT A " + currentTable + " TABLAHOZ");
 
 //                JFrame frame = new JFrame("Result table");
 //                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -288,7 +289,7 @@ public class Select {
                         MongoDatabase db = mongoClient.getDatabase(currentDatabase);
 
                         // primary key esetén
-                        if (isPk && indexType.equals("primary")) {
+                        if (isPk || indexType.equals("primary")) {
 //                            System.out.println("primary key eset " + attributeName);
 //                            MongoCollection<Document> tableCollection = db.getCollection(currentTable);
 //
@@ -443,7 +444,19 @@ public class Select {
                                 String[] split = row.split("#");
                                 System.out.println("split: " + Arrays.toString(split));
                                 System.out.println("attributeIndexDB: " + attributeIndexDB);
-                                String attributeValue = split[attributeIndexDB];
+
+
+                                ArrayList<Attribute> attrNames = findTableInCatalog(currentTable).zAttributumok();
+                                for (int i = 0; i < attrNames.size(); i++) {
+                                    System.out.println("attrNames.get(i).getNev(): " + attrNames.get(i).get_attributeName());
+                                    if (attrNames.get(i).get_attributeName().equals(attributeName)) {
+                                        attributeIndexDB = i;
+                                        System.out.println("attributeIndexDB: " + attributeIndexDB);
+                                    }
+                                }
+
+
+                                String attributeValue = split[attributeIndexDB - 1];
                                 System.out.println("attributeValue: " + attributeValue);
                                 switch (attributeType.toLowerCase()) {
                                     case "int" -> {
@@ -606,6 +619,7 @@ public class Select {
             resultTable.setTableName(currentTable);
             resultTable.setDatabaseName(currentDatabase);
             resultTables.add(resultTable);
+            System.out.println("OKE WHERE MEGVOLT A " + currentTable + " TABLAHOZ");
         }
     }
 
@@ -660,7 +674,7 @@ public class Select {
         }
     }
 
-    public void fiterSelectedTables(){
+    public void fiterSelectedTables() {
 
         if (selectedColums.contains("*")) {
             return;
@@ -668,8 +682,8 @@ public class Select {
 
         ArrayList<String> tmpS = new ArrayList<>();
 
-        for(String c : selectedColums){
-            if(c.contains(".")){
+        for (String c : selectedColums) {
+            if (c.contains(".")) {
                 String[] split = c.split("\\.");
                 c = split[1];
                 System.out.println("S table: " + c);
@@ -679,7 +693,7 @@ public class Select {
         }
 
         DataTable tmp = resultTables.get(0);
-        for (String dcm: tmp.getColumnsName()) {
+        for (String dcm : tmp.getColumnsName()) {
 //            if dcm contains . then split and check if table is in selected tables
 
             if (!tmpS.contains(dcm)) {
@@ -693,6 +707,7 @@ public class Select {
     public Select(String currentDatabase, String text, Parser parser) {
         String connectionString = "mongodb://localhost:27017";
         this.parser = parser;
+        whereClauseMap = new HashMap<Object, ArrayList<String>>();
         tableProjectionMap = new HashMap<>();
         selectedColumsMap = new HashMap<>();
         joinKeys = new ArrayList<>();
@@ -709,6 +724,10 @@ public class Select {
         ArrayList<String> columns = new ArrayList<>();
         tableProjectionMap.put(fromTable.trim(), columns);
 
+        ArrayList<String> whereConds = new ArrayList<>();
+        whereClauseMap.put(fromTable, whereConds);
+
+
         System.out.println();
         joinClause = joinClause(text);
         System.out.println("Join clause: ");
@@ -720,7 +739,10 @@ public class Select {
         for (String an : joinTables) {
             System.out.print(an + " ");
             ArrayList<String> columns2 = new ArrayList<>();
-            tableProjectionMap.put(an.trim(), columns);
+            ArrayList<String> columns3 = new ArrayList<>();
+
+            tableProjectionMap.put(an.trim(), columns2);
+            whereClauseMap.put(an.trim(), columns3);
         }
 
         whereClause = whereClause(text);
@@ -742,7 +764,14 @@ public class Select {
 
 
 //              tableProjectionMap.get(fromTable)
-        where(fromTable, whereClause);
+        String[] tmp = new String[whereClauseMap.get(fromTable).size()];
+        for (int i = 0; i < whereClauseMap.get(fromTable).size(); i++) {
+            tmp[i] = whereClauseMap.get(fromTable).get(i);
+            System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + tmp[i] + " Table: " + fromTable);
+        }
+        where(fromTable, tmp);
+
+//        where(fromTable, whereClause);
 
 
         if (joinTables.length == 1 && joinTables[0].equals("")) {
@@ -750,9 +779,14 @@ public class Select {
             return;
         }
         for (int i = 0; i < joinTables.length; i++) {
-            String[] empty = new String[1];
-            empty[0] = "";
-            System.out.println("WHERE JOIN TABLE: " + joinTables[i]);
+            String[] empty = new String[whereClauseMap.get(joinTables[i]).size()];
+
+            for (int j = 0; j < whereClauseMap.get(joinTables[i]).size(); j++) {
+                empty[j] = whereClauseMap.get(joinTables[i]).get(j);
+                System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + empty[j] + " Table: " + joinTables[i]);
+            }
+
+//            System.out.println("WHERE JOIN TABLE: " + joinTables[i]);
             where(joinTables[i], empty);
         }
 
@@ -868,20 +902,73 @@ public class Select {
             for (int i = 0; i < ans.length; i++) {
                 ans[i] = ans[i].trim();
             }
-            return ans;
         } else {
             ans = new String[1];
             ans[0] = data.trim();
-            return ans;
+
         }
 
+        ArrayList<String> chars = new ArrayList<>();
+        chars.add("=");
+        chars.add(">");
+        chars.add("<");
+        chars.add(">=");
+        chars.add("<=");
+
+
+        for (String an : ans) {
+//           table.column = table.column
+
+            for (String elv : chars) {
+                if (an.contains(elv)) {
+                    System.out.println("AANNN= "+ an);
+                    String cond1 = an.split(elv)[0].trim();
+                    String cond2 = an.split(elv)[1].trim();
+                    String sTable = "";
+                    String sColumn = "";
+                    String other = "";
+                    if (cond1.contains(".")) {
+                        sTable = cond1.split("\\.")[0].trim();
+                        sColumn = cond1.split("\\.")[1].trim();
+                        other = cond2;
+                    }
+                    if (cond2.contains(".")) {
+                        sTable = cond2.split("\\.")[0].trim();
+                        sColumn = cond2.split("\\.")[1].trim();
+                        other = cond1;
+                    }
+
+
+                    if (sTable.equals("")) {
+                        sTable = this.fromTable;
+                        ArrayList<String> wheres1 = whereClauseMap.get(sTable);
+                        wheres1.add(an);
+                        System.out.println("()()()()()()()()()()()()()()WHERE CLAUSE: " + an + " in table: " + sTable);
+                        continue;
+                    }
+
+                    ArrayList<String> wheres = whereClauseMap.get(sTable);
+                    wheres.add(sColumn + " " + elv + " " + other);
+                    System.out.println("()()()()()()()()()()()()()()WHERE CLAUSE: " + sColumn + " = " + other + " in table: " + sTable);
+                }
+            }
+
+            for (ArrayList<String> ss : whereClauseMap.values()) {
+
+                for (String s : ss) {
+                    System.out.println("WHERE CLAUSE: " + s);
+                }
+            }
+        }
+
+
+        return ans;
     }
 
     public DataTable getResultTable() {
         try {
             fiterSelectedTables();
             System.out.println("Result table: " + resultTables.get(0).getTableName());
-
 
 
             return new DataTable(resultTables.get(0));

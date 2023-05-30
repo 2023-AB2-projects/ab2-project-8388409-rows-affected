@@ -16,6 +16,19 @@ public class DataTableGUI2 extends JPanel{
 
 
     public DataTableGUI2(DataTable tableModel) {
+
+
+        if (tableModel == null) {
+            System.out.println("Table model is null");
+        }
+
+        assert tableModel != null;
+        if (tableModel.getColumns() == null) {
+            System.out.println("Table model columns is null");
+        }
+
+
+
         this.tableModel = tableModel;
         setLayout(new FlowLayout());
         panels = new ArrayList<>();
