@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import static java.lang.Math.max;
 
-public class VisualQueryDesignerTableEdit extends DataTableGUI {
+public class VisualQueryDesignerTableEdit extends DataTableGUIVV {
 
     private ArrayList<JButton> buttons;
     private final KliensNew kliens;
@@ -24,7 +24,7 @@ public class VisualQueryDesignerTableEdit extends DataTableGUI {
 //        }
 
         DataColumnModel deleteModel = new DataColumnModel("", "");
-        DataColumnGUI2 delete = new DataColumnGUI2(deleteModel);
+        DataColumnGUIVV delete = new DataColumnGUIVV(deleteModel);
 
 
         delete.addButtons("delete", getColumn());
@@ -69,7 +69,7 @@ public class VisualQueryDesignerTableEdit extends DataTableGUI {
             });
         }
 
-        for (DataColumnGUI column : getDataColums()) {
+        for (DataColumnGUIVV column : getDataColums()) {
             add(column);
             column.addInputField(1);
         }
