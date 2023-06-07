@@ -48,11 +48,11 @@ public class VisualQueryDesigner extends JPanel {
     public void selectTable(DataTable table) {
         this.removeAll();
         this.revalidate();
-        JScrollPane jps = new JScrollPane(new DataTableGUI(table), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        jps.setPreferredSize(new Dimension(700, this.getHeight()));
-        setLayout(new BorderLayout());
-        add(jps, BorderLayout.CENTER);
-        add(jps);
+//        JScrollPane jps = new JScrollPane(new DataTableGUI(table), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//        jps.setPreferredSize(new Dimension(700, this.getHeight()));
+//        setLayout(new BorderLayout());
+//        add(jps, BorderLayout.CENTER);
+//        add(jps);
         this.revalidate();
     }
 

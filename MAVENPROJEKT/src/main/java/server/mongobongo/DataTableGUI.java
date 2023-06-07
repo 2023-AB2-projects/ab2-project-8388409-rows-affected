@@ -13,6 +13,7 @@ public class DataTableGUI extends JPanel {
         this.tableModel = tableModel;
         this.dataColumnGUI = new ArrayList<>();
         setLayout(new FlowLayout());
+
         for (DataColumnModel column : tableModel.getColumns()) {
             DataColumnGUI columnGUI = new DataColumnGUI(column);
             dataColumnGUI.add(columnGUI);

@@ -1,69 +1,107 @@
 package server.mongobongo;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
+import server.mongobongo.DataColumnModel;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.util.ArrayList;
+
+import static com.sun.java.accessibility.util.SwingEventMonitor.addChangeListener;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.util.ArrayList;
 public class DataColumnGUI extends JPanel {
 
     private final DataColumnModel column;
-    protected ArrayList<ResizeLabel> valueLabels;
-    private ArrayList<JButton> buttons;
+    private final ArrayList<ResizeLabel> valueLabels;
+    private final int visibleLabelCount = 10; // Number of labels visible at a time
+    private final JScrollPane scrollPane;
+    private final JPanel contentPanel;
+    private int startIndex; // Starting index of visible labels
+
     public DataColumnGUI(DataColumnModel column) {
         this.column = column;
-//        setLayout(new GridLayout(100, 1));
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+//        this.scrollPane = scrollPane;
+
+        add(new JLabel(column.getName()), BorderLayout.NORTH);
+        add(new JLabel(column.getType()), BorderLayout.SOUTH);
+
+        setLayout(new BorderLayout());
         valueLabels = new ArrayList<>();
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        scrollPane = new JScrollPane(contentPanel);
+        add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.getVerticalScrollBar().addAdjustmentListener(new ScrollChangeListener());
 
-        System.out.println("Column: " + column.getName() + " has " + column.getValues().size() + " values");
-        ResizeLabel nameL = getLabelTop(column.getName());
-        ResizeLabel typeL = getLabelTop(column.getType());
-        this.valueLabels.add(nameL);
-        this.valueLabels.add(typeL);
-        add(nameL);
-        add(typeL);
-        revalidate();
-        column.getValues().forEach((value) -> {
-            ResizeLabel label = getLabel(value);
-            this.valueLabels.add(label);
-            add(label);
-        });
-
+        add(scrollPane, BorderLayout.CENTER);
         setVisible(true);
+        startIndex = 0;
+        addVisibleLabels();
     }
 
+    private void addVisibleLabels() {
+        int endIndex = Math.min(startIndex + visibleLabelCount, column.getValues().size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            ResizeLabel label = getLabel(column.getValues().get(i));
+            valueLabels.add(label);
+            contentPanel.add(label);
+        }
+
+        revalidate();
+        repaint();
+    }
+
+    private void addLazy(ResizeLabel label) {
+        valueLabels.add(label);
+        contentPanel.add(label);
+        revalidate();
+        repaint();
+    }
 
     private ResizeLabel getLabel(String text) {
-
-        return new ResizeLabel(text, "", this.valueLabels);
+        ResizeLabel label = new ResizeLabel(text, "", valueLabels);
+        label.setVisible(true); // Set visibility to true
+        return label;
     }
 
-    private ResizeLabel getLabelTop(String text) {
-        System.out.println("Getting label for " + text);
-        return new ResizeLabel(text, "top", this.valueLabels);
-    }
+    private class ScrollChangeListener implements AdjustmentListener {
+        @Override
+        public void adjustmentValueChanged(AdjustmentEvent e) {
+            JScrollBar scrollBar = (JScrollBar) e.getAdjustable();
+            int value = scrollBar.getValue();
+            int extent = scrollBar.getModel().getExtent();
+            int maximum = scrollBar.getMaximum();
 
-    public ArrayList<ResizeLabel> getLabels() {
-        return valueLabels;
+            // Check if the scroll bar is at the bottom
+            if (value + extent >= maximum) {
+                startIndex = Math.min(startIndex + visibleLabelCount, column.getValues().size());
+                addVisibleLabels();
+            }
+        }
     }
 
 
     public void addButtons(String buttonName, int size) {
         for (int i = 0; i < size; i++) {
-            ResizeLabel label = new ResizeLabel("", "", this.valueLabels);
+            ResizeLabel label = getLabel("");
             label.addButton(buttonName);
             this.valueLabels.add(label);
-            add(label);
-
+            addLazy(label);
         }
     }
+
     public String getRow(int index) {
-//        index += 2;
         ArrayList<String> ret = new ArrayList<>();
         for (ResizeLabel label : this.valueLabels) {
-
             ret.add(label.getTextFromLabel());
         }
         return ret.get(index);
@@ -78,14 +116,9 @@ public class DataColumnGUI extends JPanel {
             ResizeLabel label = getLabel("");
             label.addInput();
             this.valueLabels.add(label);
-            add(label);
+            addLazy(label);
         }
     }
-//
-//    public ArrayList<JButton> getButtons() {
-////        return buttons;
-//
-//    }
 
     public ArrayList<JButton> getButtons() {
         ArrayList<JButton> ret = new ArrayList<>();
@@ -101,17 +134,6 @@ public class DataColumnGUI extends JPanel {
     public String getColumnName() {
         return this.column.getName();
     }
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        frame.setSize(500, 500);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new GridLayout(1, 1));
-        DataColumnGUI column = new DataColumnGUI(new DataColumnModel("GOU", "int"));
-        JScrollPane scrollPane = new JScrollPane(column, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        frame.add(scrollPane);
-
-        frame.setVisible(true);
-    }
 
     public String get(int index) {
         return this.column.getValues().get(index);
@@ -120,5 +142,6 @@ public class DataColumnGUI extends JPanel {
     public DataColumnModel getDataColumnModel() {
         return this.column;
     }
-}
 
+
+}

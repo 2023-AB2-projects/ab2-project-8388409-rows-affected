@@ -182,4 +182,8 @@ public class ResizeLabel extends JPanel implements MouseListener, MouseMotionLis
         label.setBackground(new Color(77, 77, 77, 255));
         label.setForeground(new Color(203, 203, 203, 255));
     }
+
+    public void setText(String text) {
+        label.setText(text);
+    }
 }
