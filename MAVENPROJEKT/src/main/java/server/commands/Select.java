@@ -295,6 +295,7 @@ public class Select {
                 MongoCollection<Document> collection = db.getCollection(currentTable);
                 System.out.println("Current table: " + currentTable);
                 ArrayList<Document> documents = collection.find().into(new ArrayList<>());
+
                 resultTable = new DataTable(documents, tableStructure, selectedColums, parser);
                 resultTable.setTableName(currentTable);
                 resultTable.setDatabaseName(currentDatabase);
@@ -788,6 +789,7 @@ public class Select {
         }
 
         DataTable tmp = resultTables.get(0);
+
         for (String dcm : tmp.getColumnsName()) {
 //            if dcm contains . then split and check if table is in selected tables
 

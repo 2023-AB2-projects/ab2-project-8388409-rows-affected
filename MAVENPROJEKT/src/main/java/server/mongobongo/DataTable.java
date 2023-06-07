@@ -21,7 +21,7 @@ public class DataTable implements Serializable {
     private ArrayList<Document> documentList;
     protected String databaseName;
     protected String tableName;
-
+    protected ArrayList<Integer> primaryKeys;
     private ArrayList<String> columnNames;
     protected ArrayList<DataColumnModel> columns;
 
@@ -80,25 +80,6 @@ public class DataTable implements Serializable {
         setData(documentList);
     }
 
-    public ArrayList<Document> getDocumentList() {
-        return documentList;
-    }
-
-    public void setDocumentList(ArrayList<Document> documentList) {
-        this.documentList = documentList;
-    }
-
-    public Table getTableStructure() {
-        return tableStructure;
-    }
-
-    public void reRenderTable(){
-        columns = new ArrayList<>();
-        System.out.println("Projecting columns"+columnNames.toString());
-        buildColumns(columnNames, tableStructure);
-        setData(documentList);
-    }
-
     public DataTable(ArrayList<String> columnNames) {
         columns = new ArrayList<>();
         for (String columnName : columnNames) {
@@ -111,6 +92,13 @@ public class DataTable implements Serializable {
     public void buildColumns(ArrayList<String> columnNames, Table table) {
         columns = new ArrayList<>();
 
+
+//        array of the names of the primary keys
+
+        List<PrimaryKey> pks = table.getPrimaryKeys();
+        List<ForeignKey> fks = table.getForeignKeys();
+        List<UniqueKey> uks = table.getUniqueKeys();
+
         ArrayList<Attribute> attributes = table.zAttributumok();
         for (String cn : columnNames) {
             System.out.println(cn);
@@ -120,11 +108,22 @@ public class DataTable implements Serializable {
         for (Attribute attribute : attributes) {
             System.out.println("|"+attribute.get_attributeName()+"|");
                 if (columnNames.contains(attribute.get_attributeName().trim())) {
+
+
                     DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
                     columns.add(dataColumn);
                     selectedColumnIndexes.add(index);
                     selectedColumns.add(attribute.get_attributeName());
                     System.out.println("!Adding column: " + attribute.get_attributeName());
+
+
+                    if (pks != null) {
+                        for (PrimaryKey pk : pks) {
+                            if (pk.getPkAttribute().equals(attribute.get_attributeName())) {
+                              dataColumn.setPrimaryKey(true);
+                            }
+                        }
+                    }
                 }
 
             index++;
@@ -134,7 +133,6 @@ public class DataTable implements Serializable {
     }
 
     public String setData(ArrayList<Document> documents) {
-
 
         for (Document document : documents) {
 
@@ -149,7 +147,6 @@ public class DataTable implements Serializable {
             row.addAll(Arrays.asList(split));
             System.out.println("row: " + row.toString());
             addRow(row);
-
         }
 
         return "OK";
@@ -165,6 +162,24 @@ public class DataTable implements Serializable {
             return;
         }
 
+    }
+
+    public void addPrimaryKey(int index) {
+        columns.get(index).setPrimaryKey(true);
+    }
+
+    public void addForeignKey(int index) {
+        columns.get(index).setForeignKey(true);
+    }
+
+    public ArrayList<String> getPriamryKeys() {
+        ArrayList<String> ret = new ArrayList<>();
+        for (DataColumnModel column : columns) {
+            if (column.getIsPrimaryKey()) {
+                ret.add(column.getColumnName());
+            }
+        }
+        return ret;
     }
 
     public DataTable(DataTable table) {
@@ -351,40 +366,6 @@ public class DataTable implements Serializable {
 
         return fineIndexes;
     }
-
-//    public ArrayList<String> getRow(int index) {
-//        index += 2;
-//        ArrayList<String> ret = new ArrayList<>();
-//        for (String value : this.columns.get(0).getValues()) {
-//            ret.add(value);
-//        }
-//        return ret;
-//    }
-
-//    public static void main(String[] args) {
-//        DataTable dt = new DataTable("ab", "GPU");
-//
-//        JFrame jf = new JFrame();
-//        jf.setSize(400, 300);
-//        jf.setLayout(new FlowLayout());
-//        jf.setBackground(new Color(203, 141, 141));
-//        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        JScrollPane sp = new JScrollPane(new DataTable(dt), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-//
-////        System.out.println("width: " + dt.getPanelWidth() + " height: " + dt.getPanelHeight());
-////        System.out.println("width: " + sp.getWidth() + " height: " + sp.getHeight());
-//
-////        sp.setPreferredSize(new Dimension());
-////      sp be resizable
-//        sp.setAutoscrolls(true);
-//
-//        sp.getVerticalScrollBar().getMaximumSize();
-//
-//
-//        jf.add(sp);
-//        jf.setVisible(true);
-//
-//    }
 
 
     public void setTableName(String fromTable) {

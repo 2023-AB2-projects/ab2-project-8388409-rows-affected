@@ -17,11 +17,7 @@ public class VisualQueryDesignerTableEdit extends DataTableGUIVV {
 
         super(dataTable);
         this.kliens = kliens;
-        int size = 0;
         setLayout(new FlowLayout());
-//        for (DataColumnGUI column : getDataColums()) {
-//            size = max(column.getLength(), size);
-//        }
 
         DataColumnModel deleteModel = new DataColumnModel("", "");
         DataColumnGUIVV delete = new DataColumnGUIVV(deleteModel);
@@ -30,7 +26,6 @@ public class VisualQueryDesignerTableEdit extends DataTableGUIVV {
         delete.addButtons("delete", getColumn());
         delete.addButtons("insert", 1);
         this.removeAll();
-//        delete.setPreferredSize(new Dimension(100, 100));
         add(delete);
 
         for (JButton button : delete.getButtons()) {
@@ -54,7 +49,6 @@ public class VisualQueryDesignerTableEdit extends DataTableGUIVV {
                     }
                     delete(args2);
 
-//                    delete();
                 } else if (button.getText().equals("insert")) {
                     System.out.println("insert");
                     System.out.println(index);
@@ -83,7 +77,13 @@ public class VisualQueryDesignerTableEdit extends DataTableGUIVV {
         sql += "DELETE FROM " + getTableName() + " WHERE ";
 
         ArrayList<DataColumnModel> columns = getColumnsModel();
+
+
+
         for (int i = 0; i < columns.size(); i++) {
+
+            System.out.println("PKK: " + columns.get(i).getIsPrimaryKey() );
+
             if (columns.get(i).getIsPrimaryKey()) {
                 sql += getColumnName(i) + " = " + args[i];
                 break;
