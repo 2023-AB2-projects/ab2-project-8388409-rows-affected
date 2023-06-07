@@ -26,6 +26,7 @@ public class DataColumnGUI extends JPanel {
 //        scrollPane = new JScrollPane(contentPanel);
         scrollPane = scrollPane;
 
+
         add(contentPanel, BorderLayout.CENTER);
         add(getLabelTop(column.getType()), BorderLayout.NORTH);
         add(getLabelTop(column.getType()), BorderLayout.NORTH);
