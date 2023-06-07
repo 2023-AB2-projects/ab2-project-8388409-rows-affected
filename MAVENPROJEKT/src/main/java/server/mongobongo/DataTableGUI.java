@@ -70,16 +70,7 @@ public class DataTableGUI extends JPanel {
 
 
 
-    public static void main(String[] args) {
-        DataTable dt = new DataTable("ab", "GPU");
-        DataTableGUI dtg = new DataTableGUI(dt);
-        JFrame frame = new JFrame();
-        frame.add(dtg.getAsScrollPane());
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
 
-    }
 
 
 

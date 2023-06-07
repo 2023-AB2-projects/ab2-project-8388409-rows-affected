@@ -115,7 +115,7 @@ public class QueryPanel extends JPanel implements Accessible, MenuElement {
         resultPanel.removeAll();
 //        DataTableGUI dataTableGUI = new DataTableGUI(dataTable);
 //        JPanel dataTableGUI = new DataTableGUI(dataTable);
-        DataTableGUI2 jp =  new DataTableGUI2(dataTable);
+        DataTableGUI jp =  new DataTableGUI(dataTable);
 
 //        resultPanel.setPreferredSize(dataTableGUI.getPreferredSize());
         System.out.println("===========================================");

@@ -2,14 +2,10 @@ package server.commands;
 
 import server.Parser;
 import server.mongobongo.DataTable;
-import server.mongobongo.DataTableGUI;
 
-import javax.swing.*;
-import javax.swing.text.Document;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Join implements Serializable {
 
@@ -81,18 +77,6 @@ public class Join implements Serializable {
             e.printStackTrace();
         }
 
-//        join remaning tables to resultTable
-
-
-//        JFrame frame = new JFrame("Join");
-//        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setSize(400, 400);
-//        assert resultTable != null;
-//        frame.add(new DataTableGUI(resultTable));
-//        frame.add(new DataTableGUI(connectionMap.get(firstTable)));
-//        frame.add(new DataTableGUI(connectionMap.get(secondTable)));
-//        frame.setVisible(true);
         return new DataTable();
     }
     public DataTable getJoinCondition(String joinCondition, DataTable res) {

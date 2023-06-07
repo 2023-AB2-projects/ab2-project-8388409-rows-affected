@@ -286,8 +286,8 @@ public class Parser {
             return message;
         }
 
-        message.setErrors("");
-//        System.out.println("Query executed successfully");
+//        message.setErrors("");
+        System.out.println("Query executed successfully");
         message.setMessageUser("Query executed successfully");
 
         return message;

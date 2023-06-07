@@ -6,11 +6,13 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import server.Parser;
 import server.jacksonclasses.*;
+import server.mongobongo.DataColumnModel;
 import server.mongobongo.DataTable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static com.mongodb.client.MongoClients.create;
 import static com.mongodb.client.model.Filters.*;
@@ -23,6 +25,7 @@ public class Select {
     private final HashMap<Object, ArrayList<String>> whereClauseMap;
     private final HashMap<String, ArrayList<String>> selectedColumsMap;
     private final ArrayList<DataTable> resultTables;
+    private ArrayList<CatalogAndMongo> resultCatalogMongo;
     private final ArrayList<String> selectedColums;
     private final String fromTable;
     private final String joinClause;
@@ -32,9 +35,9 @@ public class Select {
     private final String[] joinTables;
     private final String[] whereClause;
     private String[] groupBy;
-
     private final String currentDatabase;
     private final Parser parser;
+    private final String connectionString = "mongodb://localhost:27017";
 
     private ArrayList<Document> ArrayListIntersection(ArrayList<Document> list1, ArrayList<Document> list2) {
         ArrayList<Document> result = new ArrayList<>();
@@ -50,13 +53,171 @@ public class Select {
         return result;
     }
 
+    public boolean isEmpty(String[] array) {
+        return ((array.length == 1 && array[0].equals("")) || array.length == 0);
+    }
+
+    public ArrayList<Document> getTableFromMongo(String currentTable) {
+        try (MongoClient mongoClient = create(connectionString)) {
+            Table tableStructure = findTableInCatalog(currentTable);
+            MongoDatabase db = mongoClient.getDatabase(currentDatabase);
+            MongoCollection<Document> collection = db.getCollection(currentTable);
+            return collection.find().into(new ArrayList<>());
+        }
+    }
+
+    public Table getTableFromCatalog(String tableName) {
+
+        Table mytable = null;
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Databases databases = objectMapper.readValue(new File("Catalog.json"), Databases.class);
+            List<Database> databaseList = databases.getDatabases();
+            if (databaseList == null)
+                throw new Exception("Nincs ilyen tábla");
+
+            for (Database database : databaseList) {
+//                find database
+                if (database.get_dataBaseName().equals(currentDatabase)) {
+                    List<Table> tableList = database.getTables();
+                    if (tableList == null)
+                        throw new Exception("Nincs ilyen tábla");
+
+//                    find table
+                    for (Table table : tableList) {
+                        if (table.get_tableName().equals(tableName)) {
+                            mytable = table;
+                            return mytable;
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.getMessage();
+            parser.setParserError(true);
+            parser.setOtherError(e.getMessage());
+        }
+
+        parser.setParserError(true);
+        parser.setOtherError("Nincs ilyen tábla");
+        return mytable;
+    }
+
+    public CatalogAndMongo whereMiddleware(String currentTable) {
+        CatalogAndMongo catalogAndMongo = new CatalogAndMongo();
+        Table myTable = getTableFromCatalog(currentTable);
+        IndexFiles indexFiles = myTable.getIndexFiles();
+        System.out.println("!!!!!!!!!!!!!!! indexFiles: " + indexFiles);
+        catalogAndMongo.setIndexFiles(indexFiles);
+        catalogAndMongo.setCatalog(myTable);
+
+        return catalogAndMongo;
+    }
+
+    public DataTable where2(String fromTable, String[] whereClause){
+        CatalogAndMongo catalogAndMongo = whereMiddleware(fromTable);
+        catalogAndMongo = where2(catalogAndMongo, whereClause);
+        resultCatalogMongo.add(catalogAndMongo);
+        DataTable dt = catalogAndMongo.toDataTable(parser);
+        dt.setTableName(fromTable);
+        dt.setDatabaseName(currentDatabase);
+        return dt;
+    }
+
+    public CatalogAndMongo where2(CatalogAndMongo currentTable, String[] whereClause) {
+
+        if (isEmpty(whereClause)) {
+            ArrayList<Document> mongoData = getTableFromMongo(currentTable.getTableName());
+            currentTable.setMongo(mongoData);
+            return currentTable;
+        }
+
+        try (MongoClient mongoClient = create(connectionString)) {
+            MongoDatabase db = mongoClient.getDatabase(currentDatabase);
+
+
+            ArrayList<ArrayList<Document>> arrayLists = new ArrayList<>();
+            for (int i = 0; i < whereClause.length; i++) {
+
+                System.out.println("!!!!!!!!!!!!!!! whereClause[i]: " + whereClause[i]);
+
+                String[] cond = whereClause[i].split(" ");
+                String attributeName = cond[0];
+                String operator = cond[1];
+                String value = cond[2];
+
+                Attribute type = currentTable.getAttrType(attributeName);
+                if (type == null)
+                    throw new IllegalArgumentException("Nincs ilyen attribútum");
+
+                if (operator.equalsIgnoreCase("=") && currentTable.hasIndexFile(attributeName)) {
+                    System.out.println("!!!!!!!!!!!!!!! van index  ");
+                    String indexType = currentTable.getAttrIndexType(attributeName);
+                    String indexName = currentTable.getIndexName(attributeName);
+
+                    if (currentTable.isPrimaryKey(attributeName) && indexType.equalsIgnoreCase("primary")) {
+                        System.out.println("!!!!!!!!!!!!!!! primary key  ");
+                        MongoCollection collection = db.getCollection(currentTable.getTableName());
+
+                        Bson filter = eq("_id", value);
+                        ArrayList<Document> mongoData = (ArrayList<Document>) collection.find(filter).into(new ArrayList<Document>());
+//                        currentTable.setMongo (mongoData);
+                        arrayLists.add(mongoData);
+                        continue;
+                    }
+
+                    if (indexType.equalsIgnoreCase("unique")) {
+                        System.out.println("!!!!!!!!!!!!!!! unique  ");
+                        MongoCollection indexCollection = db.getCollection(indexName);
+
+                        Bson filter = eq("_id", value);
+                        ArrayList<Document> filteredDocuments = (ArrayList<Document>) indexCollection.find(filter).into(new ArrayList<>());
+
+                        ArrayList<Document> result = new ArrayList<>();
+                        // using the index to get the documents from the table
+                        for (Document document : filteredDocuments) {
+                            String indexvalue = document.getString("indexvalue");
+                            MongoCollection<Document> tableCollection = db.getCollection(currentTable.getTableName());
+                            Bson pkFilter = eq("_id", indexvalue);
+                            Document resultDocument = tableCollection.find(pkFilter).first();
+                            result.add(resultDocument);
+                        }
+//                        arrayLists.add(result);
+//                        currentTable.setMongo(result);
+                        arrayLists.add(result);
+                        continue;
+                    }
+
+                }
+
+            ArrayList<Document> collections = getTableFromMongo(currentTable.getTableName());
+            currentTable.setMongo(collections);
+            ArrayList<Document> filteredDocuments = currentTable.filter(attributeName, operator, value);
+            arrayLists.add(filteredDocuments);
+
+            }
+
+            ArrayList<Document> result = arrayLists.get(0);
+            System.out.println("arrayLists.size() : " + arrayLists.size());
+            for (int k = 1; k < arrayLists.size(); k++) {
+                result = ArrayListIntersection(result, arrayLists.get(k));
+                System.out.println("++++ "+arrayLists.get(k));
+            }
+            currentTable.setMongo(result);
+        }
+
+        return currentTable;
+    }
+
     public void where(String currentTable, String[] whereClause) {
 
 
         System.out.println("WHERE");
         System.out.println(" ==== Table:" + currentTable + " Where clause: " + Arrays.toString(whereClause));
 
-        String connectionString = "mongodb://localhost:27017";
+
         // SELECT * FROM table
         ArrayList<String> selectedColums = new ArrayList<>();
         selectedColums.add("*");
@@ -153,7 +314,6 @@ public class Select {
         else {
             System.out.println("Van where");
             ArrayList<ArrayList<Document>> arrayLists = new ArrayList<>();
-            FindIterable<Document> filteredCollection = null;
             for (String condition : whereClause) {
                 String[] conditionParts = condition.split(" ");
                 String attributeName = conditionParts[0];
@@ -286,32 +446,7 @@ public class Select {
 
                         // primary key esetén
                         if (isPk && indexType.equals("primary")) {
-//                            System.out.println("primary key eset " + attributeName);
-//                            MongoCollection<Document> tableCollection = db.getCollection(currentTable);
 //
-//                            Bson filter = empty();
-//                            switch (operator) {
-//                                case "=" -> filter = eq("_id", value);
-//                                case "<" -> filter = lt("_id", value);
-//                                case ">" -> filter = gt("_id", value);
-//                                case "<=" -> filter = lte("_id", value);
-//                                case ">=" -> filter = gte("_id", value);
-//                                case "!=" -> filter = ne("_id", value);
-//                                default -> {
-//                                    parser.setOtherError("Operator " + operator + " is not supported");
-//                                    return;
-//                                }
-//                            }
-//                            System.out.println("Filter: " + filter);
-//                            if (filter == null) {
-//                                System.out.println("FILTER NULL");
-//                            }
-////                            use mongo cursor and sort
-//
-//
-//                            ArrayList<Document> filteredDocuments = tableCollection.find(filter).into(new ArrayList<>());
-//                            System.out.println("Filtered documents: " + filteredDocuments.toString());
-//                            arrayLists.add(filteredDocuments);
                             System.out.println("primary key eset " + attributeName);
                             MongoCollection<Document> tableCollection = db.getCollection(currentTable);
 
@@ -347,54 +482,7 @@ public class Select {
 
                             System.out.println("Attribute type: " + attributeType);
                             Bson filter = null;
-//                            switch (attributeType) {
-//                                case "int" -> {
-//                                    int intValue = Integer.parseInt(value);
-//                                    System.out.println("int value: " + intValue);
-//                                    switch (operator) {
-//                                        case "=" -> filter = eq("_id", intValue);
-//                                        case "<" -> filter = lt("_id", intValue);
-//                                        case ">" -> filter = gt("_id", intValue);
-//                                        case "<=" -> filter = lte("_id", intValue);
-//                                        case ">=" -> filter = gte("_id", intValue);
-//                                        case "!=" -> filter = ne("_id", intValue);
-//                                        default -> {
-//                                            parser.setOtherError("Operator " + operator + " is not supported");
-//                                            return;
-//                                        }
-//                                    }
-//                                }
-//                                case "float" -> {
-//                                    float floatValue = Float.parseFloat(value);
-//                                    System.out.println("float value: " + floatValue);
-//                                    switch (operator) {
-//                                        case "=" -> filter = eq("_id", floatValue);
-//                                        case "<" -> filter = lt("_id", floatValue);
-//                                        case ">" -> filter = gt("_id", floatValue);
-//                                        case "<=" -> filter = lte("_id", floatValue);
-//                                        case ">=" -> filter = gte("_id", floatValue);
-//                                        case "!=" -> filter = ne("_id", floatValue);
-//                                        default -> {
-//                                            parser.setOtherError("Operator " + operator + " is not supported");
-//                                            return;
-//                                        }
-//                                    }
-//                                }
-//                                case "varchar", "date" -> {
-//                                    switch (operator) {
-//                                        case "=" -> filter = eq("_id", value);
-//                                        case "<" -> filter = lt("_id", value);
-//                                        case ">" -> filter = gt("_id", value);
-//                                        case "<=" -> filter = lte("_id", value);
-//                                        case ">=" -> filter = gte("_id", value);
-//                                        case "!=" -> filter = ne("_id", value);
-//                                        default -> {
-//                                            parser.setOtherError("Operator " + operator + " is not supported");
-//                                            return;
-//                                        }
-//                                    }
-//                                }
-//                            }
+//
                             switch (operator) {
                                 case "=" -> filter = eq("_id", value);
                                 case "<" -> filter = lt("_id", value);
@@ -603,6 +691,7 @@ public class Select {
             System.out.println("arrayLists.size() : " + arrayLists.size());
             for (int i = 1; i < arrayLists.size(); i++) {
                 result = ArrayListIntersection(result, arrayLists.get(i));
+                System.out.println("++++ "+arrayLists.get(i));
             }
 
             System.out.print("Selected columns: ");
@@ -624,7 +713,6 @@ public class Select {
             System.out.println("OKE WHERE MEGVOLT A " + currentTable + " TABLAHOZ");
         }
     }
-
 
     public void processProjection(ArrayList<String> selectedColums) {
 
@@ -690,7 +778,6 @@ public class Select {
                 c = split[1];
                 System.out.println("S table: " + c);
             }
-
             tmpS.add(c);
         }
 
@@ -705,6 +792,55 @@ public class Select {
 
         }
     }
+    public void doit2(){
+
+//        addKeysToProjection(joinClause);
+        System.out.println("Table projection map: ");
+        for (ArrayList<String> columns1 : tableProjectionMap.values()) {
+            for (String column : columns1) {
+                System.out.print(column + " ");
+            }
+            System.out.println();
+        }
+
+
+//              tableProjectionMap.get(fromTable)
+        String[] tmp = new String[whereClauseMap.get(fromTable).size()];
+        for (int i = 0; i < whereClauseMap.get(fromTable).size(); i++) {
+            tmp[i] = whereClauseMap.get(fromTable).get(i);
+            System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + tmp[i] + " Table: " + fromTable);
+        }
+        DataTable tbl_ = where2(fromTable, tmp);
+        resultTables.add(tbl_);
+
+
+        if (joinTables.length == 1 && joinTables[0].equals("")) {
+            System.out.println("Join tables is empty");
+            return;
+        }
+        for (int i = 0; i < joinTables.length; i++) {
+            String[] empty = new String[whereClauseMap.get(joinTables[i]).size()];
+
+            for (int j = 0; j < whereClauseMap.get(joinTables[i]).size(); j++) {
+                empty[j] = whereClauseMap.get(joinTables[i]).get(j);
+                System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + empty[j] + " Table: " + joinTables[i]);
+            }
+
+//            System.out.println("WHERE JOIN TABLE: " + joinTables[i]);
+            DataTable tbl = where2(joinTables[i], empty);
+            resultTables.add(tbl);
+        }
+
+
+        System.out.println("Join clause is not empty");
+
+        for (DataTable db: resultTables){
+            System.out.println(" !!!!!! JOINNN Table: " + db.getTableName());
+        }
+
+        Join2 joinRes = new Join2(resultCatalogMongo, joinClause, joinKeys, currentDatabase, parser);
+        resultTables.set(0, joinRes.getResultTable());
+    }
 
     public Select(String currentDatabase, String text, Parser parser) {
         String connectionString = "mongodb://localhost:27017";
@@ -712,6 +848,8 @@ public class Select {
         whereClauseMap = new HashMap<Object, ArrayList<String>>();
         tableProjectionMap = new HashMap<>();
         selectedColumsMap = new HashMap<>();
+        resultCatalogMongo = new ArrayList<>();
+
         joinKeys = new ArrayList<>();
         this.currentDatabase = currentDatabase;
         resultTables = new ArrayList<>();
@@ -753,49 +891,58 @@ public class Select {
             System.out.print("|" + an + "| ");
         }
         System.out.println();
+        try {
 
+            doit2();
+        } catch (Exception e) {
+            e.printStackTrace();
+            parser.setOtherError(e.getMessage());
+            parser.setParserError(true);
 
-//        addKeysToProjection(joinClause);
-        System.out.println("Table projection map: ");
-        for (ArrayList<String> columns1 : tableProjectionMap.values()) {
-            for (String column : columns1) {
-                System.out.print(column + " ");
-            }
-            System.out.println();
         }
 
-
-//              tableProjectionMap.get(fromTable)
-        String[] tmp = new String[whereClauseMap.get(fromTable).size()];
-        for (int i = 0; i < whereClauseMap.get(fromTable).size(); i++) {
-            tmp[i] = whereClauseMap.get(fromTable).get(i);
-            System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + tmp[i] + " Table: " + fromTable);
-        }
-        where(fromTable, tmp);
-
-//        where(fromTable, whereClause);
-
-
-        if (joinTables.length == 1 && joinTables[0].equals("")) {
-            System.out.println("Join tables is empty");
-            return;
-        }
-        for (int i = 0; i < joinTables.length; i++) {
-            String[] empty = new String[whereClauseMap.get(joinTables[i]).size()];
-
-            for (int j = 0; j < whereClauseMap.get(joinTables[i]).size(); j++) {
-                empty[j] = whereClauseMap.get(joinTables[i]).get(j);
-                System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + empty[j] + " Table: " + joinTables[i]);
-            }
-
-//            System.out.println("WHERE JOIN TABLE: " + joinTables[i]);
-            where(joinTables[i], empty);
-        }
-
-
-        System.out.println("Join clause is not empty");
-        Join joinRes = new Join(resultTables, joinClause, joinKeys, parser);
-        resultTables.set(0, joinRes.getResultTable());
+//
+////        addKeysToProjection(joinClause);
+//        System.out.println("Table projection map: ");
+//        for (ArrayList<String> columns1 : tableProjectionMap.values()) {
+//            for (String column : columns1) {
+//                System.out.print(column + " ");
+//            }
+//            System.out.println();
+//        }
+//
+//
+////              tableProjectionMap.get(fromTable)
+//        String[] tmp = new String[whereClauseMap.get(fromTable).size()];
+//        for (int i = 0; i < whereClauseMap.get(fromTable).size(); i++) {
+//            tmp[i] = whereClauseMap.get(fromTable).get(i);
+//            System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + tmp[i] + " Table: " + fromTable);
+//        }
+//        where(fromTable, tmp);
+//
+////        where(fromTable, whereClause);
+//
+//
+//        if (joinTables.length == 1 && joinTables[0].equals("")) {
+//            System.out.println("Join tables is empty");
+//            return;
+//        }
+//        for (int i = 0; i < joinTables.length; i++) {
+//            String[] empty = new String[whereClauseMap.get(joinTables[i]).size()];
+//
+//            for (int j = 0; j < whereClauseMap.get(joinTables[i]).size(); j++) {
+//                empty[j] = whereClauseMap.get(joinTables[i]).get(j);
+//                System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + empty[j] + " Table: " + joinTables[i]);
+//            }
+//
+////            System.out.println("WHERE JOIN TABLE: " + joinTables[i]);
+//            where(joinTables[i], empty);
+//        }
+//
+//
+//        System.out.println("Join clause is not empty");
+//        Join joinRes = new Join(resultTables, joinClause, joinKeys, parser);
+//        resultTables.set(0, joinRes.getResultTable());
     }
 
     private String[] joinTables(String joinClause) {
@@ -923,7 +1070,7 @@ public class Select {
 
             for (String elv : chars) {
                 if (an.contains(elv)) {
-                    System.out.println("AANNN= "+ an);
+                    System.out.println("AANNN= " + an);
                     String cond1 = an.split(elv)[0].trim();
                     String cond2 = an.split(elv)[1].trim();
                     String sTable = "";
@@ -971,6 +1118,14 @@ public class Select {
         try {
             fiterSelectedTables();
             System.out.println("Result table: " + resultTables.get(0).getTableName());
+
+            for (DataColumnModel c : resultTables.get(0).getColumns()) {
+                System.out.println("Result table columns: " + c.getColumnName());
+                for (String s : c.getValues()) {
+                    System.out.println("Result table data: " + s);
+                }
+            }
+
 
 
             return new DataTable(resultTables.get(0));

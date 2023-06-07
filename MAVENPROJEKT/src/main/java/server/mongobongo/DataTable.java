@@ -17,13 +17,18 @@ import java.util.*;
 import java.util.List;
 
 public class DataTable implements Serializable {
+    private Table tableStructure;
+    private ArrayList<Document> documentList;
     protected String databaseName;
     protected String tableName;
+
+    private ArrayList<String> columnNames;
     protected ArrayList<DataColumnModel> columns;
 
     protected Parser parser;
 
     protected ArrayList<Integer> selectedColumnIndexes = new ArrayList<>();
+    protected ArrayList<String> selectedColumns = new ArrayList<>();
 
     public DataTable(String databaseName, String tableName, Parser parser) {
         this.parser = parser;
@@ -62,13 +67,35 @@ public class DataTable implements Serializable {
 
     public DataTable(ArrayList<Document> documentList, Table tableStructure, ArrayList<String> columnNames, Parser parser) {
 
+        System.out.println("()()(***&&&&& documentList" + documentList.toString());
         this.databaseName = "tempDB";
         this.tableName = "tempTable";
         columns = new ArrayList<>();
         System.out.println("Projecting columns"+columnNames.toString());
-
+        this.documentList = documentList;
+        this.tableStructure = tableStructure;
+        this.columnNames = columnNames;
         buildColumns(columnNames, tableStructure);
 
+        setData(documentList);
+    }
+
+    public ArrayList<Document> getDocumentList() {
+        return documentList;
+    }
+
+    public void setDocumentList(ArrayList<Document> documentList) {
+        this.documentList = documentList;
+    }
+
+    public Table getTableStructure() {
+        return tableStructure;
+    }
+
+    public void reRenderTable(){
+        columns = new ArrayList<>();
+        System.out.println("Projecting columns"+columnNames.toString());
+        buildColumns(columnNames, tableStructure);
         setData(documentList);
     }
 
@@ -96,6 +123,7 @@ public class DataTable implements Serializable {
                     DataColumnModel dataColumn = new DataColumnModel(attribute.get_attributeName(), attribute.get_type());
                     columns.add(dataColumn);
                     selectedColumnIndexes.add(index);
+                    selectedColumns.add(attribute.get_attributeName());
                     System.out.println("!Adding column: " + attribute.get_attributeName());
                 }
 
@@ -109,33 +137,18 @@ public class DataTable implements Serializable {
 
 
         for (Document document : documents) {
-            int index = 0;
 
-            ArrayList<String> keys = new ArrayList<>(document.keySet());
-//            System.out.println("Projecting colum indexes:"+selectedColumnIndexes.toString());
+            System.out.println("document: " + document.toString());
 
-//            System.out.println("keys: " + keys.size());
-//            System.out.println("keys: " + keys.toString());
+            String pks = document.getString("_id");
+            String pk[] = document.getString("_id").split("#");
+            ArrayList<String> row = new ArrayList<>(Arrays.asList(pk));
 
-            for (Integer i : selectedColumnIndexes) {
-//                System.out.println(i);
+            String[] split = document.getString("row").split("#");
 
-                if (i==0){
-                    columns.get(index).addValue(document.get("_id").toString());
-                    columns.get(index).setPrimaryKey(true);
-                } else {
-                    String value = (String) document.get(keys.get(1));
-//                    System.out.println("-key: " + i + " : " + keys.get(1));
-                    String[] values = value.split("#");
-//                    System.out.println(Arrays.toString(values));
-//                    System.out.println("key: " + i + " value: " + values[i-1]);
-                    columns.get(index).addValue(values[i-1]);
-                }
-                index++;
-
-
-            }
-
+            row.addAll(Arrays.asList(split));
+            System.out.println("row: " + row.toString());
+            addRow(row);
 
         }
 

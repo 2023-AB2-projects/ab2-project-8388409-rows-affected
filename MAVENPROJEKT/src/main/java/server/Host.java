@@ -41,6 +41,15 @@ public class Host {
         error = "";
         acc = "";
 
+        // Create a file to hold the log
+//        File logFile = new File("console.log");
+//        FileOutputStream fos = new FileOutputStream(logFile);
+//
+//        // Redirect System.out to the log file
+//        PrintStream ps = new PrintStream(fos);
+//        System.setOut(ps);
+
+
         Create_load_catalog();
         Create_load_lastCurrentDatabase();
         Create_socket_communication();
