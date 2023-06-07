@@ -777,9 +777,8 @@ public class Select {
         for (String c : selectedColums) {
 
 
-            System.out.println("S table: " + c);
 
-            tmpS.add(c);
+
             if (c.contains(".")) {
                 String[] split = c.split("\\.");
                 c = split[1];
@@ -1124,7 +1123,7 @@ public class Select {
 
     public DataTable getResultTable() {
         try {
-//            fiterSelectedTables();
+            fiterSelectedTables();
             System.out.println("Result table: " + resultTables.get(0).getTableName());
 
             for (DataColumnModel c : resultTables.get(0).getColumns()) {

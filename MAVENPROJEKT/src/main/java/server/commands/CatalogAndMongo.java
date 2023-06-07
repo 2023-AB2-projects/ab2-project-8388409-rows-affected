@@ -373,13 +373,6 @@ public class CatalogAndMongo {
         Structure Structure = catalog.getStructure();
 
 
-        List<Attribute> atr2 = Catalog.getStructure().getAttributes();
-        for (Attribute attribute : atr2) {
-            attribute.set_attributeName(catalog.get_tableName()+"."+attribute.get_attributeName());
-        }
-
-
-
         ArrayList<Attribute> Attributes = new ArrayList<>();
         if (catalog.getStructure() != null)
             Attributes.addAll(this.catalog.getStructure().getAttributes());
