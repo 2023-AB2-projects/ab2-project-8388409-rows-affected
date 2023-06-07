@@ -17,12 +17,11 @@ public class DataTableGUI extends JPanel {
         setLayout(new FlowLayout());
         jps = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         JPanel vpanel = new JPanel();
-        vpanel.setLayout(new BoxLayout(vpanel, BoxLayout.X_AXIS));
+        vpanel.setLayout(new FlowLayout());
         for (DataColumnModel column : tableModel.getColumns()) {
             DataColumnGUI columnGUI = new DataColumnGUI(column,jps,vpanel);
             dataColumnGUI.add(columnGUI);
         }
-
 
 
         jps.setPreferredSize(new Dimension(500, 500));

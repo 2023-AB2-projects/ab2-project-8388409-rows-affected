@@ -15,12 +15,25 @@ public class DataColumnGUI extends JPanel {
     private final JPanel contentPanel;
     private int startIndex; // Starting index of visible labels
 
+    private ResizeLabel name;
+    private ResizeLabel type;
+
     public DataColumnGUI(DataColumnModel column, JScrollPane scrollPane, JPanel vpanel) {
         this.column = column;
 //        this.scrollPane = scrollPane;
 
         setLayout(new BorderLayout());
         valueLabels = new ArrayList<>();
+
+        ResizeLabel label = getLabel(column.getName());
+        label.setTop();
+        valueLabels.add(label);
+        name = label;
+        ResizeLabel label2 = getLabel(column.getType());
+        label2.setTop();
+        valueLabels.add(label2);
+        type = label2;
+
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 //        scrollPane = new JScrollPane(contentPanel);
@@ -46,6 +59,13 @@ public class DataColumnGUI extends JPanel {
 
     private void addVisibleLabels() {
         int endIndex = Math.min(startIndex + visibleLabelCount, column.getValues().size());
+
+//        add column name to the top
+
+        if (startIndex == 0) {
+            contentPanel.add(name);
+            contentPanel.add(type);
+        }
 
         for (int i = startIndex; i < endIndex; i++) {
             ResizeLabel label = getLabel(column.getValues().get(i));
