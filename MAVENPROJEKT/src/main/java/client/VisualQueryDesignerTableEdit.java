@@ -24,7 +24,7 @@ public class VisualQueryDesignerTableEdit extends DataTableGUI {
 //        }
 
         DataColumnModel deleteModel = new DataColumnModel("", "");
-        DataColumnGUI delete = new DataColumnGUI(deleteModel);
+        DataColumnGUI2 delete = new DataColumnGUI2(deleteModel);
 
 
         delete.addButtons("delete", getColumn());

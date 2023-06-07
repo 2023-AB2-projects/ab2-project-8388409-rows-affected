@@ -1,26 +1,20 @@
 package server.mongobongo;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class DataColumnModel implements Serializable {
     protected String name;
     protected final String type;
     protected Boolean primaryKey;
     protected Boolean isNull;
-
-
     protected Boolean isForeignKey;
     protected ArrayList<String> values;
-
     protected String special;
 
 
     public DataColumnModel(DataColumnModel column) {
-        this.name = column.getName();
+        this.name = String.valueOf(column.getName());
         this.type = column.getType();
         this.primaryKey = column.getPrimaryKey();
         this.special = column.getSpecial();

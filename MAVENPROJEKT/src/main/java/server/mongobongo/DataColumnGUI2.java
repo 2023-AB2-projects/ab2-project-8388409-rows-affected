@@ -6,38 +6,36 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.ArrayList;
 
-public class DataColumnGUI extends JPanel {
+public class DataColumnGUI2 extends JPanel {
 
     private final DataColumnModel column;
     private final ArrayList<ResizeLabel> valueLabels;
     private final int visibleLabelCount = 10; // Number of labels visible at a time
-    private JScrollPane scrollPane;
+    private final JScrollPane scrollPane;
     private final JPanel contentPanel;
     private int startIndex; // Starting index of visible labels
 
-    public DataColumnGUI(DataColumnModel column, JScrollPane scrollPane, JPanel vpanel) {
+    public DataColumnGUI2(DataColumnModel column) {
         this.column = column;
 //        this.scrollPane = scrollPane;
+
 
         setLayout(new BorderLayout());
         valueLabels = new ArrayList<>();
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-//        scrollPane = new JScrollPane(contentPanel);
-        scrollPane = scrollPane;
-
+        scrollPane = new JScrollPane(contentPanel);
         add(contentPanel, BorderLayout.CENTER);
         add(getLabelTop(column.getType()), BorderLayout.NORTH);
         add(getLabelTop(column.getType()), BorderLayout.NORTH);
-//        add(scrollPane, BorderLayout.CENTER);
-        scrollPane.setViewportView(vpanel);
-        vpanel.add(contentPanel);
+        add(scrollPane, BorderLayout.CENTER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().addAdjustmentListener(new ScrollChangeListener());
-
-//        scrollPane.setColumnHeader(name);
-//        scrollPane.setVisible(false);
+        JViewport name = new JViewport();
+        name.setView(getLabelTop(column.getName()));
+        scrollPane.setColumnHeader(name);
+        scrollPane.setVisible(false);
 //        add(scrollPane, BorderLayout.CENTER);
 
         setVisible(true);

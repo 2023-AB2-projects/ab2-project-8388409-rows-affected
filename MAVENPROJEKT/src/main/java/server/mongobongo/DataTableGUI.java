@@ -9,19 +9,27 @@ public class DataTableGUI extends JPanel {
     private final DataTable tableModel;
     private final ArrayList<DataColumnGUI> dataColumnGUI;
 
+    private JScrollPane jps;
+
     public DataTableGUI(DataTable tableModel) {
         this.tableModel = tableModel;
         this.dataColumnGUI = new ArrayList<>();
         setLayout(new FlowLayout());
-
+        jps = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JPanel vpanel = new JPanel();
         for (DataColumnModel column : tableModel.getColumns()) {
-            DataColumnGUI columnGUI = new DataColumnGUI(column);
+            DataColumnGUI columnGUI = new DataColumnGUI(column,jps,vpanel);
             dataColumnGUI.add(columnGUI);
-            add(columnGUI);
         }
+
+        jps.setPreferredSize(new Dimension(500, 500));
+
 
         System.out.println("Width: " + getRowSize() + " Height: " + getColumn());
         setVisible(true);
+    }
+    public JScrollPane getJps(){
+        return jps;
     }
     public int getRowSize() {
         return tableModel.getColumns().size();

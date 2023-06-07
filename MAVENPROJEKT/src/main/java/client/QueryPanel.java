@@ -117,18 +117,19 @@ public class QueryPanel extends JPanel implements Accessible, MenuElement {
 //        JPanel dataTableGUI = new DataTableGUI(dataTable);
         DataTableGUI jp =  new DataTableGUI(dataTable);
 
+        resultPanel.add(jp.getJps());
 //        resultPanel.setPreferredSize(dataTableGUI.getPreferredSize());
         System.out.println("===========================================");
-        JScrollPane rPanel = new JScrollPane(jp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//        JScrollPane rPanel = new JScrollPane(jp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 //
 //        rPanel.getVerticalScrollBar().setPreferredSize(new Dimension(20, 0));
 //        rPanel.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 20));
 //        rPanel.getVerticalScrollBar().setMaximum(20);
-        rPanel.getHorizontalScrollBar().setMaximum(20);
-        rPanel.getVerticalScrollBar().setUnitIncrement(20);
-        rPanel.getHorizontalScrollBar().setUnitIncrement(20);
+//        rPanel.getHorizontalScrollBar().setMaximum(20);
+//        rPanel.getVerticalScrollBar().setUnitIncrement(20);
+//        rPanel.getHorizontalScrollBar().setUnitIncrement(20);
 //        rPanel.setPreferredSize(jp.getPreferredSize());
-        resultPanel.add(rPanel);
+//        resultPanel.add(rPanel);
         resultPanel.revalidate();
         resultPanel.repaint();
         revalidate();
