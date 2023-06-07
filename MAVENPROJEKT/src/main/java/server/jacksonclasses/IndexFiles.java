@@ -12,7 +12,7 @@ public class IndexFiles implements java.io.Serializable {
         IndexFiles = indexFiles;
     }
 
-    public List<IndexFile> getIndexFiles() {
+    public List<IndexFile> getIndexFilesList() {
         return IndexFiles;
     }
 

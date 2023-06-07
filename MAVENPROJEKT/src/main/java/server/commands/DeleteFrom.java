@@ -135,7 +135,7 @@ public class DeleteFrom {
             MongoCollection<Document> collection = database.getCollection(tableName);
 
             // update indexes
-            List<IndexFile> indexFilesList = myTable.getIndexFiles().getIndexFiles();
+            List<IndexFile> indexFilesList = myTable.getIndexFiles().getIndexFilesList();
             if (indexFilesList != null) {
                 for (IndexFile indexFile : indexFilesList) {
                     String indexName = indexFile.get_indexName();

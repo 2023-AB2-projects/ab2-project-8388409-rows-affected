@@ -1,7 +1,10 @@
 package server.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import server.Parser;
@@ -12,7 +15,6 @@ import server.mongobongo.DataTable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 import static com.mongodb.client.MongoClients.create;
 import static com.mongodb.client.model.Filters.*;
@@ -25,7 +27,7 @@ public class Select {
     private final HashMap<Object, ArrayList<String>> whereClauseMap;
     private final HashMap<String, ArrayList<String>> selectedColumsMap;
     private final ArrayList<DataTable> resultTables;
-    private ArrayList<CatalogAndMongo> resultCatalogMongo;
+    private final ArrayList<CatalogAndMongo> resultCatalogMongo;
     private final ArrayList<String> selectedColums;
     private final String fromTable;
     private final String joinClause;
@@ -425,7 +427,7 @@ public class Select {
                     String indexType = "";
                     String indexName = "";
                     IndexFiles indexFiles = myTable.getIndexFiles();
-                    List<IndexFile> indexFileList = indexFiles.getIndexFiles();
+                    List<IndexFile> indexFileList = indexFiles.getIndexFilesList();
                     if (indexFileList == null) {
                         indexFileList = new ArrayList<>();
                         indexFiles.setIndexFiles(indexFileList);

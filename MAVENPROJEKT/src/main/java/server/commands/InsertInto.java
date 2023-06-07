@@ -20,6 +20,7 @@ import static com.mongodb.client.MongoClients.create;
 public class InsertInto {
     public InsertInto(String databaseName, String tableName, String contents, Parser parser) {
         tableName = tableName.trim();
+        System.out.println("Inserting into table " + tableName);
         String fullPK = "";
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -250,7 +251,11 @@ public class InsertInto {
 
             key = key.substring(0, key.length() - 1);
             fullPK = key;
-            value = value.substring(0, value.length() - 1);
+            if (value.equals("")) {
+                System.out.println("value is empty");
+            } else {
+                value = value.substring(0, value.length() - 1);
+            }
 
             System.out.println("Trying to connect to MongoDB");
             try (MongoClient mongoClient = create(connectionString)) {
@@ -269,7 +274,7 @@ public class InsertInto {
 
             // Update the indexes
             IndexFiles indexFiles = myTable.getIndexFiles();
-            List<IndexFile> indexFileList = indexFiles.getIndexFiles();
+            List<IndexFile> indexFileList = indexFiles.getIndexFilesList();
             if (indexFileList == null) {
                 indexFileList = new ArrayList<>();
                 indexFiles.setIndexFiles(indexFileList);

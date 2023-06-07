@@ -4,19 +4,16 @@ import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import server.Parser;
 import server.jacksonclasses.*;
-import java.util.*;
-
-import static com.mongodb.client.MongoClients.create;
-import static com.mongodb.client.model.Filters.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bson.Document;
 import server.mongobongo.DataTable;
 
-        import javax.print.Doc;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.mongodb.client.MongoClients.create;
 
 public class CatalogAndMongo {
 
@@ -24,7 +21,7 @@ public class CatalogAndMongo {
     private ArrayList<Document> mongo;
 
     private IndexFiles indexFiles;
-    private String connectionString = "mongodb://localhost:27017";
+    private final String connectionString = "mongodb://localhost:27017";
 
     public void setIndexFiles(IndexFiles indexFiles) {
         this.indexFiles = indexFiles;
@@ -65,7 +62,7 @@ public class CatalogAndMongo {
     public String getAttrIndexType(String attributeName){
         IndexFiles ind = this.catalog.getIndexFiles();
         if (ind == null) return null;
-        for (IndexFile indexFile : ind.getIndexFiles()) {
+        for (IndexFile indexFile : ind.getIndexFilesList()) {
             for (IndexAttribute indexAttribute : indexFile.getIndexAttributes()) {
                 if (indexAttribute.getIAttribute().equals(attributeName)) {
                     return indexFile.get_indexType();
@@ -253,11 +250,11 @@ public class CatalogAndMongo {
             return false;
         }
 
-        if (catalog.getIndexFiles().getIndexFiles() == null) {
+        if (catalog.getIndexFiles().getIndexFilesList() == null) {
             return false;
         }
 
-        for (IndexFile indexFile : catalog.getIndexFiles().getIndexFiles()) {
+        for (IndexFile indexFile : catalog.getIndexFiles().getIndexFilesList()) {
             for (IndexAttribute indexAttribute : indexFile.getIndexAttributes()) {
                 if (indexAttribute.getIAttribute().equals(attributeName)) {
                     return true;
@@ -271,15 +268,12 @@ public class CatalogAndMongo {
     public boolean isPrimaryKey(String attributeName){
         List<PrimaryKey> primaryKeys = catalog.getPrimaryKeys();
         List<String> primaryKeyNames = primaryKeys.stream().map(PrimaryKey::getPkAttribute).toList();
-        if (primaryKeyNames.contains(attributeName)) {
-            return true;
-        }
-        return false;
+        return primaryKeyNames.contains(attributeName);
     }
 
     public String getIndexName(String AttrName){
 
-        List<IndexFile> indexFiles = catalog.getIndexFiles().getIndexFiles();
+        List<IndexFile> indexFiles = catalog.getIndexFiles().getIndexFilesList();
         for (IndexFile indexFile : indexFiles) {
             if (indexFile.get_indexName().equals(AttrName)) {
                 return indexFile.get_indexName();

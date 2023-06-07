@@ -105,10 +105,10 @@ public class CreateIndex {
                 myTable.setIndexFiles(indexFiles);
             }
 
-            if (indexFiles.getIndexFiles() == null) {
+            if (indexFiles.getIndexFilesList() == null) {
                 indexFiles.setIndexFiles(new JSONArray());
             }
-            List<IndexFile> lif = indexFiles.getIndexFiles();
+            List<IndexFile> lif = indexFiles.getIndexFilesList();
             if (lif == null) {
                 lif = new JSONArray();
                 indexFiles.setIndexFiles(lif);
