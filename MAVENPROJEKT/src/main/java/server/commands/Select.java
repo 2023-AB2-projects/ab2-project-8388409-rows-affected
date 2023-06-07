@@ -788,27 +788,16 @@ public class Select {
 
         DataTable tmp = resultTables.get(0);
 
-//        for (String dcm : tmp.getColumnsName()) {
-////            if dcm contains . then split and check if table is in selected tables
-//
-//
-//            if (!tmpS.contains(dcm)) {
-//                System.out.println("Removing column: " + dcm);
-//                tmp.removeColumn(dcm);
-//            }
-//
-//        }
-//
-//        for (String s : tmpS) {
-//            for (DataColumnModel dcm : tmp.getColumns()) {
-//                if (dcm.getColumnName().equals(s)) {
-//                    rightOrder.add(dcm);
-//                }
-//            }
-//        }
+        for (String dcm : tmp.getColumnsName()) {
+//            if dcm contains . then split and check if table is in selected tables
 
-        tmp.setColumns(rightOrder);
+            if (!tmpS.contains(dcm)) {
+                System.out.println("Removing column: " + dcm);
+                tmp.removeColumn(dcm);
+            }
+        }
 
+        resultTables.set(0, tmp);
 
     }
     public void doit2(){
@@ -920,48 +909,6 @@ public class Select {
 
         }
 
-//
-////        addKeysToProjection(joinClause);
-//        System.out.println("Table projection map: ");
-//        for (ArrayList<String> columns1 : tableProjectionMap.values()) {
-//            for (String column : columns1) {
-//                System.out.print(column + " ");
-//            }
-//            System.out.println();
-//        }
-//
-//
-////              tableProjectionMap.get(fromTable)
-//        String[] tmp = new String[whereClauseMap.get(fromTable).size()];
-//        for (int i = 0; i < whereClauseMap.get(fromTable).size(); i++) {
-//            tmp[i] = whereClauseMap.get(fromTable).get(i);
-//            System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + tmp[i] + " Table: " + fromTable);
-//        }
-//        where(fromTable, tmp);
-//
-////        where(fromTable, whereClause);
-//
-//
-//        if (joinTables.length == 1 && joinTables[0].equals("")) {
-//            System.out.println("Join tables is empty");
-//            return;
-//        }
-//        for (int i = 0; i < joinTables.length; i++) {
-//            String[] empty = new String[whereClauseMap.get(joinTables[i]).size()];
-//
-//            for (int j = 0; j < whereClauseMap.get(joinTables[i]).size(); j++) {
-//                empty[j] = whereClauseMap.get(joinTables[i]).get(j);
-//                System.out.println(" --- -- - -- -- --  WHERE CLAUSE: " + empty[j] + " Table: " + joinTables[i]);
-//            }
-//
-////            System.out.println("WHERE JOIN TABLE: " + joinTables[i]);
-//            where(joinTables[i], empty);
-//        }
-//
-//
-//        System.out.println("Join clause is not empty");
-//        Join joinRes = new Join(resultTables, joinClause, joinKeys, parser);
-//        resultTables.set(0, joinRes.getResultTable());
     }
 
     private String[] joinTables(String joinClause) {

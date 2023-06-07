@@ -130,22 +130,6 @@ public class Join2 implements Serializable {
         return new CatalogAndMongo();
     }
 
-    public ArrayList<Document> findWithIndex(CatalogAndMongo table, String attr, String value) {
-        try (MongoClient mongoClient = create(connectionString)) {
-//            TODO:.... akkor  ajoina isss ke tuni h mire vam index
-            MongoDatabase db = mongoClient.getDatabase(table.getCatalog().get_tableName());
-
-            Bson filter = eq(attr, value);
-
-            return db.getCollection(table.getTableName()).find(filter).into(new ArrayList<>());
-
-        } catch (Exception e) {
-            System.out.println("Error in find");
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
-        throw new RuntimeException("Error in find");
-    }
 
     private CatalogAndMongo indexNextedLoop(CatalogAndMongo table1, CatalogAndMongo tabl2, String firstColumn, String secondColumn) {
 
