@@ -774,11 +774,9 @@ public class Select {
         }
 
         ArrayList<String> tmpS = new ArrayList<>();
+        ArrayList<DataColumnModel> rightOrder = new ArrayList<>();
 
         for (String c : selectedColums) {
-
-
-
 
             if (c.contains(".")) {
                 String[] split = c.split("\\.");
@@ -790,16 +788,28 @@ public class Select {
 
         DataTable tmp = resultTables.get(0);
 
-        for (String dcm : tmp.getColumnsName()) {
-//            if dcm contains . then split and check if table is in selected tables
+//        for (String dcm : tmp.getColumnsName()) {
+////            if dcm contains . then split and check if table is in selected tables
+//
+//
+//            if (!tmpS.contains(dcm)) {
+//                System.out.println("Removing column: " + dcm);
+//                tmp.removeColumn(dcm);
+//            }
+//
+//        }
+//
+//        for (String s : tmpS) {
+//            for (DataColumnModel dcm : tmp.getColumns()) {
+//                if (dcm.getColumnName().equals(s)) {
+//                    rightOrder.add(dcm);
+//                }
+//            }
+//        }
+
+        tmp.setColumns(rightOrder);
 
 
-            if (!tmpS.contains(dcm)) {
-                System.out.println("Removing column: " + dcm);
-                tmp.removeColumn(dcm);
-            }
-
-        }
     }
     public void doit2(){
 

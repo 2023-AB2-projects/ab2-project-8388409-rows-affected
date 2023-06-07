@@ -106,7 +106,13 @@ public class Join2 implements Serializable {
         try {
             joinCondition = joinCondition.trim();
             System.out.println("joinCondition" + joinCondition);
+
             String[] joinConditionArray = joinCondition.split("ON");
+
+            System.out.println("joinConditionArray 0" + joinConditionArray[0]);
+            System.out.println("joinConditionArray 1" + joinConditionArray[1]);
+
+
             String[] keys = joinConditionArray[1].split("=");
             String[] first = keys[0].split("\\.");
             String[] second = keys[1].split("\\.");
@@ -155,19 +161,20 @@ public class Join2 implements Serializable {
         System.out.println("firstTableIsIndexed " + firstTableIsIndexed);
         System.out.println("secondTableIsIndexed " + secondTableIsIndexed);
 
-        if (firstTableIsIndexed && secondTableIsIndexed) {
-            System.out.println("Both tables are indexed");
-            return indexNoIndex(table1, tabl2, firstColumn, secondColumn);
-        } else if (firstTableIsIndexed) {
-            System.out.println("First table is indexed");
-            return indexNoIndex(table1, tabl2, firstColumn, secondColumn);
-        } else if (secondTableIsIndexed) {
-            System.out.println("Second table is indexed");
-            return indexNoIndex(tabl2, table1, secondColumn, firstColumn);
-        } else {
-            System.out.println("No table is indexed");
-            return noIndexNoIndex(table1, tabl2, firstColumn, secondColumn);
-        }
+//        if (firstTableIsIndexed && secondTableIsIndexed) {
+//            System.out.println("Both tables are indexed");
+//            return indexNoIndex(table1, tabl2, firstColumn, secondColumn);
+//        } else if (firstTableIsIndexed) {
+//            System.out.println("First table is indexed");
+//            return indexNoIndex(table1, tabl2, firstColumn, secondColumn);
+//        } else if (secondTableIsIndexed) {
+//            System.out.println("Second table is indexed");
+//            return indexNoIndex(tabl2, table1, secondColumn, firstColumn);
+//        } else {
+//            System.out.println("No table is indexed");
+//            return noIndexNoIndex(table1, tabl2, firstColumn, secondColumn);
+//        }
+        return noIndexNoIndex(table1, tabl2, firstColumn, secondColumn);
 
     }
 
