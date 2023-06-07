@@ -183,7 +183,7 @@ public class Join2 implements Serializable {
 
                 String value1 = "";
                 String pk = doc1.getString("_id");
-                String row = doc1.getString("row");
+                String row = doc1.getString("row").strip();
 
                 if (table1.isPrimaryKey(firstColumn)){
                     value1 = pk;
@@ -195,7 +195,7 @@ public class Join2 implements Serializable {
 
                 String value2 = "";
                 String pk2 = doc2.getString("_id");
-                String row2 = doc2.getString("row");
+                String row2 = doc2.getString("row").strip();
 
                 if (table2.isPrimaryKey(secondColumn)){
                     value2 = pk2;
@@ -206,6 +206,23 @@ public class Join2 implements Serializable {
                 if (value1.equals(value2)){
                     Document document = new Document();
                     document.append("_id", pk + "#" + pk2);
+                    System.out.println("::::::::::::::::::: |" + row + "| |" + row2+"|");
+
+                    if (row.equals("") && row2.strip().equals("")){
+                        result.add(document);
+                        continue;
+                    }
+                    if (row.equals("")){
+                        document.append("row", row2);
+                        result.add(document);
+                        continue;
+                    }
+                    if (row2.equals("")){
+                        document.append("row", row);
+                        result.add(document);
+                        continue;
+                    }
+
                     document.append("row", row + "#" + row2);
                     result.add(document);
 
@@ -251,7 +268,7 @@ public class Join2 implements Serializable {
             for (Document document : tabla2.getMongo()) {
 
                 String pk = document.getString("_id");
-                String row = document.getString("row");
+                String row = document.getString("row").strip();
                 String[] rowParts = row.split("#");
 
                 if (tabla2.isPrimaryKey(secondColumn)) {
@@ -264,8 +281,28 @@ public class Join2 implements Serializable {
                 ArrayList<Document> found = db.getCollection(indexFileType).find(filter).into(new ArrayList<>());
                 for (Document doc : found) {
                     Document document1 = new Document();
+
+                    String pk1 = doc.getString("_id");
+                    String row1 = doc.getString("row").strip();
+
+                    System.out.println("PKKKKKK:  PK1 " + pk1 + " PK2 " + pk);
                     document1.append("_id", doc.getString("_id") + "#" + pk);
-                    document1.append("row", doc.getString("row") + "#" + row);
+
+                    if (row.equals(" ") && row1.equals(" ")) {
+                        intersection.add(document1);
+                        continue;
+                    }
+                    if (row1.equals("")) {
+                        document1.append("row", doc.getString("row"));
+                    }
+                    if (row.equals("")) {
+                        document1.append("row", row);
+                    }
+
+                    if (!row.equals("") && !row1.equals("")) {
+                        document1.append("row", row1 + "#" + row);
+                    }
+
                     System.out.println("document1 " + document1);
                     intersection.add(document1);
                 }

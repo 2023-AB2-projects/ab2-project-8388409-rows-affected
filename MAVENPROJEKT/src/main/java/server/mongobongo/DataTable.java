@@ -416,6 +416,12 @@ public class DataTable implements Serializable {
     }
 
     public void addRow(ArrayList<String> row) {
+
+        if (row.size() != columns.size()) {
+            System.out.println("A " + tableName + " rownak nem megfelelo a sor hossza");
+            return;
+        }
+
         for (int i = 0; i < row.size(); i++) {
             columns.get(i).addValue(row.get(i));
         }
