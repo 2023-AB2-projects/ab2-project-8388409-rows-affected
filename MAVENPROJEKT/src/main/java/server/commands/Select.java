@@ -775,6 +775,11 @@ public class Select {
         ArrayList<String> tmpS = new ArrayList<>();
 
         for (String c : selectedColums) {
+
+
+            System.out.println("S table: " + c);
+
+            tmpS.add(c);
             if (c.contains(".")) {
                 String[] split = c.split("\\.");
                 c = split[1];
@@ -786,6 +791,7 @@ public class Select {
         DataTable tmp = resultTables.get(0);
         for (String dcm : tmp.getColumnsName()) {
 //            if dcm contains . then split and check if table is in selected tables
+
 
             if (!tmpS.contains(dcm)) {
                 System.out.println("Removing column: " + dcm);
@@ -1118,7 +1124,7 @@ public class Select {
 
     public DataTable getResultTable() {
         try {
-            fiterSelectedTables();
+//            fiterSelectedTables();
             System.out.println("Result table: " + resultTables.get(0).getTableName());
 
             for (DataColumnModel c : resultTables.get(0).getColumns()) {
