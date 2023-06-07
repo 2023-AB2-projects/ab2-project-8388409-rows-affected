@@ -1,0 +1,91 @@
+Starting server...
+ab
+message sent to client: Welcome to the server!
+message received from client: select * FROM Termekek WHERE TID < 3
+|=> parsed command: select * FROM Termekek WHERE TID < 3| 
+Parser : select * FROM Termekek WHERE TID < 3
+SELECT
+- start: SELECT startindex: 0
+- end: FROM endindex: 9
+- ans: * 
+ --- --  Selected columns: 
+* 
+- start: FROM startindex: 9
+- end: WHERE endindex: 23
+- ans: Termekek 
+Table: Termekek
+
+Join clause: 
+
+
+Join tables: 
+ - start: WHERE startindex: 23
+- end: ORDER BY endindex: 36
+- ans: TID < 3
+AANNN= TID < 3
+()()()()()()()()()()()()()()WHERE CLAUSE: TID < 3 in table: Termekek
+WHERE CLAUSE: TID < 3
+Where clause: 
+|TID < 3| 
+Table projection map: 
+
+
+ --- -- - -- -- --  WHERE CLAUSE: TID < 3 Table: Termekek
+!!!!!!!!!!!!!!! indexFiles: server.jacksonclasses.IndexFiles@8909f18
+!!!!!!!!!!!!!!! whereClause[i]: TID < 3
+!!!!!!!!!!!!!!! nincs index  
+attrNames.get(i).getNev(): TID
+attributeIndexDB: 0
+attrNames.get(i).getNev(): GYID
+attrNames.get(i).getNev(): Tnev
+attrNames.get(i).getNev(): Tar
+attributeValueInt: 10
+valueInt: 30
+ ----- filteredDocuments (): [Document{{_id=1, row=2#MacBook Air M1#400}}]
+attrNames.get(i).getNev(): TID
+attributeIndexDB: 0
+attrNames.get(i).getNev(): GYID
+attrNames.get(i).getNev(): Tnev
+attrNames.get(i).getNev(): Tar
+attributeValueInt: 20
+valueInt: 30
+ ----- filteredDocuments (): [Document{{_id=1, row=2#MacBook Air M1#400}}, Document{{_id=2, row=2#MacBook Air M2#450}}]
+attrNames.get(i).getNev(): TID
+attributeIndexDB: 0
+attrNames.get(i).getNev(): GYID
+attrNames.get(i).getNev(): Tnev
+attrNames.get(i).getNev(): Tar
+attributeValueInt: 30
+valueInt: 30
+ ----- filteredDocuments (): [Document{{_id=1, row=2#MacBook Air M1#400}}, Document{{_id=2, row=2#MacBook Air M2#450}}]
+attrNames.get(i).getNev(): TID
+attributeIndexDB: 0
+attrNames.get(i).getNev(): GYID
+attrNames.get(i).getNev(): Tnev
+attrNames.get(i).getNev(): Tar
+attributeValueInt: 110
+valueInt: 30
+ ----- filteredDocuments (): [Document{{_id=1, row=2#MacBook Air M1#400}}, Document{{_id=2, row=2#MacBook Air M2#450}}]
+arrayLists.size() : 4
+++++ [Document{{_id=1, row=2#MacBook Air M1#400}}, Document{{_id=2, row=2#MacBook Air M2#450}}]
+++++ [Document{{_id=1, row=2#MacBook Air M1#400}}, Document{{_id=2, row=2#MacBook Air M2#450}}]
+++++ [Document{{_id=1, row=2#MacBook Air M1#400}}, Document{{_id=2, row=2#MacBook Air M2#450}}]
+Projecting columns[TID, GYID, Tnev, Tar]
+TID
+GYID
+Tnev
+Tar
+end
+|TID|
+!Adding column: TID
+|GYID|
+!Adding column: GYID
+|Tnev|
+!Adding column: Tnev
+|Tar|
+!Adding column: Tar
+Join tables is empty
+Result table: Termekek
+Selected table is not null
+message sent to client: Query executed successfully
+message size: 1248 bytes
