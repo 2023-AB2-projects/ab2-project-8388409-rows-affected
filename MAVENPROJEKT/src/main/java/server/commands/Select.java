@@ -529,7 +529,7 @@ public class Select {
 
     public String[] whereClause(String text) {
         String[] ans = new String[0];
-        String data = betweenString(text, "WHERE", "ORDER BY");
+        String data = betweenString(text, "WHERE", "GROUP BY");
         if (text.contains("AND")) {
             ans = data.split("AND");
 

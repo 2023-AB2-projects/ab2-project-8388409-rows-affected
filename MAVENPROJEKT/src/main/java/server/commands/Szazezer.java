@@ -20,7 +20,7 @@ import static com.mongodb.client.MongoClients.create;
 public class Szazezer {
     public Szazezer(Parser parser) {
         String connectionString = "mongodb://localhost:27017";
-        String databaseName = "db";
+        String databaseName = "galaga";
         String tableName = "tbl";
         List<Document> documents = new ArrayList<>();
         for (int i = 1; i <= 100000; i++) {
