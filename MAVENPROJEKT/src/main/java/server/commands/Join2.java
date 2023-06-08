@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import server.Parser;
 import server.jacksonclasses.Attribute;
+import server.jacksonclasses.Table;
 import server.mongobongo.DataTable;
 
 import javax.print.Doc;
@@ -123,7 +124,6 @@ public class Join2 implements Serializable {
 
             System.out.println("Error in Join Condition");
             System.out.println(e.getMessage());
-            resultTable = new CatalogAndMongo();
             e.printStackTrace();
         }
 
@@ -200,7 +200,20 @@ public class Join2 implements Serializable {
         CatalogAndMongo resultC = new CatalogAndMongo();
         resultC.setCatalog(table1.getCatalog());
         resultC.addCatalog(table2.getCatalog());
+
+        ArrayList<Attribute> at = resultC.getCatalog().zAttributumok();
+        for (Attribute a : at){
+            if (a.get_attributeName().equals(firstColumn)){
+                a.set_type("primary");
+            }
+            if (a.get_attributeName().equals(secondColumn)){
+                a.set_type("primary");
+            }
+        }
+
+
         resultC.setMongo(result);
+
         return resultC;
     }
 

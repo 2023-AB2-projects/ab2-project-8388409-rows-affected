@@ -298,7 +298,9 @@ public class CatalogAndMongo {
         for (Attribute attribute : catalog.getStructure().getAttributes()) {
             selected.add(attribute.get_attributeName());
         }
-        return new DataTable(mongo, catalog, selected,parser);
+        DataTable dataTable = new DataTable(mongo, catalog, selected,parser);
+        dataTable.setTableName(catalog.get_tableName());
+        return dataTable;
     }
 
 
@@ -336,12 +338,6 @@ public class CatalogAndMongo {
 //        add the argument catalog to the current catalog
 
         List<IndexFile> IndexFiles = new LinkedList<>();
-
-//        if (catalog.getIndexFiles() != null)
-//            IndexFiles.addAll(catalog.getIndexFiles().getIndexFiles());
-//
-//        if (Catalog.getIndexFiles() != null)
-//            IndexFiles.addAll(Catalog.getIndexFiles().getIndexFiles());
 
         String _tableName = catalog.get_tableName()+"_"+this.catalog.get_tableName();
 
@@ -383,10 +379,10 @@ public class CatalogAndMongo {
         for (Attribute attribute : Attributes) {
             System.out.println(" &&&&&& on merge Attributes: "+ attribute.get_attributeName());
         }
-
         Structure.setAttributes(Attributes);
 
         String _fileName = catalog.get_fileName()+"_"+this.catalog.get_fileName();
+        catalog.set_fileName(_fileName);
 
     }
 }
