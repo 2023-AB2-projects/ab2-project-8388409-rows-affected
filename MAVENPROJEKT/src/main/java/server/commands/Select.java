@@ -352,8 +352,7 @@ public class Select {
             System.out.println(" !!!!!! JOINNN Table: " + db.getTableName());
         }
         Join joinRes = new Join(resultTables, joinClause, joinKeys, parser);
-//        Join2 joinRes = new Join2(resultCatalogMongo, joinClause, joinKeys, currentDatabase, parser);
-//        resultTables.set(0, joinRes.getResultTable());
+
         resultTables.set(0, groupBY.processTable(joinRes.getResultTable()));
     }
 
@@ -401,7 +400,7 @@ public class Select {
             whereClauseMap.put(an.trim(), columns3);
         }
 
-        groupBY = new GroupBY(selectedColums, text , fromTable);
+        groupBY = new GroupBY(text , fromTable, selectedColums);
 
 
         whereClause = whereClause(text);
@@ -602,7 +601,7 @@ public class Select {
 
     public DataTable getResultTable() {
         try {
-            fiterSelectedTables();
+//            fiterSelectedTables();
             System.out.println("Result table: " + resultTables.get(0).getTableName());
 
             for (DataColumnModel c : resultTables.get(0).getColumns()) {

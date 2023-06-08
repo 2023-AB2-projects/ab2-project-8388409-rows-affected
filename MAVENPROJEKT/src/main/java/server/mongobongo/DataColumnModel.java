@@ -144,4 +144,8 @@ public class DataColumnModel implements Serializable {
     public String getRow(int index) {
         return this.values.get(index).toString();
     }
+
+    public void setValues(ArrayList<String> values) {
+        this.values = values;
+    }
 }

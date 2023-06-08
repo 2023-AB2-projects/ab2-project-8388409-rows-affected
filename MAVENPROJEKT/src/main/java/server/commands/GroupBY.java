@@ -5,8 +5,6 @@ import server.mongobongo.DataTable;
 //impoert bason document
 import org.bson.Document;
 
-import javax.print.Doc;
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,24 +15,22 @@ public class GroupBY {
     //    private HashMap<String, Integer> groupByMapResult;
     private String tableName;
 
+    ArrayList<String> selectColumns;
+
     private HashMap<String, HashMap<String, Integer>> groupByMapResultFull;
     private ArrayList<Document> operations;
     private String text;
     private String[] groupBy;
 
-    public GroupBY(ArrayList<String> selectedColumns, String text, String tableName) {
-
+    public GroupBY(String text, String tableName,ArrayList<String> selectColumns) {
+        this.selectColumns = selectColumns;
+        this.text = text;
+        this.tableName = tableName;
         groupByMap = new HashMap<>();
         groupByMapResultFull = new HashMap<>();
-
-//        init the groupByMapResult
-
-
         operations = new ArrayList<>();
-        this.tableName = tableName;
-        this.text = text;
-        processSelected(selectedColumns);
-
+        groupBy = null;
+        processSelected(selectColumns);
     }
 
     public void addToMap(String text, String type) {
@@ -169,18 +165,51 @@ public class GroupBY {
                 }
 
             }
-
-            System.out.println("================ results ================");
-            for (HashMap<String, Integer> partial : groupByMapResultFull.values()) {
-                System.out.println("partial: " + partial);
-                for(String k : partial.keySet()){
-                    System.out.println("key: " + k);
-                    System.out.println("value: " + partial.get(k));
-                }
-            }
-
-
         }
+//        ArrayList<DataColumnModel> resultColumns = new ArrayList<>();
+
+
+        ArrayList<DataColumnModel> resultColumns = new ArrayList<>();
+
+
+        System.out.println("================ results ================");
+
+        for (Document doc : operations) {
+            String type = doc.getString("type");
+            String name = doc.getString("name");
+            System.out.println("type: " + type);
+            System.out.println("name: " + name);
+            HashMap<String, Integer> partial = groupByMapResultFull.get(name + "_" + type);
+            DataColumnModel resultColumn = new DataColumnModel(type + "("+name+")", "int");
+            ArrayList<String> values = new ArrayList<>();
+            for (String k : partial.keySet()) {
+                System.out.println("key: " + k);
+                System.out.println("value: " + partial.get(k));
+                values.add(partial.get(k) + "");
+            }
+            resultColumn.setValues(values);
+            resultColumns.add(resultColumn);
+        }
+
+        for (HashMap<String, Integer> partial : groupByMapResultFull.values()) {
+
+//            DataColumnModel resultColumn = new DataColumnModel()
+
+            int indexC = 0;
+            System.out.println("partial: " + partial);
+            for(String k : partial.keySet()){
+                System.out.println("key: " + k);
+                System.out.println("value: " + partial.get(k));
+
+
+            }
+            indexC++;
+        }
+
+        DataTable result = new DataTable();
+        result.setColumns(resultColumns);
+
+        return new DataTable(result);
 
 
 //        for (int i = 0; i < size; i++) {
@@ -203,7 +232,6 @@ public class GroupBY {
 //        }
 //
 
-        return table;
 
     }
 
