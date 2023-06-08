@@ -155,15 +155,19 @@ public class GroupBY {
                     }
                 }
                 if (type.equals("AVG")) {
+
+
+
                     if (partial.containsKey(key)) {
 
                         partial.put(key, partial.get(key) + vInt);
-                        avgCount.put(key, avgCount.get(key) + 1);
+                        avgCount.put(key+type+name, avgCount.get(key+type+name) + 1);
 
                     } else {
                         System.out.println("not contains key");
                         partial.put(key, vInt);
-                        avgCount.put(key, 1);
+                        avgCount.put(key+type+name, 1);
+
                     }
                 }
 
@@ -217,7 +221,7 @@ public class GroupBY {
                 System.out.println("TYPE:" + type);
                 if (type.equals("AVG")) {
                     System.out.println("AVG");
-                    values.add((partial.get(k) / avgCount.get(k)) + "");
+                    values.add((partial.get(k) / avgCount.get(k+type+name)) + "");
                 } else {
                     values.add(partial.get(k) + "");
                 }
