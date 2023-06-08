@@ -183,11 +183,16 @@ public class GroupBY {
 
             ArrayList<DataColumnModel> groupByKeysCol = new ArrayList<>();
 
+            System.out.println("Selected columns: "+selectColumns.toString());
+
             for (int k =0 ;k<groupBy.length;k++){
 
-                DataColumnModel c = new DataColumnModel(groupBy[k],"VARCHAR");
-                groupByKeysCol.add(c);
-                resultColumns.add(c);
+                    if (selectColumns.contains(groupBy[k])) {
+                        System.out.println("------------ "+groupBy[k]+"selected");
+                        DataColumnModel c = new DataColumnModel(groupBy[k], "VARCHAR");
+                        groupByKeysCol.add(c);
+                        resultColumns.add(c);
+                    }
             }
 
             ArrayList<String> values = new ArrayList<>();
@@ -197,10 +202,11 @@ public class GroupBY {
 
                 String[] split = k.split("#");
 
-                for (int sk = 0;sk<split.length;sk++){
-                    groupByKeysCol.get(sk).addValue(split[sk]);
-                }
-
+                    for (int sk = 0; sk < split.length; sk++) {
+                        if (selectColumns.contains(groupBy[sk])) {
+                            groupByKeysCol.get(sk).addValue(split[sk]);
+                        }
+                    }
                 System.out.println("value: " + partial.get(k));
                 values.add(partial.get(k) + "");
             }
