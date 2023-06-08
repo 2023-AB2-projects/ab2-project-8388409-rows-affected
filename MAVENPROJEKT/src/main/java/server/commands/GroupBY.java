@@ -156,8 +156,6 @@ public class GroupBY {
                 }
                 if (type.equals("AVG")) {
 
-
-
                     if (partial.containsKey(key)) {
 
                         partial.put(key, partial.get(key) + vInt);
@@ -283,6 +281,9 @@ public class GroupBY {
                 String data = text.substring(text.indexOf("GROUP BY") + 9);
                 if (data.contains(",")) {
                     groupBy = data.split(",");
+                    for (int i = 0; i < groupBy.length; i++) {
+                        groupBy[i] = groupBy[i].strip();
+                    }
 
                 } else {
                     groupBy = new String[]{data.strip()};
