@@ -65,9 +65,10 @@ public class GroupBY {
 
     public DataTable processTable(DataTable table) {
 
-        if (groupByMapResultFull.isEmpty()) {
+        if (groupByMapResultFull.isEmpty() || groupBy==null) {
             return table;
         }
+
         System.out.println("*(********* * * ** *  GROUP BY ");
         System.out.println("GroupByMap: " + groupByMap);
         if (table == null) {
