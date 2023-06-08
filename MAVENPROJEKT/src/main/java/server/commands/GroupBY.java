@@ -49,7 +49,6 @@ public class GroupBY {
 
         HashMap<String, Integer> tmp = new HashMap<>();
 
-
         groupByMapResultFull.put(name + "_" + type, tmp);
 //        make a bson document
         Document document = new Document();
@@ -70,7 +69,6 @@ public class GroupBY {
         if (table == null) {
             return null;
         }
-
 
 
 //        egyre irjukk meg
@@ -101,7 +99,7 @@ public class GroupBY {
             String key = "";
             for (DataColumnModel o : oks) {
                 if (byThis.contains(o.getName())) {
-                    key += o.getValues().get(i);
+                    key += o.getValues().get(i)+"#";
                 }
                 System.out.println("value: " + o.getValues().get(i) + " column: " + o.getName());
             }
@@ -166,7 +164,6 @@ public class GroupBY {
 
             }
         }
-//        ArrayList<DataColumnModel> resultColumns = new ArrayList<>();
 
 
         ArrayList<DataColumnModel> resultColumns = new ArrayList<>();
@@ -177,13 +174,33 @@ public class GroupBY {
         for (Document doc : operations) {
             String type = doc.getString("type");
             String name = doc.getString("name");
+
             System.out.println("type: " + type);
             System.out.println("name: " + name);
+
             HashMap<String, Integer> partial = groupByMapResultFull.get(name + "_" + type);
             DataColumnModel resultColumn = new DataColumnModel(type + "("+name+")", "int");
+
+            ArrayList<DataColumnModel> groupByKeysCol = new ArrayList<>();
+
+            for (int k =0 ;k<groupBy.length;k++){
+
+                DataColumnModel c = new DataColumnModel(groupBy[k],"VARCHAR");
+                groupByKeysCol.add(c);
+                resultColumns.add(c);
+            }
+
             ArrayList<String> values = new ArrayList<>();
+
             for (String k : partial.keySet()) {
                 System.out.println("key: " + k);
+
+                String[] split = k.split("#");
+
+                for (int sk = 0;sk<split.length;sk++){
+                    groupByKeysCol.get(sk).addValue(split[sk]);
+                }
+
                 System.out.println("value: " + partial.get(k));
                 values.add(partial.get(k) + "");
             }
@@ -191,8 +208,9 @@ public class GroupBY {
             resultColumns.add(resultColumn);
         }
 
-        for (HashMap<String, Integer> partial : groupByMapResultFull.values()) {
 
+
+        for (HashMap<String, Integer> partial : groupByMapResultFull.values()) {
 //            DataColumnModel resultColumn = new DataColumnModel()
 
             int indexC = 0;
