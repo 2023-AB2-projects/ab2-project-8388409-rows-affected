@@ -121,7 +121,7 @@ public class Select {
         return catalogAndMongo;
     }
 
-    public DataTable where2(String fromTable, String[] whereClause){
+    public DataTable where2(String fromTable, String[] whereClause) {
         CatalogAndMongo catalogAndMongo = whereMiddleware(fromTable);
         catalogAndMongo = where2(catalogAndMongo, whereClause);
         resultCatalogMongo.add(catalogAndMongo);
@@ -152,8 +152,8 @@ public class Select {
                 String attributeName = cond[0];
                 String operator = cond[1];
                 String value = cond[2];
-                if( cond.length > 2) {
-                    for (int k=3; k<cond.length; k++) {
+                if (cond.length > 2) {
+                    for (int k = 3; k < cond.length; k++) {
                         value += " " + cond[k];
                     }
                 }
@@ -202,10 +202,10 @@ public class Select {
 
                 }
 
-            ArrayList<Document> collections = getTableFromMongo(currentTable.getTableName());
-            currentTable.setMongo(collections);
-            ArrayList<Document> filteredDocuments = currentTable.filter(attributeName, operator, value);
-            arrayLists.add(filteredDocuments);
+                ArrayList<Document> collections = getTableFromMongo(currentTable.getTableName());
+                currentTable.setMongo(collections);
+                ArrayList<Document> filteredDocuments = currentTable.filter(attributeName, operator, value);
+                arrayLists.add(filteredDocuments);
 
             }
 
@@ -213,7 +213,7 @@ public class Select {
             System.out.println("arrayLists.size() : " + arrayLists.size());
             for (int k = 1; k < arrayLists.size(); k++) {
                 result = ArrayListIntersection(result, arrayLists.get(k));
-                System.out.println("++++ "+arrayLists.get(k));
+                System.out.println("++++ " + arrayLists.get(k));
             }
             currentTable.setMongo(result);
         }
@@ -305,7 +305,8 @@ public class Select {
         resultTables.set(0, tmp);
 
     }
-    public void doit2(){
+
+    public void doit2() {
 
 //        addKeysToProjection(joinClause);
         System.out.println("Table projection map: ");
@@ -348,7 +349,7 @@ public class Select {
 
         System.out.println("Join clause is not empty");
 
-        for (DataTable db: resultTables){
+        for (DataTable db : resultTables) {
             System.out.println(" !!!!!! JOINNN Table: " + db.getTableName());
         }
         Join joinRes = new Join(resultTables, joinClause, joinKeys, parser);
@@ -400,7 +401,7 @@ public class Select {
             whereClauseMap.put(an.trim(), columns3);
         }
 
-        groupBY = new GroupBY(text , fromTable, selectedColums);
+        groupBY = new GroupBY(text, fromTable, selectedColums);
 
 
         whereClause = whereClause(text);
@@ -521,8 +522,8 @@ public class Select {
             return data.trim();
         }
 
-            String data = betweenString(text, "INNER JOIN", "GROUP BY");
-            return data.trim();
+        String data = betweenString(text, "INNER JOIN", "GROUP BY");
+        return data.trim();
 
 //
     }
@@ -543,47 +544,53 @@ public class Select {
         }
 
         ArrayList<String> chars = new ArrayList<>();
+        chars.add("!=");
+        chars.add(">=");
+        chars.add("<=");
         chars.add("=");
         chars.add(">");
         chars.add("<");
-        chars.add(">=");
-        chars.add("<=");
 
 
         for (String an : ans) {
+            boolean mached = false;
 //           table.column = table.column
 
+
             for (String elv : chars) {
-                if (an.contains(elv)) {
-                    System.out.println("AANNN= " + an);
-                    String cond1 = an.split(elv)[0].trim();
-                    String cond2 = an.split(elv)[1].trim();
-                    String sTable = "";
-                    String sColumn = "";
-                    String other = "";
-                    if (cond1.contains(".")) {
-                        sTable = cond1.split("\\.")[0].trim();
-                        sColumn = cond1.split("\\.")[1].trim();
-                        other = cond2;
-                    }
-                    if (cond2.contains(".")) {
-                        sTable = cond2.split("\\.")[0].trim();
-                        sColumn = cond2.split("\\.")[1].trim();
-                        other = cond1;
-                    }
+                if (!mached) {
+                    if (an.contains(elv)) {
+                        System.out.println("AANNN= " + an);
+                        String cond1 = an.split(elv)[0].trim();
+                        String cond2 = an.split(elv)[1].trim();
+                        String sTable = "";
+                        String sColumn = "";
+                        String other = "";
+                        if (cond1.contains(".")) {
+                            sTable = cond1.split("\\.")[0].trim();
+                            sColumn = cond1.split("\\.")[1].trim();
+                            other = cond2;
+                        }
+                        if (cond2.contains(".")) {
+                            sTable = cond2.split("\\.")[0].trim();
+                            sColumn = cond2.split("\\.")[1].trim();
+                            other = cond1;
+                        }
 
 
-                    if (sTable.equals("")) {
-                        sTable = this.fromTable;
-                        ArrayList<String> wheres1 = whereClauseMap.get(sTable);
-                        wheres1.add(an);
-                        System.out.println("()()()()()()()()()()()()()()WHERE CLAUSE: " + an + " in table: " + sTable);
-                        continue;
-                    }
+                        if (sTable.equals("")) {
+                            sTable = this.fromTable;
+                            ArrayList<String> wheres1 = whereClauseMap.get(sTable);
+                            wheres1.add(an);
+                            System.out.println("()()()()()()()()()()()()()()WHERE CLAUSE: " + an + " in table: " + sTable);
+                            mached = true;
+                        }
 
-                    ArrayList<String> wheres = whereClauseMap.get(sTable);
-                    wheres.add(sColumn + " " + elv + " " + other);
-                    System.out.println("()()()()()()()()()()()()()()WHERE CLAUSE: " + sColumn + " = " + other + " in table: " + sTable);
+                        ArrayList<String> wheres = whereClauseMap.get(sTable);
+                        wheres.add(sColumn + " " + elv + " " + other);
+                        System.out.println("()()()()()()()()()()()()()()WHERE CLAUSE: " + sColumn + " = " + other + " in table: " + sTable);
+                        mached = true;
+                    }
                 }
             }
 
@@ -610,7 +617,6 @@ public class Select {
                     System.out.println("Result table data: " + s);
                 }
             }
-
 
 
             return new DataTable(resultTables.get(0));
