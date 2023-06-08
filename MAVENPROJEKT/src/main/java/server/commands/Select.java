@@ -296,7 +296,7 @@ public class Select {
         for (String dcm : tmp.getColumnsName()) {
 //            if dcm contains . then split and check if table is in selected tables
 
-            if (!tmpS.contains(dcm)) {
+            if (!tmpS.contains(dcm) && !dcm.contains("MAX") && !dcm.contains("MIN") && !dcm.contains("AVG") && !dcm.contains("COUNT") && !dcm.contains("SUM")) {
                 System.out.println("Removing column: " + dcm);
                 tmp.removeColumn(dcm);
             }
@@ -601,7 +601,7 @@ public class Select {
 
     public DataTable getResultTable() {
         try {
-//            fiterSelectedTables();
+            fiterSelectedTables();
             System.out.println("Result table: " + resultTables.get(0).getTableName());
 
             for (DataColumnModel c : resultTables.get(0).getColumns()) {

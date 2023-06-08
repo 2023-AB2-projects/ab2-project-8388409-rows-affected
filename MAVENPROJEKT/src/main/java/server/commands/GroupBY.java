@@ -17,6 +17,7 @@ public class GroupBY {
 
     ArrayList<String> selectColumns;
 
+    private HashMap<String, Integer> avgCount;
     private HashMap<String, HashMap<String, Integer>> groupByMapResultFull;
     private ArrayList<Document> operations;
     private String text;
@@ -26,6 +27,7 @@ public class GroupBY {
         this.selectColumns = selectColumns;
         this.text = text;
         this.tableName = tableName;
+        avgCount = new HashMap<>();
         groupByMap = new HashMap<>();
         groupByMapResultFull = new HashMap<>();
         operations = new ArrayList<>();
@@ -93,7 +95,6 @@ public class GroupBY {
 
         ArrayList<String> byThis = new ArrayList<>(Arrays.asList(groupBy));
 
-
         for (int i = 0; i < size; i++) {
 
             String key = "";
@@ -155,10 +156,14 @@ public class GroupBY {
                 }
                 if (type.equals("AVG")) {
                     if (partial.containsKey(key)) {
+
                         partial.put(key, partial.get(key) + vInt);
+                        avgCount.put(key, avgCount.get(key) + 1);
+
                     } else {
                         System.out.println("not contains key");
                         partial.put(key, vInt);
+                        avgCount.put(key, 1);
                     }
                 }
 
@@ -207,8 +212,15 @@ public class GroupBY {
                             groupByKeysCol.get(sk).addValue(split[sk]);
                         }
                     }
+
                 System.out.println("value: " + partial.get(k));
-                values.add(partial.get(k) + "");
+                System.out.println("TYPE:" + type);
+                if (type.equals("AVG")) {
+                    System.out.println("AVG");
+                    values.add((partial.get(k) / avgCount.get(k)) + "");
+                } else {
+                    values.add(partial.get(k) + "");
+                }
             }
             resultColumn.setValues(values);
             resultColumns.add(resultColumn);
