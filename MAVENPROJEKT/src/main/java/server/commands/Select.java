@@ -375,7 +375,7 @@ public class Select {
         }
         System.out.println();
         fromTable = fromTables(text);
-        System.out.println("Table: " + fromTable);
+        System.out.println("Table: " + fromTable + "|");
         ArrayList<String> columns = new ArrayList<>();
         tableProjectionMap.put(fromTable.trim(), columns);
 
