@@ -596,12 +596,14 @@ public class Select {
                             wheres1.add(an);
                             System.out.println("()()()()()()()()()()()()()()WHERE CLAUSE: " + an + " in table: " + sTable);
                             mached = true;
+                            break;
                         }
 
                         ArrayList<String> wheres = whereClauseMap.get(sTable);
                         wheres.add(sColumn + " " + elv + " " + other);
                         System.out.println("()()()()()()()()()()()()()()WHERE CLAUSE: " + sColumn + " = " + other + " in table: " + sTable);
                         mached = true;
+                        break;
                     }
                 }
             }
