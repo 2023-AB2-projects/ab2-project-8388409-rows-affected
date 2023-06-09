@@ -241,7 +241,6 @@ public class GroupBY {
 
 
             }
-            indexC++;
         }
 
         DataTable result = new DataTable();
@@ -249,26 +248,6 @@ public class GroupBY {
 
         return new DataTable(result);
 
-
-//        for (int i = 0; i < size; i++) {
-//            String key = "";
-//            for (DataColumnModel o : oks) {
-//                key += o.getValues().get(i);
-//            }
-//
-//            System.out.println("key: " + key);
-//            if (groupByMapResult.containsKey(key)) {
-//                groupByMapResult.put(key, groupByMapResult.get(key) + 1);
-//            } else {
-//                groupByMapResult.put(key, 1);
-//            }
-//        }
-//
-//        for (String key : groupByMapResult.keySet()){
-//            System.out.println("key: " + key);
-//            System.out.println("value: " + groupByMapResult.get(key));
-//        }
-//
 
 
     }

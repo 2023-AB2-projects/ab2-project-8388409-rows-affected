@@ -425,9 +425,13 @@ public class Select {
     private String[] joinTables(String joinClause) {
         ArrayList<String> ans = new ArrayList<>();
         String[] joinClauseSplit = joinClause.split(" ");
+
+
         ans.add(joinClauseSplit[0]);
         for (int i = 1; i < joinClauseSplit.length; i++) {
             if (joinClauseSplit[i].equals("JOIN")) {
+
+
                 ans.add(joinClauseSplit[i + 1]);
             }
         }
@@ -444,7 +448,7 @@ public class Select {
         int startindex = textUpper.indexOf(start.toUpperCase());
         int endindex = textUpper.indexOf(end.toUpperCase());
 
-        if (startindex == -1 && endindex == -1) {
+        if (startindex == -1) {
             return ans;
         }
 
@@ -530,7 +534,15 @@ public class Select {
 
     public String[] whereClause(String text) {
         String[] ans = new String[0];
+
+
+
         String data = betweenString(text, "WHERE", "GROUP BY");
+
+        System.out.println();
+        System.out.println("------------------------WHERE CLAUSE: " + data);
+        System.out.println();
+
         if (text.contains("AND")) {
             ans = data.split("AND");
 
