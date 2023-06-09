@@ -19,9 +19,18 @@ public class GroupBY {
 
     private HashMap<String, Integer> avgCount;
     private HashMap<String, HashMap<String, Integer>> groupByMapResultFull;
+
+    private HashMap<String, Integer> partial;
+
     private ArrayList<Document> operations;
     private String text;
     private String[] groupBy;
+
+    private HashMap<String, Integer> sum = new HashMap<>();
+    private HashMap<String, Integer> min = new HashMap<>();
+    private HashMap<String, Integer> max = new HashMap<>();
+    private HashMap<String, Integer> avg = new HashMap<>();
+    private HashMap<String, Integer> count = new HashMap<>();
 
     public GroupBY(String text, String tableName,ArrayList<String> selectColumns) {
         this.selectColumns = selectColumns;
@@ -31,6 +40,7 @@ public class GroupBY {
         groupByMap = new HashMap<>();
         groupByMapResultFull = new HashMap<>();
         operations = new ArrayList<>();
+        partial = new HashMap<>();
         groupBy = null;
         processSelected(selectColumns);
     }
@@ -94,7 +104,7 @@ public class GroupBY {
         }
 
         ArrayList<String> byThis = new ArrayList<>(Arrays.asList(groupBy));
-
+        ArrayList<String> uniqueKeys = new ArrayList<>();
         for (int i = 0; i < size; i++) {
 
             String key = "";
@@ -114,59 +124,74 @@ public class GroupBY {
                 System.out.println("name: " + name);
 
 //                full bol lekerjuk
-                HashMap<String, Integer> partial = groupByMapResultFull.get(name + "_" + type);
 
 //                type es namefeltoli a sajat Hasehe
+
+
                 String v = table.getColumn(name).getValues().get(i);
+                String fullkey = key+type+name;
                 System.out.println("value: " + v);
                 int vInt = Integer.parseInt(v);
+
                 if (type.equals("MAX")) {
 
-                    if (partial.containsKey(key)) {
-                        partial.put(key, Math.max(partial.get(key), vInt));
+                    if (max.containsKey(fullkey)) {
+                        max.put(fullkey, Math.max(max.get(fullkey), vInt));
                     } else {
                         System.out.println("not contains key");
-                        partial.put(key, vInt);
+                        max.put(fullkey, vInt);
+                        uniqueKeys.add(fullkey);
                     }
                 }
+
                 if (type.equals("MIN")) {
 
-                    if (partial.containsKey(key)) {
-                        partial.put(key, Math.min(partial.get(key), vInt));
+
+                    if (min.containsKey(fullkey)) {
+                        min.put(fullkey, Math.min(min.get(fullkey), vInt));
                     } else {
                         System.out.println("not contains key");
-                        partial.put(key, vInt);
+                        min.put(fullkey, vInt);
+                        uniqueKeys.add(fullkey);
                     }
                 }
                 if (type.equals("SUM")) {
-                    if (partial.containsKey(key)) {
-                        partial.put(key, partial.get(key) + vInt);
-                    } else {
-                        System.out.println("not contains key");
-                        partial.put(key, vInt);
-                    }
+
+                        if (sum.containsKey(fullkey)) {
+                            sum.put(fullkey, sum.get(fullkey) + vInt);
+                        } else {
+                            System.out.println("not contains key");
+                            sum.put(fullkey, vInt);
+                            uniqueKeys.add(fullkey);
+                        }
                 }
-                if (type.equals("COUNT")) {
-                    if (partial.containsKey(key)) {
-                        partial.put(key, partial.get(key) + 1);
+                if (type.equals("CNT")) {
+
+
+                    if (count.containsKey(fullkey)) {
+                        count.put(fullkey, count.get(fullkey) + 1);
                     } else {
                         System.out.println("not contains key");
-                        partial.put(key, 1);
+                        count.put(fullkey, 1);
+                        uniqueKeys.add(fullkey);
                     }
                 }
                 if (type.equals("AVG")) {
 
-                    if (partial.containsKey(key)) {
+                        if (avg.containsKey(fullkey)) {
 
-                        partial.put(key, partial.get(key) + vInt);
-                        avgCount.put(key+type+name, avgCount.get(key+type+name) + 1);
+                            avg.put(fullkey, avg.get(fullkey) + vInt);
+                            avgCount.put(fullkey, avgCount.get(fullkey) + 1);
 
-                    } else {
-                        System.out.println("not contains key");
-                        partial.put(key, vInt);
-                        avgCount.put(key+type+name, 1);
+                        } else {
+                            System.out.println("not contains key");
 
-                    }
+                            System.out.println("AVG FULLKEY:"+fullkey);
+                            avg.put(fullkey, vInt);
+                            avgCount.put(fullkey, 1);
+                            uniqueKeys.add(fullkey);
+
+                        }
                 }
 
             }
@@ -177,6 +202,24 @@ public class GroupBY {
 
 
         System.out.println("================ results ================");
+        DataTable result = new DataTable();
+        System.out.println("partial: " + partial);
+
+        ArrayList<DataColumnModel> groupByKeysCol = new ArrayList<>();
+
+        int length = 0;
+        for (int k = 0; k < groupBy.length; k++) {
+
+            if (selectColumns.contains(groupBy[k])) {
+                System.out.println("------------ " + groupBy[k] + "selected");
+                DataColumnModel c = new DataColumnModel(groupBy[k], "VARCHAR");
+                groupByKeysCol.add(c);
+                resultColumns.add(c);
+                length++;
+//                result.addColumn(c);
+            }
+
+        }
 
         for (Document doc : operations) {
             String type = doc.getString("type");
@@ -184,66 +227,58 @@ public class GroupBY {
 
             System.out.println("type: " + type);
             System.out.println("name: " + name);
+            System.out.println("-------------aggregate" + type + "(" + name + ")");
+            DataColumnModel c  = new DataColumnModel(type + "(" + name + ")", "int");
+//            result.addColumn(c);
+            resultColumns.add(c);
+            length++;
+        }
 
-            HashMap<String, Integer> partial = groupByMapResultFull.get(name + "_" + type);
-            DataColumnModel resultColumn = new DataColumnModel(type + "("+name+")", "int");
+        int pozSum = length -5;
+        int pozAvg = length -4;
+        int pozMin = length -3;
+        int pozMax = length -2;
+        int pozCnt = length -1;
 
-            ArrayList<DataColumnModel> groupByKeysCol = new ArrayList<>();
+        for (String uk : uniqueKeys){
 
-            System.out.println("Selected columns: "+selectColumns.toString());
-
-            for (int k =0 ;k<groupBy.length;k++){
-
-                    if (selectColumns.contains(groupBy[k])) {
-                        System.out.println("------------ "+groupBy[k]+"selected");
-                        DataColumnModel c = new DataColumnModel(groupBy[k], "VARCHAR");
-                        groupByKeysCol.add(c);
-                        resultColumns.add(c);
-                    }
+            String split[] = uk.split("#");
+            String typeNattr = split[split.length-1];
+            String type = typeNattr.substring(0, 3);
+            String name = typeNattr.substring(3, typeNattr.length());
+            ArrayList<String> columns = new ArrayList<>();
+            for (int i = 0; i < split.length-1; i++) {
+                columns.add(split[i]);
             }
+            System.out.println("split: "+Arrays.toString(columns.toArray()) + " type: "+type + " name: "+name+"value: "+sum.get(uk));
 
-            ArrayList<String> values = new ArrayList<>();
-
-            for (String k : partial.keySet()) {
-                System.out.println("key: " + k);
-
-                String[] split = k.split("#");
-
-                    for (int sk = 0; sk < split.length; sk++) {
-                        if (selectColumns.contains(groupBy[sk])) {
-                            groupByKeysCol.get(sk).addValue(split[sk]);
-                        }
-                    }
-
-                System.out.println("value: " + partial.get(k));
-                System.out.println("TYPE:" + type);
-                if (type.equals("AVG")) {
-                    System.out.println("AVG");
-                    values.add((partial.get(k) / avgCount.get(k+type+name)) + "");
-                } else {
-                    values.add(partial.get(k) + "");
+            if (type.equals("SUM")) {
+                resultColumns.get(pozSum).addValue(String.valueOf(sum.get(uk)));
+                for (int i = 0; i < columns.size(); i++) {
+                    resultColumns.get(i).addValue(columns.get(i));
                 }
             }
-            resultColumn.setValues(values);
-            resultColumns.add(resultColumn);
-        }
 
-
-
-        for (HashMap<String, Integer> partial : groupByMapResultFull.values()) {
-//            DataColumnModel resultColumn = new DataColumnModel()
-
-            int indexC = 0;
-            System.out.println("partial: " + partial);
-            for(String k : partial.keySet()){
-                System.out.println("key: " + k);
-                System.out.println("value: " + partial.get(k));
-
-
+            if (type.equals("AVG")) {
+                resultColumns.get(pozAvg).addValue(String.valueOf(avg.get(uk)/avgCount.get(uk)));
             }
+
+            if (type.equals("MAX")) {
+             resultColumns.get(pozMax).addValue(String.valueOf(max.get(uk)));
+            }
+
+            if (type.equals("MIN")) {
+                resultColumns.get(pozMin).addValue(String.valueOf(min.get(uk)));
+            }
+
+            if (type.equals("CNT")) {
+                resultColumns.get(pozCnt).addValue(String.valueOf(count.get(uk)));
+            }
+
         }
 
-        DataTable result = new DataTable();
+
+
         result.setColumns(resultColumns);
 
         return new DataTable(result);
@@ -283,7 +318,7 @@ public class GroupBY {
                 } else if (attr.contains("SUM")) {
                     addToMap(attr, "SUM");
                 } else if (attr.contains("COUNT")) {
-                    addToMap(attr, "COUNT");
+                    addToMap(attr, "CNT");
                 }
 
             }

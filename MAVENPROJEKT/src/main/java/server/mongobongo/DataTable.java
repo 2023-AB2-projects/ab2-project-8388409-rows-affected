@@ -463,4 +463,7 @@ public class DataTable implements Serializable {
         }
     }
 
+    public void addColumn(DataColumnModel c) {
+        columns.add(c);
+    }
 }
